@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 仅保留最基础的重置，不在这里写 fixed，防止破坏详情页 */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  color: white;
+  min-height: 100%;
+}
+
+/* 移除 3D 画布底部的多余间隙 */
+canvas {
+  display: block;
+}
