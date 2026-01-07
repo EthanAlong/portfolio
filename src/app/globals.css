@@ -2,16 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 仅保留最基础的重置，不在这里写 fixed，防止破坏详情页 */
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: black;
-  color: white;
-  min-height: 100%;
+* {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
-/* 移除 3D 画布底部的多余间隙 */
+html, body, main {
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+
+/* 确保 Canvas 没有任何缩放偏移 */
 canvas {
-  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* 隐藏所有元素的滚动条，但依然可以滚动 */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari and Opera */
 }
