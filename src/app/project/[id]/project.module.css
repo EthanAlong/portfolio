@@ -1,69 +1,226 @@
 /* src/app/project/[id]/project.module.css */
 
-.splitRoot {
+.projectTheme {
+  /* =============================================
+     【设计师控制台 - 控制所有物理参数】
+     ============================================= */
+
+  /* 1. 全局布局比例 */
+  --sidebar-width: 38.2%;
+  --viewport-width: 61.8%;
+  --bg-color: #ffffff;
+  --fg-color: #000000;
+
+  /* 2. 左侧侧边栏 (Sidebar) */
+  --sidebar-padding: 5rem 4rem;      /* 侧边栏内边距 */
+  --title-size: clamp(3rem, 5.5vw, 6.5rem); /* 项目名称大小 */
+  --title-weight: 900;               /* 项目名称粗细 */
+  --title-line-height: 0.85;         /* 项目名称行高 */
+  --title-tracking: -0.06em;         /* 项目名称字间距 */
+
+  --btn-size: 2.8rem;                /* ALL PROJECTS 按钮大小 */
+  --btn-weight: 900;                 /* 按钮粗细 */
+
+  /* 3. 右侧容器 (Viewport & Container) */
+  --container-width: 80%;            /* 内容占据右仓的宽度 */
+  --container-padding-top: 5vh;     /* 【新增】右仓内容离最顶部的距离 */
+  --container-padding-bottom: 25vh;  /* 右仓底部留白 */
+
+  /* 4. 引言 (Briefing) */
+  --briefing-size: clamp(1rem, 3.5vw, 2rem); 
+  --briefing-weight: 400;            /* 引言粗细 */
+  --briefing-bottom: 4vh;           /* 引言离主图的距离 */
+
+  /* 5. 主图 (Hero Image) */
+  --hero-scale: 100%;                /* 主图宽度 */
+  --hero-bottom: 4vh;               /* 主图离矩阵的距离 */
+
+  /* 6. 参数矩阵 (Meta Grid) */
+  --meta-row-height: 10rem;          /* 每一行的高度 */
+  --meta-label-size: 10px;           /* 标签字号 (如 LOCATION) */
+  --meta-value-size: 15px;           /* 内容字号 (如 FOSHAN) */
+  --meta-value-weight: 600;          /* 内容粗细 */
+  --meta-bottom: 8vh;               /* 矩阵离后续内容的距离 */
+
+  /* =============================================
+     【系统底层逻辑 - 自动同步变量】
+     ============================================= */
+
   display: flex !important;
-  flex-direction: row !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  overflow: hidden !important;
-  background-color: #ffffff;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--fg-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
   box-sizing: border-box;
 }
 
+.projectTheme * {
+  box-sizing: border-box;
+}
+
+/* --- 左侧侧边栏 --- */
 .sidebar {
-  width: 38.2% !important;
+  width: var(--sidebar-width) !important;
   height: 100%;
   flex-shrink: 0;
-  border-right: 1px solid #000000;
-  background-color: #ffffff;
+  border-right: 1px solid var(--fg-color);
+  padding: var(--sidebar-padding);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-sizing: border-box;
-  z-index: 10;
+  z-index: 100;
+  background-color: var(--bg-color);
 }
 
-.viewport {
-  width: 61.8% !important;
+.projectTitle {
+  font-size: var(--title-size);
+  font-weight: var(--title-weight);
+  line-height: var(--title-line-height);
+  letter-spacing: var(--title-tracking);
+  margin: 0;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: revealFromLeft 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.5s;
+}
+
+@keyframes revealFromLeft {
+  0% { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-20px); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); }
+}
+
+/* ALL PROJECTS 按钮 (墨水填充动效) */
+.actionLink {
+  position: relative;
+  display: inline-block;
+  font-size: var(--btn-size);
+  font-weight: var(--btn-weight);
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  color: var(--fg-color);
+  padding: 0.5rem 1rem 0.5rem 0;
+  z-index: 1;
+  transition: color 0.4s ease;
+  opacity: 0;
+  animation: fadeInOnly 1s ease forwards 1.2s;
+}
+
+.actionLink::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -1rem;
+  width: 0;
   height: 100%;
-  overflow-y: auto;
+  background-color: var(--fg-color);
+  z-index: -1;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.actionLink:hover { color: var(--bg-color); }
+.actionLink:hover::before { width: calc(100% + 2rem); }
+
+/* --- 右侧视口 --- */
+.viewport {
+  width: var(--viewport-width) !important;
+  height: 100%;
+  overflow-y: auto !important;
   overflow-x: hidden;
-  background-color: #ffffff;
-  /* 确保内部元素可以根据 margin: auto 居中 */
   display: flex;
   flex-direction: column;
-  align-items: center; 
-  box-sizing: border-box;
-  /* 隐藏滚动条 */
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  align-items: center;
+  transform: translateZ(0);
 }
 
-.viewport::-webkit-scrollbar {
-  display: none;
-}
-
-/* 核心留白容器 */
 .container {
+  width: var(--container-width) !important;
+  max-width: 1400px;
+  margin: 0 auto;
+  /* 使用控制台变量控制顶部和底部距离 */
+  padding: var(--container-padding-top) 0 var(--container-padding-bottom) 0;
+}
+
+/* --- 引言样式 --- */
+.briefingText {
+  font-size: var(--briefing-size);
+  font-weight: var(--briefing-weight);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  margin-bottom: var(--briefing-bottom);
+  text-transform: uppercase;
+}
+
+/* --- 主图样式 --- */
+.heroWrapper {
+  width: var(--hero-scale);
+  margin-bottom: var(--hero-bottom);
+}
+
+/* --- 3列 2排 矩阵 --- */
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   width: 100%;
-  /* 限制最大宽度，防止在大屏幕上图片变得无限大 */
-  max-width: 1400px; 
-  /* 这里的 padding 就是你需要的“左右留白” */
-  padding: 10rem 10% 20rem 10% !important; 
+  border-top: 2px solid var(--fg-color);
+  margin-bottom: var(--meta-bottom);
+}
+
+.metaItem {
+  height: var(--meta-row-height);
+  padding: 2rem 0;
+  border-bottom: 1px solid #eee;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
-.magazineImg {
-  width: 100% !important;
-  height: auto !important;
-  display: block;
-  filter: grayscale(100%);
-  transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  background-color: #f7f7f7;
+.metaItem:nth-child(3n+1), 
+.metaItem:nth-child(3n+2) {
+  border-right: 1px solid #eee;
+  padding-right: 2vw;
 }
 
-.magazineImg:hover {
-  filter: grayscale(0%);
+.metaItem:nth-child(3n+2),
+.metaItem:nth-child(3n) {
+  padding-left: 2vw;
 }
+
+.metaLabel { 
+  font-size: var(--meta-label-size); 
+  font-weight: 900; 
+  text-transform: uppercase; 
+  color: #999; 
+  letter-spacing: 0.1em; 
+}
+
+.metaValue { 
+  font-size: var(--meta-value-size); 
+  font-weight: var(--meta-value-weight); 
+  text-transform: uppercase; 
+  margin-top: 0.4rem; 
+}
+
+/* --- 滚动淡入动效 --- */
+.revealItem { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.2, 1, 0.3, 1); }
+.visible { opacity: 1 !important; transform: translateY(0) !important; }
+
+/* --- 动态模块样式 --- */
+.contentSection { margin-bottom: 20vh; width: 100%; }
+.moduleHeading { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
+.moduleText { font-size: 1.2rem; line-height: 1.6; max-width: 700px; margin-bottom: 5rem; font-weight: 300; }
+
+.gridSystem { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 4vw; row-gap: 12vh; width: 100%; padding-inline: 2vw; }
+.colFull { grid-column: span 12; }
+.colHalf { grid-column: span 6; }
+
+.magazineImg { width: 100%; height: auto; filter: grayscale(100%); transition: filter 0.8s ease; display: block; }
+.magazineImg:hover { filter: grayscale(0%); }
+
+.viewport::-webkit-scrollbar { width: 4px; }
+.viewport::-webkit-scrollbar-thumb { background: var(--fg-color); }
+
+@keyframes fadeInOnly { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
