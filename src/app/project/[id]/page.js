@@ -7,115 +7,73 @@ export default function ProjectPage({ params }) {
   const resolvedParams = use(params);
   const project = projects.find(p => p.id === resolvedParams.id);
 
-  if (!project) return <div className="p-20 bg-white text-black font-bold uppercase tracking-widest">Loading...</div>;
+  if (!project) return <div className="p-20 font-black">LOADING...</div>;
 
   return (
-    /* 【物理锁定层】：
-      1. flexDirection: 'row' 强制左右并排，绝不堆叠。
-      2. alignItems: 'flex-start' 确保左侧栏高度不被拉伸，sticky 才能生效。
-    */
-    <main style={{ 
-      display: 'flex', 
-      flexDirection: 'row', 
-      width: '100%', 
-      minHeight: '100vh', 
-      backgroundColor: '#fff', 
-      alignItems: 'flex-start',
-      position: 'relative',
-      overflow: 'visible'
-    }}>
+    <main className="split-screen-wrapper">
       
-      {/* --- 左侧栏：38.2% 杂志封面感侧边栏 (硬锁定) --- */}
-      <aside style={{
-        width: '38.2%',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-        left: 0,
-        backgroundColor: '#fff',
-        borderRight: '1px solid #eee',
-        padding: '4rem 3rem',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        flexShrink: 0, // 防止被右侧内容挤压
-        zIndex: 50
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Link href="/" className="mb-20 text-[10px] font-black tracking-[0.4em] uppercase hover:line-through text-black block">
-            ← ARCHIVE
+      {/* --- 左侧仓 (Sidebar) --- */}
+      <aside className="sidebar-locked p-16">
+        <div className="flex flex-col">
+          <Link href="/" className="mb-20 text-[10px] font-black tracking-[0.5em] uppercase hover:underline">
+            ← RING
           </Link>
-          
-          <h1 className="text-6xl lg:text-8xl font-black uppercase leading-[0.8] tracking-tighter mb-12 text-black">
+          <h1 className="text-6xl md:text-8xl font-black uppercase leading-[0.8] tracking-tighter mb-12">
             {project.title}
           </h1>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div style={{ borderTop: '2px solid black', paddingTop: '1.5rem', maxWidth: '300px' }}>
-              <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '1rem', color: '#000' }}>Brief</p>
-              <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#444', fontWeight: '300', fontStyle: 'italic' }}>
-                {project.description}
-              </p>
-            </div>
+          <div className="border-t-2 border-black pt-8 max-w-xs">
+            <p className="text-[10px] font-black tracking-widest uppercase mb-4">Brief</p>
+            <p className="text-base font-light leading-relaxed italic text-gray-800">
+              {project.description}
+            </p>
           </div>
         </div>
-
-        <div style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5em', color: '#000' }}>
-          EDITION 2026 / {project.id}
+        <div className="text-[10px] font-black tracking-[0.6em] uppercase">
+          {project.year} / {project.category}
         </div>
       </aside>
 
-      {/* --- 右侧栏：61.8% 杂志化图片流 (硬锁定) --- */}
-      <section style={{
-        width: '61.8%',
-        backgroundColor: '#fff',
-        padding: '8rem 4rem',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12rem', // 图片之间的垂直呼吸间距
-        flexGrow: 1
-      }}>
-        
-        {/* 模块：全宽大图 */}
-        <div style={{ width: '100%' }}>
-          <img 
-            src={project.mainImage} 
-            alt="Hero" 
-            style={{ width: '100%', height: 'auto', display: 'block', grayscale: '100%' }} 
-            className="hover:grayscale-0 transition-all duration-1000"
-          />
-        </div>
+      {/* --- 右侧仓 (Content Viewport) --- */}
+      <section className="viewport-scrollable">
+        {/* magazine-container 是居中的关键 */}
+        <div className="magazine-container">
+          
+          {/* 模块：首图 */}
+          <div className="w-full mb-48">
+            <img src={project.mainImage} alt="Hero" className="magazine-img" />
+          </div>
 
-        {/* 模块：杂志感引言文本 */}
-        <div style={{ maxWidth: '800px' }}>
-          <h2 style={{ fontSize: '4rem', fontWeight: '900', textTransform: 'uppercase', lineHeight: '0.9', letterSpacing: '-0.05em', color: '#000' }}>
-            "Space is not a void, but a computational field."
-          </h2>
-        </div>
+          {/* 模块：大字号引言 */}
+          <div className="max-w-3xl mb-48">
+            <h2 className="text-4xl md:text-6xl font-black uppercase leading-[0.9] tracking-tighter">
+              "Architecture is the learned game, correct and magnificent, of forms assembled in the light."
+            </h2>
+          </div>
 
-        {/* 模块：错落有致的图片网格 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4rem' }}>
-          {project.gallery && project.gallery.map((img, i) => (
-            <div key={i} style={{ gridColumn: i % 3 === 0 ? 'span 2' : 'span 1' }}>
-              <img 
-                src={img} 
-                alt={`Detail ${i}`} 
-                style={{ width: '100%', height: 'auto', backgroundColor: '#f9f9f9', display: 'block' }} 
-              />
-              <p style={{ marginTop: '1.5rem', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#999', borderTop: '1px solid #eee', paddingTop: '0.5rem' }}>
-                Project Detail / Sequence 0{i + 1}
-              </p>
-            </div>
-          ))}
-        </div>
+          {/* 模块：网格图流 */}
+          <div className="grid grid-cols-12 gap-x-12 gap-y-24 md:gap-y-48">
+            {project.gallery && project.gallery.map((img, i) => (
+              <div 
+                key={i} 
+                className={i % 3 === 0 ? "col-span-12" : "col-span-6"}
+              >
+                <img src={img} alt="" className="magazine-img" />
+                <div className="mt-4 flex justify-between text-[10px] font-black border-t border-black pt-2">
+                  <span>PLATE 0{i+1}</span>
+                  <span>{project.location}</span>
+                </div>
+              </div>
+            ))}
+          </div>
 
-        {/* 底部导航 */}
-        <footer style={{ paddingTop: '10rem', paddingBottom: '10rem', textAlign: 'center', borderTop: '1px solid #eee' }}>
-          <Link href="/" style={{ fontSize: '2.5rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '-0.02em', color: '#000', textDecoration: 'none' }} className="hover:underline">
-            BACK TO RING →
-          </Link>
-        </footer>
+          <footer className="mt-60 py-20 text-center">
+            <Link href="/" className="text-sm font-black tracking-[0.6em] border-2 border-black px-12 py-6 hover:bg-black hover:text-white transition-all">
+              NEXT PROJECT
+            </Link>
+          </footer>
+        </div>
       </section>
+
     </main>
   )
 }

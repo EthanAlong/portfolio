@@ -2,29 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 彻底禁用 Next.js 默认的背景色和文字色 */
-:root {
-  --background: #ffffff;
-  --foreground: #000000;
+/* 1. 强制重置 */
+:root { --bg: #ffffff; --fg: #000000; }
+body { background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; }
+
+/* 2. 左右仓物理结构 */
+.split-screen-wrapper {
+  display: flex !important;
+  flex-direction: row !important; /* 强制水平 */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* 禁止全局滚动 */
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* 左侧栏：38.2% 锁定 */
+.sidebar-locked {
+  width: 38.2% !important;
+  height: 100%;
+  flex-shrink: 0;
+  border-right: 1px solid #000;
+  background: #fff;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-html, body {
-  background-color: #ffffff !important;
-  color: #000000 !important;
+/* 右侧仓：61.8% 独立滚动 */
+.viewport-scrollable {
+  width: 61.8% !important;
+  height: 100%;
+  overflow-y: auto; /* 开启独立滚动 */
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 核心：让内部所有内容水平居中 */
+}
+
+/* 3. 内部内容约束：解决你说的“留白不均” */
+.magazine-container {
   width: 100%;
-  min-height: 100vh;
-  /* 允许自然滚动 */
-  overflow-x: hidden;
-  overflow-y: auto;
+  /* 调整这个 max-width 可以控制内容在右仓里的最大宽度 */
+  max-width: 1200px; 
+  display: flex;
+  flex-direction: column;
+  /* 左右 Padding 设为一致，确保留白均等 */
+  padding: 15vh 8% 20vh 8%; 
 }
 
-/* 移除可能存在的顶部黑条（如果是某些默认容器导致的） */
-main {
-  display: block;
+/* 4. 图片交互样式 */
+.magazine-img {
+  width: 100%;
+  height: auto;
+  filter: grayscale(100%);
+  transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: crosshair;
 }
+.magazine-img:hover { filter: grayscale(0%); }
+
+/* 隐藏滚动条 */
+.viewport-scrollable::-webkit-scrollbar { display: none; }
+.viewport-scrollable { -ms-overflow-style: none; scrollbar-width: none; }
