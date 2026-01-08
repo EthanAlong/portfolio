@@ -8,48 +8,51 @@ import Lenis from 'lenis'
 export default function ProjectPage({ params }) {
   const resolvedParams = use(params);
   const project = projects.find(p => p.id === resolvedParams.id);
+  
+  // --- 关键定义：动画帧引用与视口引用 ---
+  const requestRef = useRef();
   const viewportRef = useRef();
+  const lenisRef = useRef();
 
+  // 1. 初始化 Lenis 滚动引擎
   useEffect(() => {
-  if (!project) return;
+    if (!project) return;
 
-  // 1. 初始化 Lenis
-  const lenis = new Lenis({
-    wrapper: viewportRef.current,
-    content: document.querySelector(`.${styles.container}`),
-    duration: 1.8,
-    lerp: 0.05,
-    smoothWheel: true,
-  });
+    // 创建 Lenis 实例
+    const lenis = new Lenis({
+      wrapper: viewportRef.current,
+      content: document.querySelector(`.${styles.container}`),
+      duration: 1.8,
+      lerp: 0.05,
+      smoothWheel: true,
+    });
+    lenisRef.current = lenis;
 
-  // 2. 核心修复：监听图片加载和窗口大小变化
-  const handleResize = () => {
-    lenis.resize(); // 强制重新计算高度
-  };
-
-  // 定时检查：在图片加载的黄金 3 秒内，每隔一段时间刷新一次高度
-  // 这能解决图片异步加载导致的滚动死锁
-  const resizeInterval = setInterval(handleResize, 1000);
-
-  // 监听窗口大小变化
-  window.addEventListener('resize', handleResize);
-
-  function raf(time) {
-    lenis.raf(time);
+    // 滚动动画循环
+    function raf(time) {
+      lenis.raf(time);
+      requestRef.current = requestAnimationFrame(raf);
+    }
     requestRef.current = requestAnimationFrame(raf);
-  }
-  requestRef.current = requestAnimationFrame(raf);
 
-  // 3. 清理函数
-  return () => {
-    lenis.destroy();
-    clearInterval(resizeInterval);
-    window.removeEventListener('resize', handleResize);
-    cancelAnimationFrame(requestRef.current);
-  };
-}, [project]);
+    // 解决高度计算错误的函数
+    const handleResize = () => {
+      lenis.resize();
+    };
 
-  // 2. 滚动曝光监视器
+    // 三重保险：定时刷新、窗口监听
+    const resizeInterval = setInterval(handleResize, 1000);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      lenis.destroy();
+      clearInterval(resizeInterval);
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(requestRef.current);
+    };
+  }, [project]);
+
+  // 2. 滚动曝光监视器 (Reveal Animation)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -59,8 +62,9 @@ export default function ProjectPage({ params }) {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.05 } // 露出 5% 即可触发，提高灵敏度
     );
+
     const elements = document.querySelectorAll(`.${styles.revealItem}, .${styles.metaItem}`);
     elements.forEach(el => observer.observe(el));
     return () => observer.disconnect();
@@ -68,7 +72,14 @@ export default function ProjectPage({ params }) {
 
   if (!project) return null;
 
-  // --- 【3列 2排 数据定义】 ---
+  // 图片加载后的回调：强制刷新滚动条高度
+  const onImageLoad = () => {
+    if (lenisRef.current) {
+      lenisRef.current.resize();
+    }
+  };
+
+  // 3x2 矩阵数据
   const metaData = [
     { label: "Location", value: project.location },
     { label: "Sector", value: project.sector },
@@ -81,16 +92,23 @@ export default function ProjectPage({ params }) {
   return (
     <main className={styles.projectTheme}>
       
+      {/* --- 左侧仓 --- */}
       <aside className={styles.sidebar}>
-        <h1 className={styles.projectTitle}>{project.title}</h1>
+        <h1 className={styles.projectTitle}>
+          {project.title}
+        </h1>
+
         <div>
-          <Link href="/" className={styles.actionLink}>ALL PROJECTS +</Link>
+          <Link href="/" className={styles.actionLink}>
+            ALL PROJECTS +
+          </Link>
           <div className="mt-8 text-[11px] font-black tracking-[0.5em] text-black uppercase opacity-40">
             {project.year} / {project.category}
           </div>
         </div>
       </aside>
 
+      {/* --- 右侧仓 --- */}
       <section className={styles.viewport} ref={viewportRef}>
         <div className={styles.container}>
           
@@ -101,16 +119,21 @@ export default function ProjectPage({ params }) {
 
           {/* 2. Hero Image */}
           <div className={`${styles.revealItem} ${styles.heroWrapper}`}>
-            <img src={project.mainImage} alt="Hero" className={styles.magazineImg} />
+            <img 
+              src={project.mainImage} 
+              alt="Hero" 
+              className={styles.magazineImg} 
+              onLoad={onImageLoad}
+            />
           </div>
 
-          {/* 3. Metadata Grid (3列 x 2排) */}
+          {/* 3. Metadata Grid */}
           <div className={styles.metaGrid}>
             {metaData.map((item, i) => (
               <div 
                 key={i} 
                 className={styles.metaItem}
-                style={{ transitionDelay: `${i * 0.12}s` }} // 逐个划入动画
+                style={{ transitionDelay: `${i * 0.1}s` }}
               >
                 <span className={styles.metaLabel}>{item.label}</span>
                 <span className={styles.metaValue}>{item.value || "—"}</span>
@@ -118,7 +141,7 @@ export default function ProjectPage({ params }) {
             ))}
           </div>
 
-          {/* 4. 动态内容模块解算 */}
+          {/* 4. 动态内容模块 */}
           {project.content?.map((block, idx) => {
             if (block.type === 'textBlock') {
               return (
@@ -128,14 +151,23 @@ export default function ProjectPage({ params }) {
                 </div>
               );
             }
+
             if (block.type === 'imageGrid') {
               return (
                 <div key={idx} className={`${styles.revealItem} ${styles.gridSystem} mb-[20vh]`}>
                   {block.images.map((img, i) => (
-                    <div key={i} className={block.columns === 1 ? styles.colFull : styles.colHalf}>
-                      <img src={img} alt="" className={styles.magazineImg} />
+                    <div 
+                      key={i} 
+                      className={block.columns === 1 ? styles.colFull : styles.colHalf}
+                    >
+                      <img 
+                        src={img} 
+                        alt="" 
+                        className={styles.magazineImg} 
+                        onLoad={onImageLoad}
+                      />
                       <div className="mt-4 flex justify-between text-[10px] font-black border-t border-black pt-2 uppercase">
-                        <span>Detail Plate</span>
+                        <span>Plate Index</span>
                         <span>0{i+1}</span>
                       </div>
                     </div>
