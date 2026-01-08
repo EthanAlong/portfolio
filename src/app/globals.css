@@ -1,29 +1,32 @@
+/* src/app/globals.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg: #ffffff;
-  --fg: #000000;
+  /* 统一字体栈：建筑感无衬线字体 */
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* 基础重置，确保不干扰任何 Flex 布局 */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  background: var(--bg);
-  color: var(--fg);
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  color: #000000;
+  /* 锁定全局字体 */
+  font-family: var(--font-main) !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
-/* 彻底禁掉所有 Link 的默认变色，防止“紫色”出现 */
-a, a:visited {
-  color: inherit;
-  text-decoration: none;
+/* 确保所有标题和按钮也同步 */
+h1, h2, h3, h4, h5, h6, button, a, span, div {
+  font-family: var(--font-main) !important;
 }
