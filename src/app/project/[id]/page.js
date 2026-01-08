@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState, useRef, use } from 'react'
+import React, { use } from 'react'
 import { projects } from '@/data/projects'
 import Link from 'next/link'
 
@@ -7,75 +7,115 @@ export default function ProjectPage({ params }) {
   const resolvedParams = use(params);
   const project = projects.find(p => p.id === resolvedParams.id);
 
-  if (!project) return <div className="p-20 bg-white min-h-screen text-black font-bold uppercase tracking-widest">Project Loading...</div>;
+  if (!project) return <div className="p-20 bg-white text-black font-bold uppercase tracking-widest">Loading...</div>;
 
   return (
-    // 【关键修复 1】：items-start 是让 sticky 生效的核心
-    <main className="relative flex flex-col md:flex-row min-h-screen bg-white text-black items-start overflow-visible">
+    /* 【物理锁定层】：
+      1. flexDirection: 'row' 强制左右并排，绝不堆叠。
+      2. alignItems: 'flex-start' 确保左侧栏高度不被拉伸，sticky 才能生效。
+    */
+    <main style={{ 
+      display: 'flex', 
+      flexDirection: 'row', 
+      width: '100%', 
+      minHeight: '100vh', 
+      backgroundColor: '#fff', 
+      alignItems: 'flex-start',
+      position: 'relative',
+      overflow: 'visible'
+    }}>
       
-      {/* --- 左侧：黄金分割固定栏 (38.2%) --- */}
-      {/* 【关键修复 2】：h-screen + sticky 确保文字锁定在左侧不随页面滑走 */}
-      <aside className="w-full md:w-[38.2%] md:h-screen md:sticky md:top-0 p-8 md:p-16 flex flex-col justify-between bg-white border-r border-gray-100 z-20">
-        <div>
-          <Link href="/" className="inline-block mb-20 text-[10px] font-black tracking-[0.4em] uppercase hover:line-through">
+      {/* --- 左侧栏：38.2% 杂志封面感侧边栏 (硬锁定) --- */}
+      <aside style={{
+        width: '38.2%',
+        height: '100vh',
+        position: 'sticky',
+        top: 0,
+        left: 0,
+        backgroundColor: '#fff',
+        borderRight: '1px solid #eee',
+        padding: '4rem 3rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        flexShrink: 0, // 防止被右侧内容挤压
+        zIndex: 50
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Link href="/" className="mb-20 text-[10px] font-black tracking-[0.4em] uppercase hover:line-through text-black block">
             ← ARCHIVE
           </Link>
-          <h1 className="text-6xl md:text-8xl font-black uppercase leading-[0.8] tracking-tighter mb-12">
+          
+          <h1 className="text-6xl lg:text-8xl font-black uppercase leading-[0.8] tracking-tighter mb-12 text-black">
             {project.title}
           </h1>
-          
-          <div className="space-y-12">
-            <div className="max-w-xs border-t-2 border-black pt-6">
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-4">Design Intent</p>
-              <p className="text-sm leading-relaxed text-gray-700 font-light italic">
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ borderTop: '2px solid black', paddingTop: '1.5rem', maxWidth: '300px' }}>
+              <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '1rem', color: '#000' }}>Brief</p>
+              <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#444', fontWeight: '300', fontStyle: 'italic' }}>
                 {project.description}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 md:mt-0">
-          <Link href="/" className="text-3xl font-black border-b-4 border-black pb-1 hover:opacity-50">
-            INDEX +
-          </Link>
+        <div style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5em', color: '#000' }}>
+          EDITION 2026 / {project.id}
         </div>
       </aside>
 
-      {/* --- 右侧：杂志排版流动区 (61.8%) --- */}
-      <section className="w-full md:w-[61.8%] bg-white p-4 md:p-16 pt-32 space-y-32">
+      {/* --- 右侧栏：61.8% 杂志化图片流 (硬锁定) --- */}
+      <section style={{
+        width: '61.8%',
+        backgroundColor: '#fff',
+        padding: '8rem 4rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12rem', // 图片之间的垂直呼吸间距
+        flexGrow: 1
+      }}>
         
-        {/* 杂志模块 A：全宽大图 */}
-        <div className="w-full mb-12">
-          <img src={project.mainImage} alt="Main" className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-1000" />
+        {/* 模块：全宽大图 */}
+        <div style={{ width: '100%' }}>
+          <img 
+            src={project.mainImage} 
+            alt="Hero" 
+            style={{ width: '100%', height: 'auto', display: 'block', grayscale: '100%' }} 
+            className="hover:grayscale-0 transition-all duration-1000"
+          />
         </div>
 
-        {/* 杂志模块 B：杂志感引言文字 */}
-        <div className="max-w-2xl py-20 border-y border-gray-100">
-          <h2 className="text-4xl md:text-6xl font-black uppercase leading-none tracking-tighter text-black">
-            "Spatial complexity driven by computational logic."
+        {/* 模块：杂志感引言文本 */}
+        <div style={{ maxWidth: '800px' }}>
+          <h2 style={{ fontSize: '4rem', fontWeight: '900', textTransform: 'uppercase', lineHeight: '0.9', letterSpacing: '-0.05em', color: '#000' }}>
+            "Space is not a void, but a computational field."
           </h2>
         </div>
 
-        {/* 杂志模块 C：混合网格图流 (根据索引自动生成杂志感错落排版) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* 模块：错落有致的图片网格 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4rem' }}>
           {project.gallery && project.gallery.map((img, i) => (
-            <div key={i} className={i % 3 === 0 ? "md:col-span-2" : "md:col-span-1"}>
-              <div className="bg-gray-50 overflow-hidden">
-                <img src={img} alt={`Detail ${i}`} className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700" />
-              </div>
-              <p className="mt-4 text-[9px] uppercase tracking-widest text-gray-400">View / Sequence 0{i + 1}</p>
+            <div key={i} style={{ gridColumn: i % 3 === 0 ? 'span 2' : 'span 1' }}>
+              <img 
+                src={img} 
+                alt={`Detail ${i}`} 
+                style={{ width: '100%', height: 'auto', backgroundColor: '#f9f9f9', display: 'block' }} 
+              />
+              <p style={{ marginTop: '1.5rem', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#999', borderTop: '1px solid #eee', paddingTop: '0.5rem' }}>
+                Project Detail / Sequence 0{i + 1}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* 页脚 */}
-        <footer className="py-40 text-center border-t border-gray-100">
-          <Link href="/" className="text-[10px] font-black tracking-[0.6em] uppercase hover:underline">
-            Discovery Next
+        {/* 底部导航 */}
+        <footer style={{ paddingTop: '10rem', paddingBottom: '10rem', textAlign: 'center', borderTop: '1px solid #eee' }}>
+          <Link href="/" style={{ fontSize: '2.5rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '-0.02em', color: '#000', textDecoration: 'none' }} className="hover:underline">
+            BACK TO RING →
           </Link>
         </footer>
       </section>
-      
     </main>
   )
 }
