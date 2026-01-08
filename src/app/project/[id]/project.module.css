@@ -1,0 +1,69 @@
+/* src/app/project/[id]/project.module.css */
+
+.splitRoot {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.sidebar {
+  width: 38.2% !important;
+  height: 100%;
+  flex-shrink: 0;
+  border-right: 1px solid #000000;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.viewport {
+  width: 61.8% !important;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #ffffff;
+  /* 确保内部元素可以根据 margin: auto 居中 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  box-sizing: border-box;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* 核心留白容器 */
+.container {
+  width: 100%;
+  /* 限制最大宽度，防止在大屏幕上图片变得无限大 */
+  max-width: 1400px; 
+  /* 这里的 padding 就是你需要的“左右留白” */
+  padding: 10rem 10% 20rem 10% !important; 
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.magazineImg {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+  filter: grayscale(100%);
+  transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #f7f7f7;
+}
+
+.magazineImg:hover {
+  filter: grayscale(0%);
+}
