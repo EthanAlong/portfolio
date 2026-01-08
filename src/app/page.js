@@ -1,17 +1,26 @@
+// src/app/page.js
 import RingInterface from '@/components/canvas/RingInterface'
 
 export default function Home() {
   return (
-    <main style={{ width: '100vw', height: '100vh', background: '#000' }}>
+    /* 使用 fixed 覆盖全屏，并在这里单独写 overflow: hidden */
+    <main style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      width: '100vw', 
+      height: '100vh', 
+      overflow: 'hidden', 
+      background: '#000' 
+    }}>
       <RingInterface />
       
-      {/* 确保 UI 不遮挡点击 */}
       <div style={{
         position: 'absolute',
         bottom: '40px',
         left: '40px',
         color: 'white',
-        zIndex: 100,
+        zIndex: 10,
         pointerEvents: 'none',
         fontFamily: 'sans-serif'
       }}>

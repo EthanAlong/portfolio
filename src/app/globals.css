@@ -2,34 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 彻底禁用 Next.js 默认的背景色和文字色 */
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
 * {
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html, body, main {
-  width: 100vw !important;
-  height: 100vh !important;
-  background: #000 !important;
-  overflow: hidden !important;
+html, body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  width: 100%;
+  min-height: 100vh;
+  /* 允许自然滚动 */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-/* 确保 Canvas 没有任何缩放偏移 */
-canvas {
-  width: 100% !important;
-  height: 100% !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-}
-
-/* 隐藏所有元素的滚动条，但依然可以滚动 */
-* {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
-}
-
-*::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari and Opera */
+/* 移除可能存在的顶部黑条（如果是某些默认容器导致的） */
+main {
+  display: block;
 }
