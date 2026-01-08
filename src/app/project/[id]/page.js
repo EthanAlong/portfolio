@@ -10,19 +10,44 @@ export default function ProjectPage({ params }) {
   const project = projects.find(p => p.id === resolvedParams.id);
   const viewportRef = useRef();
 
-  // 1. Lenis 惯性滚动
   useEffect(() => {
-    if (!project) return;
-    const lenis = new Lenis({
-      wrapper: viewportRef.current,
-      duration: 1.8,
-      lerp: 0.05,
-      smoothWheel: true,
-    });
-    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf);
-    return () => lenis.destroy();
-  }, [project]);
+  if (!project) return;
+
+  // 1. 初始化 Lenis
+  const lenis = new Lenis({
+    wrapper: viewportRef.current,
+    content: document.querySelector(`.${styles.container}`),
+    duration: 1.8,
+    lerp: 0.05,
+    smoothWheel: true,
+  });
+
+  // 2. 核心修复：监听图片加载和窗口大小变化
+  const handleResize = () => {
+    lenis.resize(); // 强制重新计算高度
+  };
+
+  // 定时检查：在图片加载的黄金 3 秒内，每隔一段时间刷新一次高度
+  // 这能解决图片异步加载导致的滚动死锁
+  const resizeInterval = setInterval(handleResize, 1000);
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', handleResize);
+
+  function raf(time) {
+    lenis.raf(time);
+    requestRef.current = requestAnimationFrame(raf);
+  }
+  requestRef.current = requestAnimationFrame(raf);
+
+  // 3. 清理函数
+  return () => {
+    lenis.destroy();
+    clearInterval(resizeInterval);
+    window.removeEventListener('resize', handleResize);
+    cancelAnimationFrame(requestRef.current);
+  };
+}, [project]);
 
   // 2. 滚动曝光监视器
   useEffect(() => {
