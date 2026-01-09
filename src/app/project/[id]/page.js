@@ -95,7 +95,15 @@ export default function ProjectPage({ params }) {
       {/* --- 左侧仓 --- */}
       <aside className={styles.sidebar}>
         <h1 className={styles.projectTitle}>
-          {project.title}
+         {Array.isArray(project.title) ? (
+         project.title.map((line, i) => (
+          <span key={i} className={styles.titleLine} style={{ animationDelay: `${0.5 + i * 0.15}s` }}>
+          {line}
+          </span>
+         ))
+         ) : (
+         project.title
+         )}
         </h1>
 
         <div>

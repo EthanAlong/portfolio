@@ -4,7 +4,7 @@
 const realProjects = [
   {
     id: "1104-labrea-ave", 
-    title: "LaBrea Collection",
+    title: ["La Brea", "Collection"],
     year: "2024",
     category: "Mixed Use",
     ringImage: "/1104-labrea-ave/1.webp", 
