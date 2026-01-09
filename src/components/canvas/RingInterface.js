@@ -6,23 +6,23 @@ import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
 import { projects } from '@/data/projects'
 
-// --- 【关键：全站生命周期变量】 ---
+// 全局标志位：防止返回首页时重复加载
 let globalInitialized = false;
 
-// --- 【设计师控制台：100% 变量化】 ---
+// --- 【100% 恢复：设计师控制台】 ---
 const CONFIG = {
   INTRO: {
-    SPIN_KICK: Math.PI * 1.5,
-    CAMERA_START_Z: 70,      
-    FADE_DURATION: 1.5,
+    SPIN_KICK: Math.PI * 1.5, // 开场旋转总量
+    CAMERA_START_Z: 70,      // 开场相机起始位置
+    FADE_DURATION: 1.5,      // 黑场渐显时间
   },
   RING: {
-    RADIUS: 17,
-    IMAGE_W: 5,
-    IMAGE_H: 4,
-    HOVER_OUT: 2,
-    HOVER_UP: 1,
-    INITIAL_OFFSET: 0.12,
+    RADIUS: 17,              // 圆环半径
+    IMAGE_W: 5,              // 图片宽
+    IMAGE_H: 4,              // 图片高
+    HOVER_OUT: 2,            // 悬停向外偏移
+    HOVER_UP: 1,             // 悬停向上偏移
+    INITIAL_OFFSET: 0.12,    // 初始旋转偏移
   },
   CENTRAL: {
     IMAGE_W: 10,
@@ -32,9 +32,8 @@ const CONFIG = {
     TEXT_Y: -4.5,
   },
   CAMERA: {
-    // 【俯视逻辑】：提升 Y 轴（如 22）实现俯瞰。值越高，俯视感越强。
-    POSITION: [0, 22, 45],   
-    FOV: 55,                 
+    POSITION: [0, 22, 45],   // 俯视稳定位置 [X, Y, Z]
+    FOV: 55,
   },
   INTERACTION: {
     WHEEL_SPEED: 0.002,
@@ -42,13 +41,13 @@ const CONFIG = {
     DAMPING: 4,
   },
   MOUSE_TILT: {
-    X_INTENSITY: 0.12,
-    Z_INTENSITY: 0.15,
-    SMOOTHING: 0.05,
+    X_INTENSITY: 0.12,       // 鼠标上下倾斜强度
+    Z_INTENSITY: 0.15,       // 鼠标左右倾斜强度
+    SMOOTHING: 0.05,         // 随动丝滑度
   }
 }
 
-// 1. 圆环单体组件
+// 1. 单个项目图片组件
 function ProjectItem({ item, index, total, setActiveProject, onNavigate }) {
   const ref = useRef()
   const [hovered, setHover] = useState(false)
@@ -78,11 +77,7 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate }) {
         transparent
         side={THREE.DoubleSide}
         rotation={[0, angle + Math.PI / 2, 0]}
-        onPointerOver={(e) => { 
-          e.stopPropagation(); 
-          setHover(true); 
-          setActiveProject(item); 
-        }}
+        onPointerOver={(e) => { e.stopPropagation(); setHover(true); setActiveProject(item); }}
         onPointerOut={() => setHover(false)}
         onClick={(e) => { e.stopPropagation(); onNavigate(item.id); }}
       />
@@ -98,6 +93,12 @@ function CentralDisplay({ activeProject, onNavigate }) {
     const targetScale = activeProject ? 1 : 0
     group.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1)
   })
+
+  // 修复：处理数组标题
+  const displayTitle = activeProject 
+    ? (Array.isArray(activeProject.title) ? activeProject.title.join(' ') : activeProject.title)
+    : "";
+
   return (
     <group ref={group}>
       <Suspense fallback={null}>
@@ -119,7 +120,7 @@ function CentralDisplay({ activeProject, onNavigate }) {
               letterSpacing={-0.05}
               anchorY="middle"
             >
-              {activeProject.title.toUpperCase()}
+              {displayTitle.toUpperCase()}
             </Text>
           </>
         )}
@@ -128,24 +129,24 @@ function CentralDisplay({ activeProject, onNavigate }) {
   )
 }
 
-// 3. 场景内容驱动
+// 3. 场景逻辑核心
 function SceneContent({ targetRotation, setActiveProject, activeProject, onNavigate, isTransitioning, introActive, mousePos }) {
   const spinGroup = useRef()
   const tiltGroup = useRef()
   const scrollRotation = useRef(CONFIG.RING.INITIAL_OFFSET)
 
   useFrame((state, delta) => {
-    // A. 相机进场与俯视锁定
+    // A. 相机逻辑
     if (introActive) {
       state.camera.position.lerp(new THREE.Vector3(...CONFIG.CAMERA.POSITION), 0.03)
-      state.camera.lookAt(0, 0, 0) 
+      state.camera.lookAt(0, 0, 0) // 俯视锁定
     }
 
     // B. 惯性滚动
     scrollRotation.current = THREE.MathUtils.damp(scrollRotation.current, targetRotation.current, CONFIG.INTERACTION.DAMPING, delta)
     if (spinGroup.current) spinGroup.current.rotation.y = scrollRotation.current
 
-    // C. 鼠标倾斜
+    // C. 鼠标随动倾斜
     if (tiltGroup.current) {
       const targetTiltX = mousePos.current.y * CONFIG.MOUSE_TILT.X_INTENSITY
       const targetTiltZ = -mousePos.current.x * CONFIG.MOUSE_TILT.Z_INTENSITY
@@ -153,7 +154,7 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
       tiltGroup.current.rotation.z = THREE.MathUtils.lerp(tiltGroup.current.rotation.z, targetTiltZ, CONFIG.MOUSE_TILT.SMOOTHING)
     }
 
-    // D. 转场加速
+    // D. 转场逻辑
     if (isTransitioning) {
       targetRotation.current += delta * 4
       state.camera.position.lerp(new THREE.Vector3(0, 5, 5), 0.05)
@@ -164,10 +165,7 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
     <group ref={tiltGroup}>
       <group ref={spinGroup}>
         {projects.map((item, i) => (
-          <ProjectItem 
-            key={item.id} index={i} total={projects.length} item={item} 
-            setActiveProject={setActiveProject} onNavigate={onNavigate} 
-          />
+          <ProjectItem key={item.id} index={i} total={projects.length} item={item} setActiveProject={setActiveProject} onNavigate={onNavigate} />
         ))}
       </group>
       <CentralDisplay activeProject={activeProject} onNavigate={onNavigate} />
@@ -175,74 +173,61 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
   )
 }
 
-// 4. 主渲染接口
+// 4. 主入口
 export default function RingInterface() {
   const router = useRouter()
-  
-  // --- 【核心修复：重新加入缺失的状态定义】 ---
   const [hasMounted, setHasMounted] = useState(false)
   const [activeProject, setActiveProject] = useState(null)
   const [isLoading, setIsLoading] = useState(!globalInitialized)
   const [isTransitioning, setIsTransitioning] = useState(false)
-  // ------------------------------------------
-
+  
   const targetRotation = useRef(CONFIG.RING.INITIAL_OFFSET)
+  const mousePos = useRef({ x: 0, y: 0 })
   const isDragging = useRef(false)
   const lastMouseX = useRef(0)
-  const mousePos = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     setHasMounted(true)
-    
     if (!globalInitialized) {
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         setIsLoading(false)
         targetRotation.current += CONFIG.INTRO.SPIN_KICK
         globalInitialized = true
       }, 2500)
-      return () => clearTimeout(timer)
     } else {
-      // 如果已经初始化，直接开始进场动画，跳过 Loading
       targetRotation.current += CONFIG.INTRO.SPIN_KICK
     }
   }, [])
 
   useEffect(() => {
     if (!hasMounted) return
-    const handleWheel = (e) => { targetRotation.current -= e.deltaY * CONFIG.INTERACTION.WHEEL_SPEED }
-    const handleDown = (e) => { isDragging.current = true; lastMouseX.current = e.clientX }
-    const handleMove = (e) => { 
+    const hMove = (e) => {
       mousePos.current.x = (e.clientX / window.innerWidth) * 2 - 1
       mousePos.current.y = (e.clientY / window.innerHeight) * 2 - 1
       if (isDragging.current) { 
         targetRotation.current += (e.clientX - lastMouseX.current) * CONFIG.INTERACTION.DRAG_SPEED
         lastMouseX.current = e.clientX 
-      } 
+      }
     }
-    const handleUp = () => isDragging.current = false
-    window.addEventListener('wheel', handleWheel, { passive: true })
-    window.addEventListener('mousedown', handleDown); window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleUp)
-    return () => { 
-      window.removeEventListener('wheel', handleWheel); window.removeEventListener('mousedown', handleDown);
-      window.removeEventListener('mousemove', handleMove); window.removeEventListener('mouseup', handleUp) 
+    const hWheel = (e) => { targetRotation.current -= e.deltaY * CONFIG.INTERACTION.WHEEL_SPEED }
+    const hDown = (e) => { isDragging.current = true; lastMouseX.current = e.clientX }
+    const hUp = () => isDragging.current = false
+
+    window.addEventListener('wheel', hWheel, { passive: true })
+    window.addEventListener('mousedown', hDown); window.addEventListener('mousemove', hMove)
+    window.addEventListener('mouseup', hUp)
+    return () => {
+      window.removeEventListener('wheel', hWheel); window.removeEventListener('mousedown', hDown)
+      window.removeEventListener('mousemove', hMove); window.removeEventListener('mouseup', hUp)
     }
   }, [hasMounted])
 
-  const handleNavigate = (id) => {
-    if (isTransitioning) return
-    setIsTransitioning(true)
-    setTimeout(() => router.push(`/project/${id}`), 2000)
-  }
+  if (!hasMounted) return <div style={{ background: 'black', width: '100vw', height: '100vh' }} />
 
-  if (!hasMounted) return <div style={{ width: '100vw', height: '100vh', background: 'black' }} />
-
-  // --- 【变量同步：Canvas 初始相机位置】 ---
-  const initialCameraPos = [
-    CONFIG.CAMERA.POSITION[0],
-    CONFIG.CAMERA.POSITION[1],
-    globalInitialized ? CONFIG.CAMERA.POSITION[2] : CONFIG.INTRO.CAMERA_START_Z
-  ];
+  // 获取加载文字（处理数组）
+  const displayTitleForLoader = activeProject 
+    ? (Array.isArray(activeProject.title) ? activeProject.title.join(' ') : activeProject.title)
+    : "";
 
   return (
     <div className="main-wrapper">
@@ -256,7 +241,7 @@ export default function RingInterface() {
       {isTransitioning && (
         <div className="clou-loader-overlay">
            <div className="letter-wrapper">
-             {activeProject?.title?.split('').map((char, i) => (
+             {displayTitleForLoader.split('').map((char, i) => (
                <span key={i} className="stagger-letter" style={{ animationDelay: `${i * 0.05}s` }}>
                  {char === ' ' ? '\u00A0' : char}
                </span>
@@ -265,22 +250,17 @@ export default function RingInterface() {
         </div>
       )}
 
-      <Canvas camera={{ position: initialCameraPos, fov: CONFIG.CAMERA.FOV }}>
-        <color attach="background" args={['#000']} />
-        <ambientLight intensity={3} />
+      <Canvas camera={{ position: [0, 22, globalInitialized ? 45 : CONFIG.INTRO.CAMERA_START_Z], fov: CONFIG.CAMERA.FOV }}>
+        <color attach="background" args={['#000']} /><ambientLight intensity={3} />
         <SceneContent 
-          targetRotation={targetRotation} 
-          setActiveProject={setActiveProject} 
-          activeProject={activeProject} 
-          onNavigate={handleNavigate}
-          isTransitioning={isTransitioning} 
-          introActive={!isLoading}
-          mousePos={mousePos}
+          targetRotation={targetRotation} setActiveProject={setActiveProject} 
+          activeProject={activeProject} onNavigate={(id) => { setIsTransitioning(true); setTimeout(() => router.push(`/project/${id}`), 2000) }}
+          isTransitioning={isTransitioning} introActive={!isLoading} mousePos={mousePos}
         />
       </Canvas>
 
       <style jsx global>{`
-        .main-wrapper { width: 100vw; height: 100vh; background: black; cursor: grab; position: relative; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .main-wrapper { width: 100vw; height: 100vh; background: black; cursor: grab; position: relative; overflow: hidden; font-family: -apple-system, sans-serif; }
         .initial-loader { position: absolute; inset: 0; z-index: 500; background: black; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .wipe-text { color: white; font-size: 10px; font-weight: 900; letter-spacing: 0.8em; clip-path: inset(0 100% 0 0); animation: textWipe 1.5s ease forwards 0.5s; }
         @keyframes textWipe { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0 0 0); } }

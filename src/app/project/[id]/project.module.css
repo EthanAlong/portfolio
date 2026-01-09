@@ -5,251 +5,113 @@
      【设计师控制台 - 控制所有物理参数】
      ============================================= */
 
-  /* 1. 全局布局比例 */
   --sidebar-width: 38.2%;
   --viewport-width: 61.8%;
   --bg-color: #ffffff;
   --fg-color: #000000;
 
   /* 2. 左侧侧边栏 (Sidebar) */
-  --sidebar-padding: 5rem 2.5rem;      /* 侧边栏内边距 */
-  --title-size: clamp(1.5rem, 5.5vw, 4.5rem); /* 项目名称大小 */
-  --title-weight: 900;               /* 项目名称粗细 */
-  --title-line-height: 0.85;         /* 项目名称行高 */
-  --title-tracking: -0.06em;         /* 项目名称字间距 */
+  --sidebar-padding: 5rem 2.5rem;
+  --title-size: clamp(1.5rem, 5.5vw, 4.5rem);
+  --title-weight: 900;
+  --title-line-height: 0.85;
+  --title-tracking: -0.06em;
 
-  --btn-size: 2.8rem;                /* ALL PROJECTS 按钮大小 */
-  --btn-weight: 900;                 /* 按钮粗细 */
+  --btn-size: 2.8rem;
+  --btn-weight: 900;
 
-  /* 3. 右侧容器 (Viewport & Container) */
-  --container-width: 80%;            /* 内容占据右仓的宽度 */
-  --container-padding-top: 5vh;     /* 【新增】右仓内容离最顶部的距离 */
-  --container-padding-bottom: 25vh;  /* 右仓底部留白 */
-
-  /* 4. 引言 (Briefing) */
-  --briefing-size: clamp(1rem, 3.5vw, 2rem); 
-  --briefing-weight: 400;            /* 引言粗细 */
-  --briefing-bottom: 4vh;           /* 引言离主图的距离 */
-
-  /* 5. 主图 (Hero Image) */
-  --hero-scale: 100%;                /* 主图宽度 */
-  --hero-bottom: 4vh;               /* 主图离矩阵的距离 */
-
-  /* 6. 参数矩阵 (Meta Grid) */
-  --meta-row-height: 10rem;          /* 每一行的高度 */
-  --meta-label-size: 10px;           /* 标签字号 (如 LOCATION) */
-  --meta-value-size: 15px;           /* 内容字号 (如 FOSHAN) */
-  --meta-value-weight: 600;          /* 内容粗细 */
-  --meta-bottom: 8vh;               /* 矩阵离后续内容的距离 */
+  /* 3. 右侧容器 */
+  --container-width: 85%; 
+  --container-padding-top: 10vh;
+  
+  /* 4. 矩阵参数 */
+  --meta-row-height: 10rem;
+  --meta-label-size: 10px;
+  --meta-value-size: 15px;
 
   /* =============================================
-     【系统底层逻辑 - 自动同步变量】
+     【系统底层逻辑】
      ============================================= */
-
-  display: flex !important;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background-color: var(--bg-color);
-  color: var(--fg-color);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-  box-sizing: border-box;
+  display: flex !important; width: 100vw; height: 100vh; overflow: hidden;
+  background-color: var(--bg-color); color: var(--fg-color);
+  font-family: -apple-system, sans-serif !important; box-sizing: border-box;
 }
 
-.projectTheme * {
-  box-sizing: border-box;
-}
-
-/* --- 左侧侧边栏 --- */
 .sidebar {
-  width: var(--sidebar-width) !important;
-  height: 100%;
-  flex-shrink: 0;
-  border-right: 1px solid var(--fg-color);
-  
-  /* 【查 Padding】：确保左右 padding 绝对一致 */
-  /* 5rem 是上下，2.5rem 是左右。只要左右都是 2.5rem，它就不会偏 */
-  padding: 5rem 2.5rem; 
-  
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  
-  /* 即使设置了 center，我们也要给子元素加保险 */
+  width: var(--sidebar-width) !important; height: 100%; flex-shrink: 0;
+  border-right: 1px solid var(--fg-color); padding: var(--sidebar-padding);
+  display: flex; flex-direction: column; justify-content: space-between;
   align-items: center; 
-  
-  z-index: 100;
-  background-color: var(--bg-color);
-  box-sizing: border-box; /* 确保 padding 不会撑大容器 */
 }
 
 .projectTitle {
-  /* 【第一重保险】：强制盒子宽度只包裹文字 */
-  display: table;        /* 比 fit-content 在旧版/复杂环境更稳定 */
-  width: auto;
-  
-  /* 【第二重保险】：几何中心定位 */
-  /* auto margin 会自动平分左右剩余空间，强制盒子居中 */
-  margin-left: auto;
-  margin-right: auto;
-  
-  /* 【第三重保险】：内部对齐 */
-  text-align: left;      /* 盒子居中了，但文字在盒子里靠左写 */
-  
-  font-size: var(--title-size);
-  font-weight: var(--title-weight);
-  line-height: var(--title-line-height);
-  letter-spacing: var(--title-tracking);
-  text-transform: uppercase;
-  
-  /* 动画：修正了位移，确保结束时是在 0 的位置 */
-  opacity: 0;
-  animation: revealFromLeft 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.5s;
+  width: fit-content; display: flex; flex-direction: column; align-items: flex-start;
+  text-align: left; margin: 0; text-transform: uppercase;
 }
 
-/* 底部按钮区同步修改 */
-.sidebar > div:last-child {
-  width: auto;
-  display: table;
-  margin-left: auto;
-  margin-right: auto;
+.titleLine {
+  display: block; font-size: var(--title-size); font-weight: var(--title-weight);
+  line-height: var(--title-line-height); letter-spacing: var(--title-tracking);
+  white-space: nowrap; opacity: 0;
+  animation: revealFromLeft 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
 @keyframes revealFromLeft {
-  0% { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-20px); }
+  0% { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-15px); }
   100% { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); }
 }
 
-/* ALL PROJECTS 按钮 (墨水填充动效) */
+.sidebarBottom { display: flex; flex-direction: column; align-items: center; }
+
 .actionLink {
-  position: relative;
-  display: block;
-  font-size: var(--btn-size);
-  font-weight: var(--btn-weight);
-  letter-spacing: -0.04em;
-  text-decoration: none;
-  color: var(--fg-color);
-  padding: 0.5rem  0;
-  z-index: 1;
-  transition: color 0.4s ease;
-  opacity: 0;
-  animation: fadeInOnly 1s ease forwards 1.2s;
+  position: relative; font-size: var(--btn-size); font-weight: var(--btn-weight);
+  text-decoration: none; color: var(--fg-color); padding: 0.5rem 0;
+  opacity: 0; animation: fadeInOnly 1s ease forwards 1.2s;
 }
-
 .actionLink::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -1rem;
-  width: 0;
-  height: 100%;
-  background-color: var(--fg-color);
-  z-index: -1;
-  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  content: ""; position: absolute; top: 0; left: -1rem; width: 0; height: 100%;
+  background-color: var(--fg-color); z-index: -1; transition: width 0.6s ease;
 }
-
 .actionLink:hover { color: var(--bg-color); }
 .actionLink:hover::before { width: calc(100% + 2rem); }
 
-/* --- 右侧视口 --- */
 .viewport {
-  width: var(--viewport-width) !important;
-  height: 100%;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translateZ(0);
+  width: var(--viewport-width) !important; height: 100%; overflow-y: auto !important;
+  display: flex; flex-direction: column; align-items: center;
 }
+.container { width: var(--container-width) !important; padding: var(--container-padding-top) 0 25vh 0; }
+.briefingText { font-size: clamp(1rem, 3.5vw, 2.3rem); line-height: 0.9; margin-bottom: 6vh; text-transform: uppercase; }
+.heroWrapper { width: 100%; margin-bottom: 8vh; }
+.magazineImg { width: 100%; height: auto; display: block; filter: grayscale(100%); transition: filter 0.8s ease; }
+.magazineImg:hover { filter: grayscale(0%); }
 
-.container {
-  width: var(--container-width) !important;
-  max-width: 1400px;
-  margin: 0 auto;
-  /* 使用控制台变量控制顶部和底部距离 */
-  padding: var(--container-padding-top) 0 var(--container-padding-bottom) 0;
-}
-
-/* --- 引言样式 --- */
-.briefingText {
-  font-size: var(--briefing-size);
-  font-weight: var(--briefing-weight);
-  line-height: 0.9;
-  letter-spacing: -0.05em;
-  margin-bottom: var(--briefing-bottom);
-  text-transform: uppercase;
-}
-
-/* --- 主图样式 --- */
-.heroWrapper {
-  width: var(--hero-scale);
-  margin-bottom: var(--hero-bottom);
-}
-
-/* --- 3列 2排 矩阵 --- */
+/* --- 【核心恢复：矩阵网格边框】 --- */
 .metaGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 100%;
-  border-top: 2px solid var(--fg-color);
-  margin-bottom: var(--meta-bottom);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  width: 100%; border-top: 2px solid var(--fg-color);
+  margin-bottom: 15vh;
 }
-
 .metaItem {
-  height: var(--meta-row-height);
-  padding: 2rem 0;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+  height: var(--meta-row-height); padding: 2rem 0;
+  border-bottom: 1px solid #eee; display: flex; flex-direction: column; justify-content: center;
+  opacity: 0; transform: translateY(20px); transition: all 0.8s ease;
 }
+/* 矩阵边框逻辑 */
+.metaItem:nth-child(3n+1), .metaItem:nth-child(3n+2) { border-right: 1px solid #eee; padding-right: 2vw; }
+.metaItem:nth-child(3n+2), .metaItem:nth-child(3n) { padding-left: 2vw; }
 
-.metaItem:nth-child(3n+1), 
-.metaItem:nth-child(3n+2) {
-  border-right: 1px solid #eee;
-  padding-right: 2vw;
-}
+.metaLabel { font-size: var(--meta-label-size); font-weight: 900; color: #999; text-transform: uppercase; }
+.metaValue { font-size: var(--meta-value-size); font-weight: 600; text-transform: uppercase; margin-top: 0.4rem; }
 
-.metaItem:nth-child(3n+2),
-.metaItem:nth-child(3n) {
-  padding-left: 2vw;
-}
+/* --- 动态内容样式 --- */
+.moduleHeading { font-size: 3.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
+.moduleText { font-size: 1.15rem; line-height: 1.6; max-width: 750px; font-weight: 400; color: #333; }
 
-.metaLabel { 
-  font-size: var(--meta-label-size); 
-  font-weight: 900; 
-  text-transform: uppercase; 
-  color: #999; 
-  letter-spacing: 0.1em; 
-}
-
-.metaValue { 
-  font-size: var(--meta-value-size); 
-  font-weight: var(--meta-value-weight); 
-  text-transform: uppercase; 
-  margin-top: 0.4rem; 
-}
-
-/* --- 滚动淡入动效 --- */
-.revealItem { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.2, 1, 0.3, 1); }
-.visible { opacity: 1 !important; transform: translateY(0) !important; }
-
-/* --- 动态模块样式 --- */
-.contentSection { margin-bottom: 20vh; width: 100%; }
-.moduleHeading { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
-.moduleText { font-size: 1.2rem; line-height: 1.6; max-width: 700px; margin-bottom: 5rem; font-weight: 300; }
-
-.gridSystem { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 4vw; row-gap: 12vh; width: 100%; padding-inline: 2vw; }
+.gridSystem { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 3vw; width: 100%; }
 .colFull { grid-column: span 12; }
 .colHalf { grid-column: span 6; }
 
-.magazineImg { width: 100%; height: auto; filter: grayscale(100%); transition: filter 0.8s ease; display: block; }
-.magazineImg:hover { filter: grayscale(0%); }
-
-.viewport::-webkit-scrollbar { width: 4px; }
-.viewport::-webkit-scrollbar-thumb { background: var(--fg-color); }
+.revealItem { opacity: 0; transform: translateY(40px); transition: all 1.2s ease; }
+.visible { opacity: 1 !important; transform: translateY(0) !important; }
 
 @keyframes fadeInOnly { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
