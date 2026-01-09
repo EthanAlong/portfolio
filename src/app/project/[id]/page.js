@@ -13,7 +13,7 @@ export default function ProjectPage({ params }) {
   const viewportRef = useRef();
   const lenisRef = useRef();
 
-  // Lenis 滚动同步
+  // 1. Lenis 滚动引擎
   useEffect(() => {
     if (!project) return;
     const lenis = new Lenis({
@@ -41,7 +41,7 @@ export default function ProjectPage({ params }) {
     };
   }, [project]);
 
-  // 曝光监控
+  // 2. 元素曝光动效
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add(styles.visible); });
@@ -57,9 +57,9 @@ export default function ProjectPage({ params }) {
   return (
     <main className={styles.projectTheme}>
       
-      {/* --- 左侧仓 --- */}
+      {/* --- 左侧侧边栏 --- */}
       <aside className={styles.sidebar}>
-        {/* 使用 titleWrapper 居中标题并吸收多余空间 */}
+        {/* 标题置顶容器 */}
         <div className={styles.titleWrapper}>
           <h1 className={styles.projectTitle}>
             {Array.isArray(project.title) ? (
@@ -74,7 +74,7 @@ export default function ProjectPage({ params }) {
           </h1>
         </div>
 
-        {/* 底部按钮区：固定在底部 */}
+        {/* 底部信息：锁定在视口底部 */}
         <div className={styles.sidebarBottom}>
           <Link href="/" className={styles.actionLink}>ALL PROJECTS +</Link>
           <div className={styles.sidebarMetadata}>
@@ -93,7 +93,7 @@ export default function ProjectPage({ params }) {
             <img src={project.mainImage} alt="Hero" className={styles.magazineImg} onLoad={onImageLoad} />
           </div>
 
-          {/* 2排3列矩阵 */}
+          {/* 3. Meta Data 矩阵 (2排3列) */}
           <div className={styles.metaGrid}>
             {[
               { label: "Location", value: project.location },
@@ -110,6 +110,7 @@ export default function ProjectPage({ params }) {
             ))}
           </div>
 
+          {/* 4. 动态模块 */}
           {project.content?.map((block, idx) => (
             <div key={idx} className={`${styles.revealItem} ${styles.contentSection}`}>
               {block.type === 'textBlock' ? (
