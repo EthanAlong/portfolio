@@ -29,12 +29,12 @@ const realProjects = [
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/1104-labrea-ave/1.webp']
+        images: ['/1104-labrea-ave/2.webp']
       },
       {
         type: 'imageGrid',
         columns: 2, // 两张图平分 100% 宽度
-        images: ['https://picsum.photos/seed/lb1/800/600', 'https://picsum.photos/seed/lb2/800/600']
+        images: ['/1104-labrea-ave/3.webp', '/1104-labrea-ave/4.webp' ]
       }
     ]
   }
