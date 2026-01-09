@@ -13,7 +13,7 @@ export default function ProjectPage({ params }) {
   const viewportRef = useRef();
   const lenisRef = useRef();
 
-  // 1. Lenis 滚动引擎
+  // 1. Lenis 滚动引擎 + 高度实时监听 (解决 Vercel 滚动问题)
   useEffect(() => {
     if (!project) return;
     const lenis = new Lenis({
@@ -30,7 +30,7 @@ export default function ProjectPage({ params }) {
     requestRef.current = requestAnimationFrame(raf);
 
     const handleResize = () => lenis.resize();
-    const resizeInterval = setInterval(handleResize, 1000);
+    const resizeInterval = setInterval(handleResize, 1000); // 每一秒检查高度
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -41,7 +41,7 @@ export default function ProjectPage({ params }) {
     };
   }, [project]);
 
-  // 2. 元素曝光动效
+  // 2. 元素入场曝光动效
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add(styles.visible); });
@@ -59,7 +59,7 @@ export default function ProjectPage({ params }) {
       
       {/* --- 左侧侧边栏 --- */}
       <aside className={styles.sidebar}>
-        {/* 标题置顶容器 */}
+        {/* 标题区 */}
         <div className={styles.titleWrapper}>
           <h1 className={styles.projectTitle}>
             {Array.isArray(project.title) ? (
@@ -74,7 +74,7 @@ export default function ProjectPage({ params }) {
           </h1>
         </div>
 
-        {/* 底部信息：锁定在视口底部 */}
+        {/* 底部信息区 (Vercel 修复版本) */}
         <div className={styles.sidebarBottom}>
           <Link href="/" className={styles.actionLink}>ALL PROJECTS +</Link>
           <div className={styles.sidebarMetadata}>
@@ -110,7 +110,7 @@ export default function ProjectPage({ params }) {
             ))}
           </div>
 
-          {/* 4. 动态模块 */}
+          {/* 4. 动态内容渲染 */}
           {project.content?.map((block, idx) => (
             <div key={idx} className={`${styles.revealItem} ${styles.contentSection}`}>
               {block.type === 'textBlock' ? (
