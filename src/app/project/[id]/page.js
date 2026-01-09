@@ -13,6 +13,7 @@ export default function ProjectPage({ params }) {
   const viewportRef = useRef();
   const lenisRef = useRef();
 
+  // 1. Lenis 滚动引擎 + 动态高度 Resize
   useEffect(() => {
     if (!project) return;
     const lenis = new Lenis({
@@ -25,7 +26,7 @@ export default function ProjectPage({ params }) {
     requestRef.current = requestAnimationFrame(raf);
 
     const handleResize = () => lenis.resize();
-    const resizeInterval = setInterval(handleResize, 1000);
+    const resizeInterval = setInterval(handleResize, 1000); // 每一秒强制刷新高度，解决图片加载导致的卡死
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -35,6 +36,7 @@ export default function ProjectPage({ params }) {
     };
   }, [project]);
 
+  // 2. 曝光动效 (Reveal Animation)
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add(styles.visible); });
@@ -48,16 +50,21 @@ export default function ProjectPage({ params }) {
 
   return (
     <main className={styles.projectTheme}>
+      
+      {/* --- 左侧侧边栏 --- */}
       <aside className={styles.sidebar}>
-        <h1 className={styles.projectTitle}>
-          {Array.isArray(project.title) ? (
-            project.title.map((line, i) => (
-              <span key={i} className={styles.titleLine} style={{ animationDelay: `${0.5 + i * 0.15}s` }}>{line}</span>
-            ))
-          ) : (
-            <span className={styles.titleLine}>{project.title}</span>
-          )}
-        </h1>
+        <div className={styles.titleWrapper}>
+          <h1 className={styles.projectTitle}>
+            {Array.isArray(project.title) ? (
+              project.title.map((line, i) => (
+                <span key={i} className={styles.titleLine} style={{ animationDelay: `${0.5 + i * 0.15}s` }}>{line}</span>
+              ))
+            ) : (
+              <span className={styles.titleLine}>{project.title}</span>
+            )}
+          </h1>
+        </div>
+
         <div className={styles.sidebarBottom}>
           <Link href="/" className={styles.actionLink}>ALL PROJECTS +</Link>
           <div className="mt-8 text-[11px] font-black tracking-[0.5em] opacity-40 uppercase">
@@ -66,17 +73,19 @@ export default function ProjectPage({ params }) {
         </div>
       </aside>
 
+      {/* --- 右侧视口 --- */}
       <section className={styles.viewport} ref={viewportRef}>
         <div className={styles.container}>
-          {/* 1. Briefing */}
-          <div className={`${styles.revealItem} ${styles.briefingText}`}>{project.description}</div>
           
-          {/* 2. Hero */}
+          {/* 1. Briefing 引言 */}
+          <div className={`${styles.revealItem} ${styles.briefingText}`}>{project.description}</div>
+
+          {/* 2. Hero 主图 */}
           <div className={`${styles.revealItem} ${styles.heroWrapper}`}>
             <img src={project.mainImage} alt="Hero" className={styles.magazineImg} onLoad={onImageLoad} />
           </div>
 
-          {/* --- 3. 【核心恢复：2排3列矩阵】 --- */}
+          {/* --- 3. 【核心恢复：2排3列 Meta Data 矩阵】 --- */}
           <div className={styles.metaGrid}>
             {[
               { label: "Location", value: project.location },
@@ -93,15 +102,18 @@ export default function ProjectPage({ params }) {
             ))}
           </div>
 
-          {/* 4. 动态模块渲染 */}
+          {/* 4. 动态模块渲染逻辑 */}
           {project.content?.map((block, idx) => (
             <div key={idx} className={`${styles.revealItem} ${styles.contentSection}`}>
+              
+              {/* 文字块：标题 + 描述 */}
               {block.type === 'textBlock' ? (
                 <div className="mb-[15vh]">
                   <h2 className={styles.moduleHeading}>{block.title}</h2>
                   <p className={styles.moduleText}>{block.text}</p>
                 </div>
               ) : (
+                /* 图片阵列：1列或2列 */
                 <div className={`${styles.gridSystem} mb-[15vh]`}>
                   {block.images.map((img, i) => (
                     <div key={i} className={block.columns === 1 ? styles.colFull : styles.colHalf}>

@@ -5,32 +5,36 @@
      【设计师控制台 - 控制所有物理参数】
      ============================================= */
 
+  /* 1. 全局布局比例 */
   --sidebar-width: 38.2%;
   --viewport-width: 61.8%;
   --bg-color: #ffffff;
   --fg-color: #000000;
 
   /* 2. 左侧侧边栏 (Sidebar) */
-  --sidebar-padding: 5rem 2.5rem;
-  --title-size: clamp(1.5rem, 5.5vw, 4.5rem);
-  --title-weight: 900;
-  --title-line-height: 0.85;
-  --title-tracking: -0.06em;
+  --sidebar-padding: 5rem 2.5rem;      /* 侧边栏内边距 */
+  --title-size: clamp(1.5rem, 5.5vw, 4.5rem); /* 项目名称大小 */
+  --title-weight: 900;               /* 项目名称粗细 */
+  --title-line-height: 0.85;         /* 项目名称行高 */
+  --title-tracking: -0.06em;         /* 项目名称字间距 */
 
-  --btn-size: 2.8rem;
-  --btn-weight: 900;
+  --btn-size: 2.8rem;                /* ALL PROJECTS 按钮大小 */
+  --btn-weight: 900;                 /* 按钮粗细 */
 
   /* 3. 右侧容器 */
-  --container-width: 85%; 
-  --container-padding-top: 10vh;
-  
-  /* 4. 矩阵参数 */
-  --meta-row-height: 10rem;
-  --meta-label-size: 10px;
-  --meta-value-size: 15px;
+  --container-width: 85%;            /* 内容占据右仓的宽度 */
+  --container-padding-top: 10vh;     /* 右仓内容离最顶部的距离 */
+  --container-padding-bottom: 25vh;  /* 右仓底部留白 */
+
+  /* 4. 参数矩阵 (Meta Grid) */
+  --meta-row-height: 10rem;          /* 每一行的高度 */
+  --meta-label-size: 10px;           /* 标签字号 (如 LOCATION) */
+  --meta-value-size: 15px;           /* 内容字号 (如 FOSHAN) */
+  --meta-value-weight: 600;          /* 内容粗细 */
+  --meta-bottom: 12vh;               /* 矩阵离后续内容的距离 */
 
   /* =============================================
-     【系统底层逻辑】
+     【系统底层逻辑 - 不要轻易修改】
      ============================================= */
   display: flex !important; width: 100vw; height: 100vh; overflow: hidden;
   background-color: var(--bg-color); color: var(--fg-color);
@@ -41,12 +45,12 @@
   width: var(--sidebar-width) !important; height: 100%; flex-shrink: 0;
   border-right: 1px solid var(--fg-color); padding: var(--sidebar-padding);
   display: flex; flex-direction: column; justify-content: space-between;
-  align-items: center; 
+  align-items: center; /* 锁定：让子容器整体在侧边栏居中 */
 }
 
 .projectTitle {
-  width: fit-content; display: flex; flex-direction: column; align-items: flex-start;
-  text-align: left; margin: 0; text-transform: uppercase;
+  width: fit-content; display: flex; flex-direction: column; align-items: flex-start; /* 锁定：内部文字左对齐 */
+  margin: 0; text-transform: uppercase;
 }
 
 .titleLine {
@@ -61,13 +65,14 @@
   100% { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); }
 }
 
-.sidebarBottom { display: flex; flex-direction: column; align-items: center; }
+.sidebarBottom { width: fit-content; display: flex; flex-direction: column; align-items: flex-start; }
 
 .actionLink {
-  position: relative; font-size: var(--btn-size); font-weight: var(--btn-weight);
+  position: relative; display: inline-block; font-size: var(--btn-size); font-weight: var(--btn-weight);
   text-decoration: none; color: var(--fg-color); padding: 0.5rem 0;
   opacity: 0; animation: fadeInOnly 1s ease forwards 1.2s;
 }
+
 .actionLink::before {
   content: ""; position: absolute; top: 0; left: -1rem; width: 0; height: 100%;
   background-color: var(--fg-color); z-index: -1; transition: width 0.6s ease;
@@ -75,43 +80,39 @@
 .actionLink:hover { color: var(--bg-color); }
 .actionLink:hover::before { width: calc(100% + 2rem); }
 
-.viewport {
-  width: var(--viewport-width) !important; height: 100%; overflow-y: auto !important;
-  display: flex; flex-direction: column; align-items: center;
-}
-.container { width: var(--container-width) !important; padding: var(--container-padding-top) 0 25vh 0; }
+.viewport { width: var(--viewport-width) !important; height: 100%; overflow-y: auto !important; display: flex; flex-direction: column; align-items: center; }
+.container { width: var(--container-width) !important; padding: var(--container-padding-top) 0 var(--container-padding-bottom) 0; }
 .briefingText { font-size: clamp(1rem, 3.5vw, 2.3rem); line-height: 0.9; margin-bottom: 6vh; text-transform: uppercase; }
 .heroWrapper { width: 100%; margin-bottom: 8vh; }
 .magazineImg { width: 100%; height: auto; display: block; filter: grayscale(100%); transition: filter 0.8s ease; }
 .magazineImg:hover { filter: grayscale(0%); }
 
-/* --- 【核心恢复：矩阵网格边框】 --- */
+/* --- 【核心恢复：2排3列矩阵边框逻辑】 --- */
 .metaGrid {
   display: grid; grid-template-columns: repeat(3, 1fr);
   width: 100%; border-top: 2px solid var(--fg-color);
-  margin-bottom: 15vh;
+  margin-bottom: var(--meta-bottom);
 }
 .metaItem {
   height: var(--meta-row-height); padding: 2rem 0;
   border-bottom: 1px solid #eee; display: flex; flex-direction: column; justify-content: center;
   opacity: 0; transform: translateY(20px); transition: all 0.8s ease;
 }
-/* 矩阵边框逻辑 */
 .metaItem:nth-child(3n+1), .metaItem:nth-child(3n+2) { border-right: 1px solid #eee; padding-right: 2vw; }
 .metaItem:nth-child(3n+2), .metaItem:nth-child(3n) { padding-left: 2vw; }
 
-.metaLabel { font-size: var(--meta-label-size); font-weight: 900; color: #999; text-transform: uppercase; }
-.metaValue { font-size: var(--meta-value-size); font-weight: 600; text-transform: uppercase; margin-top: 0.4rem; }
+.metaLabel { font-size: var(--meta-label-size); font-weight: 900; color: #999; text-transform: uppercase; letter-spacing: 0.1em; }
+.metaValue { font-size: var(--meta-value-size); font-weight: var(--meta-value-weight); text-transform: uppercase; margin-top: 0.4rem; }
 
-/* --- 动态内容样式 --- */
+/* --- 动态模块样式 --- */
 .moduleHeading { font-size: 3.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
 .moduleText { font-size: 1.15rem; line-height: 1.6; max-width: 750px; font-weight: 400; color: #333; }
 
-.gridSystem { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 3vw; width: 100%; }
+.gridSystem { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 3vw; row-gap: 8vh; width: 100%; }
 .colFull { grid-column: span 12; }
 .colHalf { grid-column: span 6; }
 
-.revealItem { opacity: 0; transform: translateY(40px); transition: all 1.2s ease; }
+.revealItem { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.2, 1, 0.3, 1); }
 .visible { opacity: 1 !important; transform: translateY(0) !important; }
 
 @keyframes fadeInOnly { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
