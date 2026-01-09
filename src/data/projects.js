@@ -248,9 +248,9 @@ const realProjects = [
     title: ["2430", "7th ","st"], // 数组格式：支持精准控制两行排版
     year: "2024",
     category: "Multi Family",
-    ringImage: "/323-boylston-st/1.webp", 
+    ringImage: "/2430-7th-st/1.webp", 
     description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
-    mainImage: "/323-boylston-st/1.webp",
+    mainImage: "/2430-7th-st/1.webp",
     location: "Sherman Oaks, CA",
     sector: "Mixed-Use / Residential",
     status: "Proposed / DD Phase",
@@ -266,22 +266,292 @@ const realProjects = [
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/323-boylston-st/2.webp']
+        images: ['/2430-7th-st/2.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/323-boylston-st/3.webp']
+        images: ['/2430-7th-st/3.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/323-boylston-st/4.webp']
+        images: ['/2430-7th-st/4.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/323-boylston-st/5.webp']
+        images: ['/2430-7th-st/5.webp']
+      }
+    ]
+  },
+  {
+    id: "328-douglas-st", 
+    title: ["328", "Douglas ","st"], // 数组格式：支持精准控制两行排版
+    year: "2024",
+    category: "Multi Family",
+    ringImage: "/328-douglas-st/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/328-douglas-st/1.webp",
+    location: "Sherman Oaks, CA",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / DD Phase",
+    scale: "14,125 sqft Lot",
+    architect: "Plus Architect", 
+    contribution: "DD, Modeling, Rendering, Art Installation",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Framework',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/328-douglas-st/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/328-douglas-st/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/328-douglas-st/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/328-douglas-st/5.webp']
+      }
+    ]
+  },
+  {
+    id: "838-malcolm-ave", 
+    title: ["838", "Malcolm ","Residence"], // 数组格式：支持精准控制两行排版
+    year: "2024",
+    category: "Single Family Residence",
+    ringImage: "/838-malcolm-ave/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/838-malcolm-ave/1.webp",
+    location: "Westwood, LA",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / DD Phase",
+    scale: "14,125 sqft Lot",
+    architect: "Plus Architect", 
+    contribution: "DD, Modeling, Rendering, Art Installation",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Framework',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/838-malcolm-ave/2.webp']
+      }
+      
+    ]
+  },
+  {
+    id: "2169-lindaflora-dr", 
+    title: ["2169", "Linda flora ","dr"], // 数组格式：支持精准控制两行排版
+    year: "2024",
+    category: "Multi Family",
+    ringImage: "/2169-lindaflora-dr/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/2169-lindaflora-dr/1.webp",
+    location: "Sherman Oaks, CA",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / DD Phase",
+    scale: "14,125 sqft Lot",
+    architect: "Plus Architect", 
+    contribution: "DD, Modeling, Rendering, Art Installation",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Framework',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2169-lindaflora-dr/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2169-lindaflora-dr/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2169-lindaflora-dr/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2169-lindaflora-dr/5.webp']
+      }
+    ]
+  },
+  {
+    id: "4355-melrose-ave", 
+    title: ["4355", "Melrose ","ave"], // 数组格式：支持精准控制两行排版
+    year: "2024",
+    category: "Multi Family",
+    ringImage: "/4355-melrose-ave/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/4355-melrose-ave/1.webp",
+    location: "Sherman Oaks, CA",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / DD Phase",
+    scale: "14,125 sqft Lot",
+    architect: "Plus Architect", 
+    contribution: "DD, Modeling, Rendering, Art Installation",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Framework',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/4355-melrose-ave/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/4355-melrose-ave/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/4355-melrose-ave/4.webp']
+      }
+    ]
+  },
+  {
+    id: "8325-beverly-blvd", 
+    title: ["8325", "Beverly ","Flores"], // 数组格式：支持精准控制两行排版
+    year: "2024",
+    category: "Multi Family",
+    ringImage: "/8325-beverly-blvd/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/8325-beverly-blvd/1.webp",
+    location: "Sherman Oaks, CA",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / DD Phase",
+    scale: "14,125 sqft Lot",
+    architect: "Plus Architect", 
+    contribution: "DD, Modeling, Rendering, Art Installation",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Framework',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/3.webp']
+      }
+    ]
+  },
+  {
+    id: "10706-ohio-ave", 
+    title: ["10706", "Ohio ","place"], // 数组格式：支持精准控制两行排版
+    year: "2024",
+    category: "Multi Family",
+    ringImage: "/10706-ohio-ave/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/10706-ohio-ave/1.webp",
+    location: "Sherman Oaks, CA",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / DD Phase",
+    scale: "14,125 sqft Lot",
+    architect: "Plus Architect", 
+    contribution: "DD, Modeling, Rendering, Art Installation",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Framework',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/10706-ohio-ave/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/10706-ohio-ave/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/10706-ohio-ave/4.webp']
+      },
+      {
+        type: 'videoEmbed',
+        columns: 1, // video占据 100% 宽度
+        src: ['/10706-ohio-ave/5.mp4']
+      }
+    ]
+  },
+  {
+    id: "11580-pico-blvd", 
+    title: ["11580", "Pico ","blvd"], // 数组格式：支持精准控制两行排版
+    year: "2024",
+    category: "Multi Family",
+    ringImage: "/11580-pico-blvd/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/11580-pico-blvd/1.webp",
+    location: "Sherman Oaks, CA",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / DD Phase",
+    scale: "14,125 sqft Lot",
+    architect: "Plus Architect", 
+    contribution: "DD, Modeling, Rendering, Art Installation",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Framework',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/11580-pico-blvd/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/11580-pico-blvd/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/11580-pico-blvd/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/11580-pico-blvd/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/11580-pico-blvd/6.webp']
       }
     ]
   }
