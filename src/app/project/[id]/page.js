@@ -160,20 +160,30 @@ export default function ProjectPage({ params }) {
 
             // 图片阵列模块
             if (block.type === 'imageGrid') {
-              return (
-                <div key={idx} className={`${styles.revealItem} ${styles.gridSystem} mb-[15vh]`}>
-                  {block.images.map((img, i) => (
-                    <div key={i} className={block.columns === 1 ? styles.colFull : styles.colHalf}>
-                      <img src={img} alt="" className={styles.magazineImg} onLoad={onImageLoad} />
-                      <div className="mt-4 flex justify-between text-[10px] font-black border-t border-black pt-2 uppercase">
-                        <span>Plate Index</span>
-                        <span>0{i+1}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            }
+  return (
+    <div key={idx} className={`${styles.revealItem} ${styles.gridSystem} mb-[15vh]`}>
+      {block.images.map((img, i) => (
+        <div key={i} className={block.columns === 1 ? styles.colFull : styles.colHalf}>
+          <img 
+            src={img} 
+            alt="" 
+            className={`${styles.magazineImg} ${block.hasBorder ? styles.withBorder : ''}`} 
+            onLoad={onImageLoad} 
+          />
+          <div className="mt-4 flex justify-between text-[10px] font-black border-t border-black pt-2 uppercase">
+            {/* 优先显示 customTitle，否则显示默认的 Plate Index */}
+            <span>{block.customTitle || "Plate Index"}</span>
+            
+            {/* 优先显示 labels 数组里对应位置的文字，否则显示自动生成的 01, 02... */}
+            <span>
+              {block.labels && block.labels[i] ? block.labels[i] : `0${i+1}`}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
             // 【新增】视频嵌入模块 (带 3s 延迟循环)
             if (block.type === 'videoEmbed') {

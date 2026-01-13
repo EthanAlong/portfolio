@@ -192,10 +192,18 @@
   height: auto;
   display: block;
   filter: grayscale(100%);
-  transition: filter 0.8s ease;
+  transition: filter 0.8s ease, border 0.3s ease; /* 增加平滑过渡 */
 }
 
-.magazineImg:hover { filter: grayscale(0%); }
+/* --- 【新样式：分析图黑框】 --- */
+.withBorder {
+  border: 1px solid #000; /* 极简的黑色细框 */
+  box-sizing: border-box;  /* 确保边框不影响图片排版尺寸 */
+}
+
+.magazineImg:hover {
+  filter: grayscale(0%);
+}
 
 /* --- 2排3列矩阵 --- */
 .metaGrid {

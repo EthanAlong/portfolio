@@ -554,6 +554,154 @@ const realProjects = [
         images: ['/11580-pico-blvd/6.webp']
       }
     ]
+  },
+  {
+    id: "vertical-shanghai", 
+    title: ["Vertical", "Shanghai "], // 数组格式：支持精准控制两行排版
+    year: "2014",
+    category: "High Rise",
+    ringImage: "/vertical-shanghai/1.webp", 
+    description: "A 7-story mixed-use development in West Hollywood, integrating 49 residential units with street-level retail to redefine urban living.",
+    mainImage: "/vertical-shanghai/1.webp",
+    location: "Shanghai, China",
+    sector: "Mixed-Use / Residential",
+    status: "Proposed / Competition",
+    scale: "-",
+    architect: "School Project", 
+    contribution: "Grasshopper, Modeling, Rendering, Data Analysis",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Description',
+        text: 'The proposed project features two levels of subterranean parking beneath 1,110 sqft of ground-floor commercial space. The design prioritizes pedestrian flow and street-level engagement.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+       
+        images: ['/vertical-shanghai/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/6.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/7.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/8.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        hasBorder: true,
+        customTitle: "Diagram",    // 【新参数】覆盖左侧的 "Plate Index"
+        labels: ["Analysis"],   // 【新参数】覆盖右侧的 "01"
+        images: ['/vertical-shanghai/9.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/10.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/11.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/12.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/13.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/vertical-shanghai/14.webp']
+      }
+    ]
+  },
+  {
+    id: "bj-railway-complex", 
+    title: ["Beijing", "Railway", "Complex"], // 数组格式：支持精准控制两行排版
+    year: "2020",
+    category: "Complex",
+    ringImage: "/bj-railway-complex/6.webp", 
+    description: "Bridging the void left by the old iron road, this residential and commercial synthesis aspires to weave dignity back into a once-fragmented urban landscape.",
+    mainImage: "/bj-railway-complex/6.webp",
+    location: "Beijing, China",
+    sector: "Commercial / Residential",
+    status: "Proposed / Competition",
+    scale: "180,000 sqft",
+    architect: "School Project", 
+    contribution: "Design,Modeling, Rendering, Data Analysis",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Description',
+        text: 'After Beijing north Railway station being closed and being reused recently, the old Jingzhang Rail was abandoned. The new constructed underground high-speed rail took place of the original overground rail. The area around Beijing-Zhangjiakou Railway, which turned out to become the "degraded" area that remained isolated and un-integrated, needs to be relinked with culture, history or tradition immediately. This reconstruction aims at giving dignity to a place and the users of the place through the development of a new residential and commercial complex architecture'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/bj-railway-complex/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/bj-railway-complex/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/bj-railway-complex/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/bj-railway-complex/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/bj-railway-complex/6.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/bj-railway-complex/7.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/bj-railway-complex/8.webp']
+      }
+    ]
   }
 ];
 
