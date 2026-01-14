@@ -217,14 +217,22 @@ export default function RingInterface() {
 
   useEffect(() => {
     setHasMounted(true)
+    
+    // 情况 A: 初次加载 (First Load)
     if (!globalInitialized) {
       setTimeout(() => {
         setIsLoading(false)
         targetRotation.current += CONFIG.INTRO.SPIN_KICK
         globalInitialized = true
       }, 2500)
-    } else {
-      targetRotation.current += CONFIG.INTRO.SPIN_KICK
+    } 
+    // 情况 B: 回场加载 (Back from Project)
+    else {
+      // 回场加载：给一个微小的延时 (100ms)，确保组件挂载完成、Canvas 渲染循环已启动
+      // 然后再施加旋转力，这样视觉上绝对能看到转动
+      setTimeout(() => {
+        targetRotation.current += CONFIG.INTRO.SPIN_KICK
+      }, 200)
     }
   }, [])
 
@@ -255,6 +263,30 @@ export default function RingInterface() {
   const handleNavigate = (id) => {
     // 1. 立即：加速旋转 + 半径扩张 + CSS模糊开始
     setIsTransitioning(true)
+
+    // --- 【新增：后台预加载逻辑】 ---
+    // 在用户点击项目时，利用转场动画的时间，后台静默加载详情页的前5张图
+    // 这样当页面跳转完成时，图片大概率已经下载好了，不会出现卡顿
+    const targetProject = projects.find(p => p.id === id);
+    if (targetProject) {
+      // 收集 Hero 图片和内容中的前 4 张图片
+      const imagesToPreload = [targetProject.mainImage];
+      
+      if (targetProject.content) {
+        const contentImages = targetProject.content
+          .filter(block => block.type === 'imageGrid')
+          .flatMap(block => block.images)
+          .slice(0, 4); // 只取前4张，避免过多请求阻塞带宽
+        imagesToPreload.push(...contentImages);
+      }
+
+      // 执行预加载
+      imagesToPreload.forEach(src => {
+        const img = new window.Image();
+        img.src = src;
+      });
+    }
+    // ----------------------------
     
     // 2. 延迟：进入黑场遮罩
     setTimeout(() => {
