@@ -203,6 +203,10 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
 export default function RingInterface() {
   const router = useRouter()
   const [hasMounted, setHasMounted] = useState(false)
+  
+  // --- 【错峰加载：控制 Canvas 是否渲染】 ---
+  const [canRenderCanvas, setCanRenderCanvas] = useState(false)
+
   const [activeProject, setActiveProject] = useState(null)
   const [isLoading, setIsLoading] = useState(!globalInitialized)
   
@@ -218,22 +222,29 @@ export default function RingInterface() {
   useEffect(() => {
     setHasMounted(true)
     
-    // 情况 A: 初次加载 (First Load)
-    if (!globalInitialized) {
-      setTimeout(() => {
-        setIsLoading(false)
-        targetRotation.current += CONFIG.INTRO.SPIN_KICK
-        globalInitialized = true
-      }, 2500)
-    } 
-    // 情况 B: 回场加载 (Back from Project)
-    else {
-      // 回场加载：给一个微小的延时 (100ms)，确保组件挂载完成、Canvas 渲染循环已启动
-      // 然后再施加旋转力，这样视觉上绝对能看到转动
-      setTimeout(() => {
-        targetRotation.current += CONFIG.INTRO.SPIN_KICK
-      }, 200)
-    }
+    // --- 【错峰加载逻辑】 ---
+    // 延迟 300ms 再挂载 Canvas，给 Layout 的 Nav 动画让路
+    const timer = setTimeout(() => {
+      setCanRenderCanvas(true)
+
+      // 情况 A: 初次加载 (First Load)
+      if (!globalInitialized) {
+        setTimeout(() => {
+          setIsLoading(false)
+          targetRotation.current += CONFIG.INTRO.SPIN_KICK
+          globalInitialized = true
+        }, 2500)
+      } 
+      // 情况 B: 回场加载 (Back from Project)
+      else {
+        // 关键：给 100ms 延时确保 Canvas Ready，再给冲量，解决回场不转动问题
+        setTimeout(() => {
+          targetRotation.current += CONFIG.INTRO.SPIN_KICK
+        }, 100)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -264,23 +275,17 @@ export default function RingInterface() {
     // 1. 立即：加速旋转 + 半径扩张 + CSS模糊开始
     setIsTransitioning(true)
 
-    // --- 【新增：后台预加载逻辑】 ---
-    // 在用户点击项目时，利用转场动画的时间，后台静默加载详情页的前5张图
-    // 这样当页面跳转完成时，图片大概率已经下载好了，不会出现卡顿
+    // --- 【后台预加载逻辑】 ---
     const targetProject = projects.find(p => p.id === id);
     if (targetProject) {
-      // 收集 Hero 图片和内容中的前 4 张图片
       const imagesToPreload = [targetProject.mainImage];
-      
       if (targetProject.content) {
         const contentImages = targetProject.content
           .filter(block => block.type === 'imageGrid')
           .flatMap(block => block.images)
-          .slice(0, 4); // 只取前4张，避免过多请求阻塞带宽
+          .slice(0, 4); 
         imagesToPreload.push(...contentImages);
       }
-
-      // 执行预加载
       imagesToPreload.forEach(src => {
         const img = new window.Image();
         img.src = src;
@@ -334,14 +339,26 @@ export default function RingInterface() {
         </div>
       )}
 
-      <Canvas camera={{ position: [0, 22, globalInitialized ? 45 : CONFIG.INTRO.CAMERA_START_Z], fov: CONFIG.CAMERA.FOV }}>
-        <color attach="background" args={['#000']} /><ambientLight intensity={3} />
-        <SceneContent 
-          targetRotation={targetRotation} setActiveProject={setActiveProject} 
-          activeProject={activeProject} onNavigate={handleNavigate}
-          isTransitioning={isTransitioning} introActive={!isLoading} mousePos={mousePos}
-        />
-      </Canvas>
+      {/* --- 【标题动画区域】 --- */}
+      {/* 只有当: 1.加载完成 2.不是在转场 3.Canvas已准备好渲染 时才显示 */}
+      {/* 这样可以保证标题出来的时候 Ring 已经稳稳地在那了 */}
+      {!isLoading && !isTransitioning && canRenderCanvas && (
+        <div className="home-title-wrapper">
+          <h1 className="home-title-text">PORTFOLIO 2026</h1>
+        </div>
+      )}
+
+      {/* 条件渲染 Canvas，消除卡顿 */}
+      {canRenderCanvas && (
+        <Canvas camera={{ position: [0, 22, globalInitialized ? 45 : CONFIG.INTRO.CAMERA_START_Z], fov: CONFIG.CAMERA.FOV }}>
+          <color attach="background" args={['#000']} /><ambientLight intensity={3} />
+          <SceneContent 
+            targetRotation={targetRotation} setActiveProject={setActiveProject} 
+            activeProject={activeProject} onNavigate={handleNavigate}
+            isTransitioning={isTransitioning} introActive={!isLoading} mousePos={mousePos}
+          />
+        </Canvas>
+      )}
 
       <style jsx global>{`
         .main-wrapper { width: 100vw; height: 100vh; background: black; cursor: grab; position: relative; overflow: hidden; font-family: -apple-system, sans-serif; }
@@ -374,6 +391,22 @@ export default function RingInterface() {
         @keyframes textWipe { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0 0 0); } }
         .loading-bar-container { width: 120px; height: 1px; background: rgba(255,255,255,0.1); margin-top: 24px; overflow: hidden; }
         .loading-bar-fill { width: 100%; height: 100%; background: white; animation: barSlide 2s infinite; }
+
+        /* --- 标题动画 CSS --- */
+        .home-title-wrapper {
+          position: absolute; bottom: 40px; left: 40px; z-index: 10; pointer-events: none; color: white;
+        }
+        .home-title-text {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          font-size: 3rem; font-weight: 900; margin: 0; letter-spacing: -2px; line-height: 1;
+          opacity: 0;
+          /* 延迟 0.2s 确保 Ring 先出现，再刷文字 */
+          animation: revealTitle 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+        }
+        @keyframes revealTitle {
+          0% { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-20px); }
+          100% { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); }
+        }
       `}</style>
     </div>
   )
