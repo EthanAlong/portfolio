@@ -29,15 +29,15 @@ const CONFIG = {
     INITIAL_OFFSET: 0.12,    // 初始旋转偏角
   },
   CENTRAL: {
-    IMAGE_W: 12,
-    IMAGE_H: 9,
-    Y_OFFSET: -0.5,
+    IMAGE_W: 18,
+    IMAGE_H: 12,
+    Y_OFFSET: -5.5,
     Z_OFFSET: -5,
-    TEXT_Y: -6.5,
+    TEXT_Y: -12.5,
   },
   CAMERA: {
     POSITION: [0, 22, 45],   // 俯视稳定视角 [X, Y, Z]
-    FOV: 55,
+    FOV: 60,
   },
   INTERACTION: {
     WHEEL_SPEED: 0.002,      // 滚轮灵敏度
