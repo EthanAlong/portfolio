@@ -16,7 +16,7 @@ let globalInitialized = false;
  */
 const CONFIG = {
   INTRO: {
-    SPIN_KICK: Math.PI * 0.5, // 开场旋转总量
+    SPIN_KICK: Math.PI * 0.9, // 开场旋转总量
     CAMERA_START_Z: 70,      // 开场相机起始深度
     FADE_DURATION: 1.5,      // 黑场渐显时间
   },
@@ -45,7 +45,7 @@ const CONFIG = {
     DAMPING: 4,              // 旋转惯性阻尼
   },
   MOUSE_TILT: {
-    X_INTENSITY: 0.12,       // 俯仰倾斜强度
+    X_INTENSITY: 0.04,       // 俯仰倾斜强度
     Z_INTENSITY: 0.15,       // 左右倾斜强度
     SMOOTHING: 0.05,         // 倾斜跟随平滑度
   },
