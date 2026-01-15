@@ -939,10 +939,10 @@ const realProjects = [
 /**
  * ============================================================
  * 【 占位符生成逻辑 - ARCHIVE GENERATOR 】
- * 保持 Ring 界面的丰满感（共计 22 个项目）
+ * 保持 Ring 界面的丰满感（共计 24 个项目，日后可补充）
  * ============================================================
  */
-const placeholderCount = 30; 
+const placeholderCount = 24; 
 const remainingCount = Math.max(0, placeholderCount - realProjects.length);
 const placeholders = Array.from({ length: remainingCount }, (_, i) => {
   const pId = realProjects.length + i + 1;
