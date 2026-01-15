@@ -647,60 +647,291 @@ const realProjects = [
     ]
   },
   {
-    id: "bj-railway-complex", 
-    title: ["Beijing", "Railway", "Complex"], // 数组格式：支持精准控制两行排版
-    year: "2020",
-    category: "Complex",
-    ringImage: "/bj-railway-complex/6.webp", 
-    description: "Bridging the void left by the old iron road, this residential and commercial synthesis aspires to weave dignity back into a once-fragmented urban landscape.",
-    mainImage: "/bj-railway-complex/6.webp",
-    location: "Beijing, China",
-    sector: "Commercial / Residential",
-    status: "Proposed / Competition",
-    scale: "180,000 sqft",
-    architect: "School Project", 
-    contribution: "Design,Modeling, Rendering, Data Analysis",
+    id: "digital-escape", 
+    title: ["Digital", "Escape"], // 数组格式：支持精准控制两行排版
+    year: "2022",
+    category: "Digital Media",
+    ringImage: "/digital-escape/1.webp", 
+    description: "A cinematic exploration of digital immortality, where a 'soul cache' satellite network archives human existence amidst an impending global catastrophe and a clandestine power struggle",
+    mainImage: "/digital-escape/1.webp",
+    location: "-",
+    sector: "Cultural Archive",
+    status: "Academic / Research Phase",
+    scale: "Multi-node Network",
+    architect: "UCLA Project", 
+    contribution: "3D Visualization, Data Scripting, Video Editing",
     content: [
       {
         type: 'textBlock',
         title: 'Project Description',
-        text: 'After Beijing north Railway station being closed and being reused recently, the old Jingzhang Rail was abandoned. The new constructed underground high-speed rail took place of the original overground rail. The area around Beijing-Zhangjiakou Railway, which turned out to become the "degraded" area that remained isolated and un-integrated, needs to be relinked with culture, history or tradition immediately. This reconstruction aims at giving dignity to a place and the users of the place through the development of a new residential and commercial complex architecture'
+        text: 'In an age of digital immortality, the Soul Cache serves as a remote repository for human experiences, transmitted via a satellite network linked by biological code. As a meteorite strike looms, the masses scramble to archive their lives while a rogue scientist attempts to hack the system, turning humanity’s final preservation into a desperate struggle for control.'
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/bj-railway-complex/2.webp']
+        images: ['/digital-escape/2.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/bj-railway-complex/3.webp']
+        images: ['/digital-escape/3.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/bj-railway-complex/4.webp']
+        images: ['/digital-escape/4.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/bj-railway-complex/5.webp']
+        images: ['/digital-escape/5.webp']
       },
       {
-        type: 'imageGrid',
-        columns: 1, // 一张图占据 100% 宽度
-        images: ['/bj-railway-complex/6.webp']
+        type: 'mixedGrid',
+        items: [
+          { type: 'image', src: '/digital-escape/6.webp' },
+          { type: 'video', src: '/digital-escape/6.mp4' }
+        ]
       },
       {
-        type: 'imageGrid',
-        columns: 1, // 一张图占据 100% 宽度
-        images: ['/bj-railway-complex/7.webp']
+        type: 'mixedGrid',
+        items: [
+          { type: 'image', src: '/digital-escape/7.webp' },
+          { type: 'video', src: '/digital-escape/7.mp4' }
+        ]
       },
       {
-        type: 'imageGrid',
-        columns: 1, // 一张图占据 100% 宽度
-        images: ['/bj-railway-complex/8.webp']
+        type: 'mixedGrid',
+        items: [
+          { type: 'image', src: '/digital-escape/8.webp' },
+          { type: 'video', src: '/digital-escape/8.mp4' }
+        ]
       }
+        
+    ]
+  },
+  {
+    id: "in-the-mood-for-love", 
+    title: ["In The Mood", "For Love"], // 数组格式：支持精准控制两行排版
+    year: "2017",
+    category: "Urban Renovation",
+    ringImage: "/in-the-mood-for-love/1.webp", 
+    description: "A cinematic reimagining of urban intimacy: translating the nostalgic communal fabric of In the Mood for Love into a modern spatial strategy for Enning Road.",
+    mainImage: "/in-the-mood-for-love/1.webp",
+    location: "Guangzhou, China",
+    sector: "Urban Cultural Archive & Heritage Preservation",
+    status: "Academic / Research Phase",
+    scale: "Urban Network",
+    architect: "GAFA Project", 
+    contribution: "Cinematic Visualization, Multimedia Narrative",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Description',
+        text: 'This project addresses the erosion of neighborly connections in the wake of urban refurbishment at Enning Road. Using the 1970s Hong Kong setting of In the Mood for Love as a cultural and spatial benchmark, the design researches how narrow, constrained environments can paradoxically foster closer human relationships. The intervention aims to recreate the vibrant social atmosphere of the past, utilizing the cinematic art story to inform a contemporary spatial framework where intimate communal life can once again thrive amidst the historic fabric of Yongqingfang.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/in-the-mood-for-love/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/in-the-mood-for-love/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/in-the-mood-for-love/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/in-the-mood-for-love/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/in-the-mood-for-love/6.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/in-the-mood-for-love/7.webp']
+      },  
+    ]
+  },
+  {
+    id: "mosaic-bookstore", 
+    title: ["Mosaic", "Bookstore"], // 数组格式：支持精准控制两行排版
+    year: "2019",
+    category: "Interior Design / Installation",
+    ringImage: "/mosaic-bookstore/1.webp", 
+    description: "A full-cycle architectural intervention: Translating the metaphor of enlightenment into a spatial sequence of light and shadow in Shunde, China",
+    mainImage: "/mosaic-bookstore/1.webp",
+    location: "Shunde, China",
+    sector: "Commercial & Cultural Space",
+    status: "Built / Completed",
+    scale: "Interior Installation",
+    architect: "Way-A Architects", 
+    contribution: "Technical Detailing, Construction Administration",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Description',
+        text: 'From preliminary research to on-site construction, this project explores the concept of the “book as light” within a cave-like setting. Located in Shunde’s Overseas Chinese Town, the design utilizes installation-based interventions to create a sense of guidance and intellectual advancement. By choreographing the virtual medium of light and shadow, the intervention shapes a fluid, atmospheric space that transcends traditional retail, encouraging visitors to linger and find direction within its sculptural volumes.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/6.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/7.webp']
+      },  
+      {
+        type: 'imageGrid',
+        columns: 2, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/8.webp', '/mosaic-bookstore/9.webp']
+      },  {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/10.webp']
+      },  {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/mosaic-bookstore/11.webp']
+      },  
+    ]
+  },
+  {
+    id: "traditional-chinese-medicine", 
+    title: ["Traditional", "Chinese Medicine"], // 数组格式：支持精准控制两行排版
+    year: "2020",
+    category: "Urban Renovation / Cultural",
+    ringImage: "/traditional-chinese-medicine/1.webp", 
+    description: "A modular dialogue between heritage and healing: Reimagining Guangzhou's historic Qingping Market as a contemporary hub for Traditional Chinese Medicine (TCM) culture",
+    mainImage: "/traditional-chinese-medicine/1.webp",
+    location: "Guangzhou, China",
+    sector: "Commercial & Cultural Space",
+    status: "Academic / Undergraduate Design",
+    scale: "Urban Block Renovation",
+    architect: "Peng Li", 
+    contribution: "CD, DD, Parametric Modeling, Cinematic Rendering",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Description',
+        text: 'Located in the historic medical district of Guangzhou, the Medicine Bucket City Renovation addresses the revitalization of the Qingping Market (Phase II). Historically a nexus for hospitals and medicinal trade, the site now faces the challenge of reconciling its aging residential fabric with a fragmented TCM industry. This project proposes a systemic urban intervention that integrates modern architectural principles with the traditional essence of TCM. By translating the rhythmic, modular logic of the "medicine bucket" into a spatial framework, the design creates a multi-scale network—from urban planning to tectonic detail—that fosters cultural education and industrial innovation. The resulting space acts as a catalyst for community growth, bridging the gap between the district’s historical legacy and its future functional demands'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/traditional-chinese-medicine/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/traditional-chinese-medicine/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/traditional-chinese-medicine/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/traditional-chinese-medicine/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/traditional-chinese-medicine/6.webp']
+      },
+    ]
+  },
+  {
+    id: "river-residence", 
+    title: ["River", "Residence"], // 数组格式：支持精准控制两行排版
+    year: "2018",
+    category: "Adaptive Reuse / Urban Waterfront",
+    ringImage: "/river-residence/1.webp", 
+    description: "From Vessel Fabrication to Aquatic Habitation: The adaptive reuse of the historic Guangzhou Shipyard into a resilient mixed-use waterfront.",
+    mainImage: "/river-residence/1.webp",
+    location: "Guangzhou, China",
+    sector: "Mixed-use / Industrial Heritage",
+    status: "Academic / Undergraduate Design",
+    scale: "Large-scale Urban Intervention",
+    architect: "Peng Li", 
+    contribution: "CD, DD, Parametric Modeling, Cinematic Rendering",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Description',
+        text: 'As a century-old icon of China\'s industrial evolution, the Guangzhou Shipyard faced marginalization amidst rapid urbanization. This project seeks to preserve this indelible cultural symbol by transforming the abandoned industrial site into a vibrant commercial and residential hub. The design intervention pivots on the conceptual evolution from "shipbuilding" to "boat dwelling"—a typology that honors the site\'s maritime heritage while addressing contemporary housing needs. By repurposing industrial relics as structural frameworks for modern living, the project ensures that the spirit of the riverboat is not merely remembered, but inhabited, creating a seamless continuity between Guangzhou\'s industrial past and its urban future.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/3.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/4.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/6.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/7.webp']
+      },{
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/8.webp']
+      },{
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/river-residence/9.webp']
+      },
     ]
   }
 ];

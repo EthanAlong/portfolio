@@ -203,8 +203,51 @@ export default function ProjectPage({ params }) {
                 </div>
               );
             }
+            if (block.type === 'mixedGrid') {
+              return (
+                <div key={idx} className={`${styles.revealItem} ${styles.gridSystem} mb-[15vh]`}>
+                  {block.items.map((item, i) => (
+                    <div key={i} className={styles.colHalf}> {/* 强制两列布局，每列占一半 */}
+                      
+                      {/* 如果是图片 */}
+                      {item.type === 'image' && (
+                        <>
+                          <img 
+                            src={item.src} 
+                            alt="" 
+                            className={`${styles.magazineImg} ${item.hasBorder ? styles.withBorder : ''}`} 
+                            onLoad={onImageLoad} 
+                          />
+                          <div className="mt-4 flex justify-between text-[10px] font-black border-t border-black pt-2 uppercase">
+                            <span>{item.customTitle || "Plate Index"}</span>
+                            <span>{item.label || `0${i+1}`}</span>
+                          </div>
+                        </>
+                      )}
+
+                      {/* 如果是视频 */}
+                      {item.type === 'video' && (
+                        <>
+                          <DelayedVideo 
+                            src={item.src} 
+                            className={styles.magazineImg} 
+                            onLoadedData={onImageLoad}
+                          />
+                          <div className="mt-4 flex justify-between text-[10px] font-black border-t border-black pt-2 uppercase">
+                            <span>{item.customTitle || "Motion Sequence"}</span>
+                            <span>{item.label || "Loop"}</span>
+                          </div>
+                        </>
+                      )}
+
+                    </div>
+                  ))}
+                </div>
+              );
+            }
             return null;
           })}
+          
 
           <div className="h-[25vh]" />
         </div>
