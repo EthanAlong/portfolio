@@ -13,8 +13,8 @@ export default function AboutPage() {
           </h1>
         </div>
         <div className={styles.sidebarBottom}>
-          <div className={styles.sidebarMetadata}>COMPUTATIONAL ARCHITECT</div>
-          <div className={styles.sidebarMetadata}>LA / SHANGHAI</div>
+          <div className={styles.sidebarMetadata}>COMPUTATIONAL DESIGNER</div>
+          <div className={styles.sidebarMetadata}>LA / GUANGZHOU</div>
         </div>
       </aside>
 
@@ -29,7 +29,8 @@ export default function AboutPage() {
           <div className={styles.metaGrid}>
             <div className={`${styles.metaItem} ${styles.visible}`}>
               <span className={styles.metaLabel}>Contact</span>
-              <span className={styles.metaValue}>yourname@email.com</span>
+              <span className={styles.metaValue}>ethan_along@outlook.com</span>
+              <span className={styles.metaValue}>ethanh@plusarchitects.com</span>
             </div>
             <div className={`${styles.metaItem} ${styles.visible}`}>
               <span className={styles.metaLabel}>Location</span>
@@ -37,11 +38,11 @@ export default function AboutPage() {
             </div>
             <div className={`${styles.metaItem} ${styles.visible}`}>
               <span className={styles.metaLabel}>Social</span>
-              <span className={styles.metaValue}>Instagram / LinkedIn</span>
+              <span className={styles.metaValue}>LinkedIn</span>
             </div>
             <div className={`${styles.metaItem} ${styles.visible}`}>
               <span className={styles.metaLabel}>Education</span>
-              <span className={styles.metaValue}>M.Arch, SCI-Arc</span>
+              <span className={styles.metaValue}>UCLA</span>
             </div>
             <div className={`${styles.metaItem} ${styles.visible}`}>
               <span className={styles.metaLabel}>Tools</span>
