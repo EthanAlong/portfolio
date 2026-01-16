@@ -935,49 +935,54 @@ const realProjects = [
     ]
   },
   {
-    id: "robotic-arms", 
-    title: ["Robotic", "Arm","Filming"], // 数组格式：支持精准控制两行排版
+    id: "pulse-station", 
+    title: ["Pulse", "Station"], // 数组格式：支持精准控制两行排版
     year: "2022",
-    category: "Robotics / Media Architecture",
-    ringImage: "/robotic-arms/1.webp", 
-    description: "A synchronized exploration of media architecture, utilizing 6-axis robotic cinematography to document and animate physical models through dynamic spatial projection mapping.",
-    mainImage: "/robotic-arms/1.webp",
-    location: "Los Angeles, CA",
+    category: "Speculative Design / XR Narrative",
+    ringImage: "/pulse-station/1.webp", 
+    description: "An immersive Unreal Engine narrative exploring the future of social intimacy through emotional masks and AR-driven persona projections.",
+    mainImage: "/pulse-station/1.webp",
+    location: "Virtual",
     sector: "Academic Research & Prototyping",
-    status: "Completed Prototype",
+    status: "Experimental Prototype",
     scale: "Installation / Model Scale",
-    architect: "Matt Conway / UCLA", 
-    contribution: "KUKA PRC Programming, Physical Fabrication",
+    architect: "-", 
+    contribution: "UE5 Development / Interaction Logic",
     content: [
       {
         type: 'textBlock',
         title: 'Project Description',
-        text: 'Developed during my research at UCLA, this project investigates the intersection of digital control and physical representation. The workflow involved programming KUKA industrial robotic arms to execute complex, precise camera paths for the cinematic documentation of analog architectural models. Furthermore, the project integrated spatial augmented reality (SAR) through overhead projectors, accurately overlaying dynamic digital content onto complex physical geometries to create a synchronized, hybrid reality experience'
+        text: 'Set within a surreal liminal space, Pulse Station is a speculative exploration of human connection in the age of augmented reality. The journey begins at a transitional station where users are required to don a physical-digital mask before entering a communal bar environment. This mask serves as an interface for “Affective Casting”: users select their current emotional state, which is then translated into a persistent AR aura projected onto their physical form. Through the lens of the mask, participants perceive a world where emotions are no longer internal, but externalized, atmospheric data. This project leverages the cinematic power of Unreal Engine to visualize a future where social barriers are replaced by digital transparency, challenging the authenticity of identity in a gamified social landscape.'
       },
       {
         type: 'videoEmbed',
         columns: 1, // 一张图占据 100% 宽度
-        src: ['/robotic-arms/2.mp4']
+        src: ['/pulse-station/7.mp4']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/robotic-arms/3.webp']
+        images: ['/pulse-station/2.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/robotic-arms/4.webp']
+        images: ['/pulse-station/3.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/robotic-arms/5.webp']
+        images: ['/pulse-station/4.webp']
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/robotic-arms/6.webp']
+        images: ['/pulse-station/5.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/pulse-station/6.webp']
       }
        
     ]
