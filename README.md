@@ -1,6 +1,6 @@
 # EthanDigital Portfolio 2026
 
-![Project Banner](public/og-image.jpg)
+![Project Banner](public/og-image.png)
 
 **An immersive, 3D interactive portfolio website.**
 Combining the high-performance rendering capabilities of **React Three Fiber** with the server-side advantages of **Next.js**, this project delivers a digital experience characterized by spatial depth, parallax effects, and seamless cinematic transitions.
