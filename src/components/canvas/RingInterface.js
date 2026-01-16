@@ -1,5 +1,5 @@
 "use client"
-import React, { useRef, useState, useEffect, Suspense } from 'react'
+import React, { useRef, useState, useEffect, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Image, Text } from '@react-three/drei'
 import { useRouter } from 'next/navigation'
@@ -65,6 +65,104 @@ const CONFIG = {
     
     NAVIGATE_DELAY: 2500,    // 正式切页延迟
   }
+}
+
+// --- 【核心组件：数据网络 (DataNetwork)】 ---
+// 替代 Vanta/Sparkles。实现点与点之间的连线，以及整体公转。
+function DataNetwork() {
+  const groupRef = useRef()
+  const linesRef = useRef()
+  
+  // 1. 生成静态粒子数据 (只计算一次)
+  const { points, linesGeometry } = useMemo(() => {
+    const particleCount = 150; // 粒子数量
+    const radius = 160;         // 分布半径
+    const connectionDist = 28; // 连线距离阈值
+
+    const positions = new Float32Array(particleCount * 3);
+    const particles = [];
+
+    // 生成随机点
+    for (let i = 0; i < particleCount; i++) {
+      const x = (Math.random() - 0.5) * radius * 2;
+      const y = (Math.random() - 0.5) * radius * 1.5;
+      const z = (Math.random() - 0.5) * radius * 0.8; // 稍微扁一点
+      
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+      particles.push(new THREE.Vector3(x, y, z));
+    }
+
+    // 计算连线 (静态拓扑，性能极高)
+    const linePositions = [];
+    for (let i = 0; i < particleCount; i++) {
+      for (let j = i + 1; j < particleCount; j++) {
+        const dist = particles[i].distanceTo(particles[j]);
+        if (dist < connectionDist) {
+          linePositions.push(
+            particles[i].x, particles[i].y, particles[i].z,
+            particles[j].x, particles[j].y, particles[j].z
+          );
+        }
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+
+    return { 
+      points: positions, 
+      linesGeometry: geometry 
+    };
+  }, []);
+
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      // 1. 集体公转：绝对不会自转，只是整体像星系一样转
+      groupRef.current.rotation.y -= delta * 0.03; 
+    }
+    
+    if (linesRef.current) {
+      // 2. 线条呼吸效果：模拟数据传输的闪烁感
+      // 利用正弦波让透明度在 0.05 到 0.25 之间波动
+      const breath = 0.15 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      linesRef.current.material.opacity = breath;
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 0, -10]}> 
+      {/* 粒子点 (Nodes) */}
+      <points>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={points.length / 3}
+            array={points}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.4}           // 点的大小
+          color="#aaaaaa"      // 浅灰色节点
+          transparent
+          opacity={0.8}
+          sizeAttenuation={true}
+        />
+      </points>
+
+      {/* 连线 (Links) */}
+      <lineSegments ref={linesRef} geometry={linesGeometry}>
+        <lineBasicMaterial
+          color="#555555"      // 深灰色连线
+          transparent
+          opacity={0.15}       // 初始透明度 (会被 useFrame 覆盖)
+          depthWrite={false}   // 关键：防止线条遮挡
+        />
+      </lineSegments>
+    </group>
+  )
 }
 
 // 1. 项目单体组件
@@ -149,6 +247,7 @@ function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
 function SceneContent({ targetRotation, setActiveProject, activeProject, onNavigate, isTransitioning, introActive, mousePos }) {
   const spinGroup = useRef()
   const tiltGroup = useRef()
+  const bgGroup = useRef() // 新增背景容器 Ref
   const scrollRotation = useRef(CONFIG.RING.INITIAL_OFFSET)
   const transitionRadiusScale = useRef(1.0) 
 
@@ -175,27 +274,45 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
       spinGroup.current.scale.setScalar(transitionRadiusScale.current)
     }
 
+    // --- Ring 的视差倾斜 (前景) ---
     if (tiltGroup.current && !isTransitioning) {
       const tx = mousePos.current.y * CONFIG.MOUSE_TILT.X_INTENSITY
       const tz = -mousePos.current.x * CONFIG.MOUSE_TILT.Z_INTENSITY
       tiltGroup.current.rotation.x = THREE.MathUtils.lerp(tiltGroup.current.rotation.x, tx, CONFIG.MOUSE_TILT.SMOOTHING)
       tiltGroup.current.rotation.z = THREE.MathUtils.lerp(tiltGroup.current.rotation.z, tz, CONFIG.MOUSE_TILT.SMOOTHING)
     }
+
+    // --- 【背景的视差倾斜 (模拟引力)】 ---
+    if (bgGroup.current && !isTransitioning) {
+      // 强度比 Ring 大，产生空间错位感 (Parallax)
+      const bgTx = mousePos.current.y * 0.15; 
+      const bgTz = -mousePos.current.x * 0.15;
+      bgGroup.current.rotation.x = THREE.MathUtils.lerp(bgGroup.current.rotation.x, bgTx, 0.03)
+      bgGroup.current.rotation.z = THREE.MathUtils.lerp(bgGroup.current.rotation.z, bgTz, 0.03)
+    }
   })
 
   return (
-    <group ref={tiltGroup}>
-      <group ref={spinGroup}>
-        {projects.map((item, i) => (
-          <ProjectItem 
-            key={item.id} index={i} total={projects.length} item={item} 
-            setActiveProject={setActiveProject} onNavigate={onNavigate} 
-            isTransitioning={isTransitioning}
-          />
-        ))}
+    <>
+      {/* --- 【背景层：放置 DataNetwork】 --- */}
+      <group ref={bgGroup}>
+        <DataNetwork />
       </group>
-      <CentralDisplay activeProject={activeProject} onNavigate={onNavigate} isTransitioning={isTransitioning} />
-    </group>
+
+      {/* --- 前景层：Ring --- */}
+      <group ref={tiltGroup}>
+        <group ref={spinGroup}>
+          {projects.map((item, i) => (
+            <ProjectItem 
+              key={item.id} index={i} total={projects.length} item={item} 
+              setActiveProject={setActiveProject} onNavigate={onNavigate} 
+              isTransitioning={isTransitioning}
+            />
+          ))}
+        </group>
+        <CentralDisplay activeProject={activeProject} onNavigate={onNavigate} isTransitioning={isTransitioning} />
+      </group>
+    </>
   )
 }
 
@@ -203,16 +320,12 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
 export default function RingInterface() {
   const router = useRouter()
   const [hasMounted, setHasMounted] = useState(false)
-  
-  // --- 【错峰加载：控制 Canvas 是否渲染】 ---
   const [canRenderCanvas, setCanRenderCanvas] = useState(false)
-
   const [activeProject, setActiveProject] = useState(null)
   const [isLoading, setIsLoading] = useState(!globalInitialized)
   
-  // 分段状态控制
-  const [isTransitioning, setIsTransitioning] = useState(false) // 开启物理效果
-  const [showOverlay, setShowOverlay] = useState(false)         // 开启黑场+文字
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showOverlay, setShowOverlay] = useState(false)
 
   const targetRotation = useRef(CONFIG.RING.INITIAL_OFFSET)
   const mousePos = useRef({ x: 0, y: 0 })
@@ -221,29 +334,14 @@ export default function RingInterface() {
 
   useEffect(() => {
     setHasMounted(true)
-    
-    // --- 【错峰加载逻辑】 ---
-    // 延迟 300ms 再挂载 Canvas，给 Layout 的 Nav 动画让路
     const timer = setTimeout(() => {
       setCanRenderCanvas(true)
-
-      // 情况 A: 初次加载 (First Load)
       if (!globalInitialized) {
-        setTimeout(() => {
-          setIsLoading(false)
-          targetRotation.current += CONFIG.INTRO.SPIN_KICK
-          globalInitialized = true
-        }, 2500)
-      } 
-      // 情况 B: 回场加载 (Back from Project)
-      else {
-        // 关键：给 100ms 延时确保 Canvas Ready，再给冲量，解决回场不转动问题
-        setTimeout(() => {
-          targetRotation.current += CONFIG.INTRO.SPIN_KICK
-        }, 100)
+        setTimeout(() => { setIsLoading(false); targetRotation.current += CONFIG.INTRO.SPIN_KICK; globalInitialized = true; }, 2500)
+      } else {
+        setTimeout(() => { targetRotation.current += CONFIG.INTRO.SPIN_KICK; }, 100)
       }
     }, 300)
-
     return () => clearTimeout(timer)
   }, [])
 
@@ -270,38 +368,19 @@ export default function RingInterface() {
 
   if (!hasMounted) return <div className="bg-black w-screen h-screen" />
 
-  // 【核心执行序列】
   const handleNavigate = (id) => {
-    // 1. 立即：加速旋转 + 半径扩张 + CSS模糊开始
     setIsTransitioning(true)
-
-    // --- 【后台预加载逻辑】 ---
     const targetProject = projects.find(p => p.id === id);
     if (targetProject) {
       const imagesToPreload = [targetProject.mainImage];
       if (targetProject.content) {
-        const contentImages = targetProject.content
-          .filter(block => block.type === 'imageGrid')
-          .flatMap(block => block.images)
-          .slice(0, 4); 
+        const contentImages = targetProject.content.filter(block => block.type === 'imageGrid').flatMap(block => block.images).slice(0, 4); 
         imagesToPreload.push(...contentImages);
       }
-      imagesToPreload.forEach(src => {
-        const img = new window.Image();
-        img.src = src;
-      });
+      imagesToPreload.forEach(src => { const img = new window.Image(); img.src = src; });
     }
-    // ----------------------------
-    
-    // 2. 延迟：进入黑场遮罩
-    setTimeout(() => {
-      setShowOverlay(true)
-    }, CONFIG.TRANSITION.OVERLAY_DELAY)
-
-    // 3. 最后：跳转页面
-    setTimeout(() => {
-      router.push(`/project/${id}`)
-    }, CONFIG.TRANSITION.NAVIGATE_DELAY)
+    setTimeout(() => setShowOverlay(true), CONFIG.TRANSITION.OVERLAY_DELAY)
+    setTimeout(() => router.push(`/project/${id}`), CONFIG.TRANSITION.NAVIGATE_DELAY)
   }
 
   const getLoaderTitle = () => {
@@ -311,47 +390,26 @@ export default function RingInterface() {
 
   return (
     <div className={`main-wrapper ${isTransitioning ? 'is-blurring' : ''}`}>
-      {/* 初始加载界面 */}
-      {isLoading && (
-        <div className="initial-loader">
-          <div className="wipe-text">INITIALIZING ARCHIVE</div>
-          <div className="loading-bar-container"><div className="loading-bar-fill" /></div>
-        </div>
-      )}
-
-      {/* 转场黑色遮罩与文字加载界面 */}
-      {showOverlay && (
-        <div className="clou-loader-overlay">
-           <div className="letter-wrapper">
-             {getLoaderTitle().split('').map((char, i) => (
-               <span 
-                 key={i} 
-                 className="stagger-letter" 
-                 style={{ 
-                   animationDelay: `${i * CONFIG.TRANSITION.LETTER_STAGGER}s`,
-                   animationDuration: CONFIG.TRANSITION.LETTER_ANIM_DURATION 
-                 }}
-               >
-                 {char === ' ' ? '\u00A0' : char}
-               </span>
-             ))}
-           </div>
-        </div>
-      )}
-
-      {/* --- 【标题动画区域】 --- */}
-      {/* 只有当: 1.加载完成 2.不是在转场 3.Canvas已准备好渲染 时才显示 */}
-      {/* 这样可以保证标题出来的时候 Ring 已经稳稳地在那了 */}
+      
+      {isLoading && <div className="initial-loader"><div className="wipe-text">INITIALIZING DATA</div><div className="loading-bar-container"><div className="loading-bar-fill" /></div></div>}
+      
+      {showOverlay && <div className="clou-loader-overlay"><div className="letter-wrapper">{getLoaderTitle().split('').map((char, i) => <span key={i} className="stagger-letter" style={{ animationDelay: `${i * CONFIG.TRANSITION.LETTER_STAGGER}s`, animationDuration: CONFIG.TRANSITION.LETTER_ANIM_DURATION }}>{char === ' ' ? '\u00A0' : char}</span>)}</div></div>}
+      
       {!isLoading && !isTransitioning && canRenderCanvas && (
         <div className="home-title-wrapper">
           <h1 className="home-title-text">PORTFOLIO 2026</h1>
         </div>
       )}
 
-      {/* 条件渲染 Canvas，消除卡顿 */}
+      {/* --- 3D Ring Canvas --- */}
       {canRenderCanvas && (
-        <Canvas camera={{ position: [0, 22, globalInitialized ? 45 : CONFIG.INTRO.CAMERA_START_Z], fov: CONFIG.CAMERA.FOV }}>
-          <color attach="background" args={['#000']} /><ambientLight intensity={3} />
+        <Canvas 
+          camera={{ position: [0, 22, globalInitialized ? 45 : CONFIG.INTRO.CAMERA_START_Z], fov: CONFIG.CAMERA.FOV }}
+          // 这里设置背景颜色，确保背景纯黑
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+        >
+          <color attach="background" args={['#000000']} /> 
+          <ambientLight intensity={3} />
           <SceneContent 
             targetRotation={targetRotation} setActiveProject={setActiveProject} 
             activeProject={activeProject} onNavigate={handleNavigate}
@@ -361,38 +419,23 @@ export default function RingInterface() {
       )}
 
       <style jsx global>{`
-        .main-wrapper { width: 100vw; height: 100vh; background: black; cursor: grab; position: relative; overflow: hidden; font-family: -apple-system, sans-serif; }
+        .main-wrapper { 
+          width: 100vw; height: 100vh; 
+          background: transparent; 
+          cursor: grab; position: relative; overflow: hidden; font-family: -apple-system, sans-serif; 
+        }
         
-        /* 1. 点击时立即开始的模糊 */
-        .is-blurring canvas {
-          filter: blur(${CONFIG.TRANSITION.BLUR_STRENGTH});
-          transition: filter 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* 2. 转场黑色加载界面 */
-        .clou-loader-overlay { 
-          position: absolute; inset: 0; z-index: 600; background: #000;
-          display: flex; align-items: center; justify-content: center;
-          animation: overlayFadeIn ${CONFIG.TRANSITION.FADE_TIME} ease forwards;
-        }
-
+        .is-blurring canvas { filter: blur(${CONFIG.TRANSITION.BLUR_STRENGTH}); transition: filter 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .clou-loader-overlay { position: absolute; inset: 0; z-index: 600; background: #000; display: flex; align-items: center; justify-content: center; animation: overlayFadeIn ${CONFIG.TRANSITION.FADE_TIME} ease forwards; }
         @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* 3. 字母动画 */
-        .stagger-letter { 
-          color: white; font-size: 5vw; font-weight: 900; text-transform: uppercase; 
-          display: inline-block; opacity: 0;
-          animation: letterUp ease forwards; 
-        }
+        .stagger-letter { color: white; font-size: 5vw; font-weight: 900; text-transform: uppercase; display: inline-block; opacity: 0; animation: letterUp ease forwards; }
         @keyframes letterUp { from { opacity: 0; transform: translateY(50%); } to { opacity: 1; transform: translateY(0); } }
-
         .initial-loader { position: absolute; inset: 0; z-index: 500; background: black; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .wipe-text { color: white; font-size: 10px; font-weight: 900; letter-spacing: 0.8em; clip-path: inset(0 100% 0 0); animation: textWipe 1.5s ease forwards 0.5s; }
         @keyframes textWipe { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0 0 0); } }
         .loading-bar-container { width: 120px; height: 1px; background: rgba(255,255,255,0.1); margin-top: 24px; overflow: hidden; }
         .loading-bar-fill { width: 100%; height: 100%; background: white; animation: barSlide 2s infinite; }
 
-        /* --- 标题动画 CSS --- */
         .home-title-wrapper {
           position: absolute; bottom: 40px; left: 40px; z-index: 10; pointer-events: none; color: white;
         }
@@ -400,7 +443,6 @@ export default function RingInterface() {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           font-size: 3rem; font-weight: 900; margin: 0; letter-spacing: -2px; line-height: 1;
           opacity: 0;
-          /* 延迟 0.2s 确保 Ring 先出现，再刷文字 */
           animation: revealTitle 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
         }
         @keyframes revealTitle {
