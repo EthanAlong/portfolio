@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# EthanDigital Portfolio 2026
 
-## Getting Started
+![Project Banner](public/og-image.jpg)
 
-First, run the development server:
+**An immersive, 3D interactive portfolio website.**
+Combining the high-performance rendering capabilities of **React Three Fiber** with the server-side advantages of **Next.js**, this project delivers a digital experience characterized by spatial depth, parallax effects, and seamless cinematic transitions.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **🌌 3D Ring Navigation System**
+  - Custom circular layout algorithm based on trigonometric functions.
+  - Implements physics-based inertial scrolling, mouse dragging, and wheel interaction.
+  - **Dynamic Mouse Parallax Tilt**: Simulates real-world gravitational pull and depth within the 3D space.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **🕸️ Native Particle Data Network**
+  - **Zero External Dependencies**: Replaced legacy Vanta.js with a custom implementation using native Three.js `BufferGeometry`.
+  - **High-Performance Rendering**: Renders 500+ particles with dynamic connections (topology) in a single draw call.
+  - **Interactive Dynamics**: Features a slowly orbiting "galaxy" motion, breathing connection lines, and mouse-influence parallax, all integrated within the same Canvas to eliminate z-index layering issues.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **🚀 Seamless Cinematic Transitions**
+  - **"Spin & Expand" Effect**: Upon clicking a project, the ring accelerates and expands outward for a dramatic entry.
+  - **Staggered Loading Architecture**: Ensures UI animations complete smoothly before loading heavy 3D assets.
+  - **Smart Preloading**: Silently preloads high-definition project assets during the transition phase to prevent layout shifts.
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **3D Engine**: [React Three Fiber (R3F)](https://docs.pmnd.rs/react-three-fiber) / [Three.js](https://threejs.org/)
+- **3D Utilities**: [@react-three/drei](https://github.com/pmndrs/drei) (Used for Image, Text, and Sparkles components)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animation**: R3F `useFrame` (Physics/Loop animations) + CSS Keyframes (UI animations)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ⚡️ Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository**
+   ```bash
+   git clone [https://github.com/your-username/portfolio.git](https://github.com/your-username/portfolio.git)
+   cd portfolio
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+3. **Run the development server**
+   ```bash
+   npm run dev
+4. **Open in browser**
+   Open http://localhost:3000 with your browser to see the result.
 
-## Deploy on Vercel
+   📂 Project Structure
+   ```bash
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   src/
+   ├── app/
+   │   ├── globals.css        # Global styles (Handles transparent canvas setup)
+   │   ├── layout.js          # Root layout with dynamic Navigation color control
+   │   └── page.js            # Home entry point
+   ├── components/
+   │   └── canvas/
+   │       └── RingInterface.js # Core 3D Component: Contains Ring logic, Particle Network, and Camera controls
+   └── data/
+       └── projects.js        # Data source for portfolio items
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🎨 Design & Engineering Details
+Visuals: Procedural Background
+Instead of using heavy video files or GIFs, the background is generated in real-time using code. It creates a deep, slowly orbiting particle universe. The particles connect dynamically based on proximity, simulating a data topology, and respond subtly to mouse movements to create a sense of immersion.
+
+Performance Optimization
+Native Implementation: Moved away from Vanta.js to a custom R3F implementation to fix compatibility issues with modern Three.js (r160+) and improve frame rates.
+
+Dynamic Imports: Used next/dynamic and React.lazy to split heavy 3D logic from the initial bundle.
+
+Canvas Visibility Control: Utilized CSS opacity transitions and pointer-events management to ensure no white flashes occur during page navigation or asset loading.
+
+BufferGeometry Optimization: The particle system manipulates buffer data directly rather than creating thousands of separate object instances, significantly reducing draw calls.
+
+📄 License
+MIT © 2026 EthanDigital
