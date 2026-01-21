@@ -37,7 +37,37 @@ const CONFIG = {
   },
   CAMERA: {
     POSITION: [0, 22, 45],   // 俯视稳定视角 [X, Y, Z]
+    LOOK_AT: [0, 0, 0],      // 看向中心
     FOV: 60,
+  },
+  // --- 【移动端配置】 ---
+  MOBILE: {
+    BREAKPOINT: 768,         // 移动端断点宽度
+    CAMERA: {
+      POSITION: [0, 20, 40], // 相机位置
+      LOOK_AT: [-20, 0, 0],  // 【关键】相机看向左侧，让左半环居中显示
+      FOV: 55,
+    },
+    RING: {
+      RADIUS: 18,            // 稍小的半径
+      IMAGE_W: 5,
+      IMAGE_H: 3.5,
+      INITIAL_OFFSET: Math.PI * 0.5, // 初始旋转让左侧项目面向相机
+    },
+    CENTRAL: {
+      IMAGE_W: 9,
+      IMAGE_H: 6,
+      X_OFFSET: -24,         // 缩略图在左半环的左侧浮动
+      Y_OFFSET: 0,
+      Z_OFFSET: 10,          // 稍微靠前，避免被ring遮挡
+      TEXT_Y: -5,
+    },
+    // 陀螺仪倾斜配置
+    GYRO: {
+      X_INTENSITY: 0.015,    // 前后倾斜强度
+      Z_INTENSITY: 0.025,    // 左右倾斜强度
+      SMOOTHING: 0.08,       // 平滑度
+    },
   },
   INTERACTION: {
     WHEEL_SPEED: 0.002,      // 滚轮灵敏度
@@ -166,25 +196,30 @@ function DataNetwork() {
 }
 
 // 1. 项目单体组件
-function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTransitioning }) {
+function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTransitioning, isMobile }) {
   const ref = useRef()
   const [hovered, setHover] = useState(false)
   const angle = (index / total) * Math.PI * 2
-  const currentRadius = useRef(CONFIG.RING.RADIUS)
+
+  const ringConfig = isMobile ? CONFIG.MOBILE.RING : CONFIG.RING
+  const currentRadius = useRef(ringConfig.RADIUS)
 
   useFrame(() => {
     if (!ref.current) return
-    const targetBaseRadius = hovered ? CONFIG.RING.RADIUS + CONFIG.RING.HOVER_OUT : CONFIG.RING.RADIUS
+    const baseRadius = isMobile ? CONFIG.MOBILE.RING.RADIUS : CONFIG.RING.RADIUS
+    const targetBaseRadius = hovered ? baseRadius + CONFIG.RING.HOVER_OUT : baseRadius
     currentRadius.current = THREE.MathUtils.lerp(currentRadius.current, targetBaseRadius, 0.1)
-    
+
     ref.current.position.set(
-      Math.sin(angle) * currentRadius.current, 
-      THREE.MathUtils.lerp(ref.current.position.y, hovered ? CONFIG.RING.HOVER_UP : 0, 0.1), 
+      Math.sin(angle) * currentRadius.current,
+      THREE.MathUtils.lerp(ref.current.position.y, hovered ? CONFIG.RING.HOVER_UP : 0, 0.1),
       Math.cos(angle) * currentRadius.current
     )
-    
+
+    const imgW = isMobile ? CONFIG.MOBILE.RING.IMAGE_W : CONFIG.RING.IMAGE_W
+    const imgH = isMobile ? CONFIG.MOBILE.RING.IMAGE_H : CONFIG.RING.IMAGE_H
     const s = hovered ? 1.05 : 1
-    ref.current.scale.lerp(new THREE.Vector3(CONFIG.RING.IMAGE_W * s, CONFIG.RING.IMAGE_H * s, 1), 0.1)
+    ref.current.scale.lerp(new THREE.Vector3(imgW * s, imgH * s, 1), 0.1)
   })
 
   return (
@@ -203,13 +238,24 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
   )
 }
 
-// 2. 中间大图显示
-function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
+// 2. 中间大图显示 (移动端在左侧浮动，始终面向相机)
+function CentralDisplay({ activeProject, onNavigate, isTransitioning, isMobile }) {
   const group = useRef()
-  useFrame(() => {
+  const imageRef = useRef()
+  const textRef = useRef()
+
+  useFrame((state) => {
     if (!group.current) return
     const targetScale = (activeProject && !isTransitioning) ? 1 : 0
     group.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1)
+
+    // 【关键】让图片和文字始终面向相机（Billboard效果）
+    if (isMobile && imageRef.current) {
+      imageRef.current.lookAt(state.camera.position)
+    }
+    if (isMobile && textRef.current) {
+      textRef.current.lookAt(state.camera.position)
+    }
   })
 
   const getTitleString = () => {
@@ -217,22 +263,33 @@ function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
     return Array.isArray(activeProject.title) ? activeProject.title.join(' ') : activeProject.title;
   };
 
+  // 根据设备选择配置
+  const centralConfig = isMobile ? CONFIG.MOBILE.CENTRAL : CONFIG.CENTRAL
+  const xOffset = isMobile ? CONFIG.MOBILE.CENTRAL.X_OFFSET : 0
+
   return (
     <group ref={group}>
       <Suspense fallback={null}>
         {activeProject && (
           <>
-            <Image 
-              url={activeProject.mainImage} 
-              scale={[CONFIG.CENTRAL.IMAGE_W, CONFIG.CENTRAL.IMAGE_H]}
-              position={[0, CONFIG.CENTRAL.Y_OFFSET, CONFIG.CENTRAL.Z_OFFSET]}
+            <Image
+              ref={imageRef}
+              url={activeProject.mainImage}
+              scale={[centralConfig.IMAGE_W, centralConfig.IMAGE_H]}
+              position={[xOffset, centralConfig.Y_OFFSET, centralConfig.Z_OFFSET]}
               transparent
               toneMapped={false}
               onClick={() => onNavigate(activeProject.id)}
             />
-            <Text 
-              position={[0, CONFIG.CENTRAL.TEXT_Y, CONFIG.CENTRAL.Z_OFFSET + 0.2]} 
-              fontSize={1.2} color="white" fontWeight={900} letterSpacing={-0.05} anchorY="middle"
+            <Text
+              ref={textRef}
+              position={[xOffset, centralConfig.TEXT_Y, centralConfig.Z_OFFSET + 0.2]}
+              fontSize={isMobile ? 0.8 : 1.2}
+              color="white"
+              fontWeight={900}
+              letterSpacing={-0.05}
+              anchorY="middle"
+              maxWidth={isMobile ? 8 : 20}
             >
               {getTitleString().toUpperCase()}
             </Text>
@@ -244,31 +301,38 @@ function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
 }
 
 // 3. 场景逻辑核心驱动
-function SceneContent({ targetRotation, setActiveProject, activeProject, onNavigate, isTransitioning, introActive, mousePos }) {
+function SceneContent({ targetRotation, setActiveProject, activeProject, onNavigate, isTransitioning, introActive, mousePos, isMobile, gyroPos }) {
   const spinGroup = useRef()
   const tiltGroup = useRef()
   const bgGroup = useRef() // 新增背景容器 Ref
-  const scrollRotation = useRef(CONFIG.RING.INITIAL_OFFSET)
-  const transitionRadiusScale = useRef(1.0) 
+
+  const initialOffset = isMobile ? CONFIG.MOBILE.RING.INITIAL_OFFSET : CONFIG.RING.INITIAL_OFFSET
+  const scrollRotation = useRef(initialOffset)
+  const transitionRadiusScale = useRef(1.0)
+
+  // 根据设备选择相机目标位置和lookAt目标
+  const cameraTarget = isMobile ? CONFIG.MOBILE.CAMERA.POSITION : CONFIG.CAMERA.POSITION
+  const lookAtTarget = isMobile ? CONFIG.MOBILE.CAMERA.LOOK_AT : CONFIG.CAMERA.LOOK_AT
 
   useFrame((state, delta) => {
     if (introActive) {
-      state.camera.position.lerp(new THREE.Vector3(...CONFIG.CAMERA.POSITION), 0.03)
-      state.camera.lookAt(0, 0, 0)
+      state.camera.position.lerp(new THREE.Vector3(...cameraTarget), 0.03)
+      // 【关键】移动端看向左侧，桌面端看向中心
+      state.camera.lookAt(new THREE.Vector3(...lookAtTarget))
     }
 
     // --- 【物理炸裂序列】 ---
     if (isTransitioning) {
       targetRotation.current += delta * CONFIG.TRANSITION.SPIN_ACCEL; // 加速转动
       transitionRadiusScale.current = THREE.MathUtils.lerp( // 半径扩张
-        transitionRadiusScale.current, 
-        CONFIG.TRANSITION.EXPAND_SCALE, 
+        transitionRadiusScale.current,
+        CONFIG.TRANSITION.EXPAND_SCALE,
         CONFIG.TRANSITION.EXPAND_SPEED
       );
     }
 
     scrollRotation.current = THREE.MathUtils.damp(scrollRotation.current, targetRotation.current, CONFIG.INTERACTION.DAMPING, delta)
-    
+
     if (spinGroup.current) {
       spinGroup.current.rotation.y = scrollRotation.current
       spinGroup.current.scale.setScalar(transitionRadiusScale.current)
@@ -276,19 +340,36 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
 
     // --- Ring 的视差倾斜 (前景) ---
     if (tiltGroup.current && !isTransitioning) {
-      const tx = mousePos.current.y * CONFIG.MOUSE_TILT.X_INTENSITY
-      const tz = -mousePos.current.x * CONFIG.MOUSE_TILT.Z_INTENSITY
-      tiltGroup.current.rotation.x = THREE.MathUtils.lerp(tiltGroup.current.rotation.x, tx, CONFIG.MOUSE_TILT.SMOOTHING)
-      tiltGroup.current.rotation.z = THREE.MathUtils.lerp(tiltGroup.current.rotation.z, tz, CONFIG.MOUSE_TILT.SMOOTHING)
+      if (isMobile && gyroPos) {
+        // 移动端：使用陀螺仪数据
+        const tx = gyroPos.current.x * CONFIG.MOBILE.GYRO.X_INTENSITY
+        const tz = -gyroPos.current.z * CONFIG.MOBILE.GYRO.Z_INTENSITY
+        tiltGroup.current.rotation.x = THREE.MathUtils.lerp(tiltGroup.current.rotation.x, tx, CONFIG.MOBILE.GYRO.SMOOTHING)
+        tiltGroup.current.rotation.z = THREE.MathUtils.lerp(tiltGroup.current.rotation.z, tz, CONFIG.MOBILE.GYRO.SMOOTHING)
+      } else {
+        // 桌面端：使用鼠标位置
+        const tx = mousePos.current.y * CONFIG.MOUSE_TILT.X_INTENSITY
+        const tz = -mousePos.current.x * CONFIG.MOUSE_TILT.Z_INTENSITY
+        tiltGroup.current.rotation.x = THREE.MathUtils.lerp(tiltGroup.current.rotation.x, tx, CONFIG.MOUSE_TILT.SMOOTHING)
+        tiltGroup.current.rotation.z = THREE.MathUtils.lerp(tiltGroup.current.rotation.z, tz, CONFIG.MOUSE_TILT.SMOOTHING)
+      }
     }
 
     // --- 【背景的视差倾斜 (模拟引力)】 ---
     if (bgGroup.current && !isTransitioning) {
-      // 强度比 Ring 大，产生空间错位感 (Parallax)
-      const bgTx = mousePos.current.y * 0.15; 
-      const bgTz = -mousePos.current.x * 0.15;
-      bgGroup.current.rotation.x = THREE.MathUtils.lerp(bgGroup.current.rotation.x, bgTx, 0.03)
-      bgGroup.current.rotation.z = THREE.MathUtils.lerp(bgGroup.current.rotation.z, bgTz, 0.03)
+      if (isMobile && gyroPos) {
+        // 移动端：背景也跟随陀螺仪，强度稍大
+        const bgTx = gyroPos.current.x * 0.03
+        const bgTz = -gyroPos.current.z * 0.05
+        bgGroup.current.rotation.x = THREE.MathUtils.lerp(bgGroup.current.rotation.x, bgTx, 0.05)
+        bgGroup.current.rotation.z = THREE.MathUtils.lerp(bgGroup.current.rotation.z, bgTz, 0.05)
+      } else {
+        // 桌面端：使用鼠标位置
+        const bgTx = mousePos.current.y * 0.15
+        const bgTz = -mousePos.current.x * 0.15
+        bgGroup.current.rotation.x = THREE.MathUtils.lerp(bgGroup.current.rotation.x, bgTx, 0.03)
+        bgGroup.current.rotation.z = THREE.MathUtils.lerp(bgGroup.current.rotation.z, bgTz, 0.03)
+      }
     }
   })
 
@@ -303,14 +384,14 @@ function SceneContent({ targetRotation, setActiveProject, activeProject, onNavig
       <group ref={tiltGroup}>
         <group ref={spinGroup}>
           {projects.map((item, i) => (
-            <ProjectItem 
-              key={item.id} index={i} total={projects.length} item={item} 
-              setActiveProject={setActiveProject} onNavigate={onNavigate} 
-              isTransitioning={isTransitioning}
+            <ProjectItem
+              key={item.id} index={i} total={projects.length} item={item}
+              setActiveProject={setActiveProject} onNavigate={onNavigate}
+              isTransitioning={isTransitioning} isMobile={isMobile}
             />
           ))}
         </group>
-        <CentralDisplay activeProject={activeProject} onNavigate={onNavigate} isTransitioning={isTransitioning} />
+        <CentralDisplay activeProject={activeProject} onNavigate={onNavigate} isTransitioning={isTransitioning} isMobile={isMobile} />
       </group>
     </>
   )
@@ -323,14 +404,32 @@ export default function RingInterface() {
   const [canRenderCanvas, setCanRenderCanvas] = useState(false)
   const [activeProject, setActiveProject] = useState(null)
   const [isLoading, setIsLoading] = useState(!globalInitialized)
-  
+  const [isMobile, setIsMobile] = useState(false)
+
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showOverlay, setShowOverlay] = useState(false)
 
   const targetRotation = useRef(CONFIG.RING.INITIAL_OFFSET)
   const mousePos = useRef({ x: 0, y: 0 })
+  const gyroPos = useRef({ x: 0, z: 0 })  // 陀螺仪数据
   const isDragging = useRef(false)
   const lastMouseX = useRef(0)
+  const lastTouchX = useRef(0)
+
+  // 移动端检测
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < CONFIG.MOBILE.BREAKPOINT
+      setIsMobile(mobile)
+      // 更新初始旋转偏移
+      if (mobile) {
+        targetRotation.current = CONFIG.MOBILE.RING.INITIAL_OFFSET
+      }
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     setHasMounted(true)
@@ -347,24 +446,103 @@ export default function RingInterface() {
 
   useEffect(() => {
     if (!hasMounted) return
+
+    // --- 桌面端事件 ---
     const hMove = (e) => {
       mousePos.current.x = (e.clientX / window.innerWidth) * 2 - 1
       mousePos.current.y = (e.clientY / window.innerHeight) * 2 - 1
-      if (isDragging.current && !isTransitioning) { 
+      if (isDragging.current && !isTransitioning) {
         targetRotation.current += (e.clientX - lastMouseX.current) * CONFIG.INTERACTION.DRAG_SPEED
-        lastMouseX.current = e.clientX 
+        lastMouseX.current = e.clientX
       }
     }
     const hWheel = (e) => { if(!isTransitioning) targetRotation.current -= e.deltaY * CONFIG.INTERACTION.WHEEL_SPEED }
     const hDown = (e) => { if(!isTransitioning) { isDragging.current = true; lastMouseX.current = e.clientX } }
     const hUp = () => isDragging.current = false
-    window.addEventListener('wheel', hWheel, { passive: true }); window.addEventListener('mousedown', hDown);
-    window.addEventListener('mousemove', hMove); window.addEventListener('mouseup', hUp)
+
+    // --- 移动端触摸事件 ---
+    const hTouchStart = (e) => {
+      if (!isTransitioning && e.touches.length === 1) {
+        isDragging.current = true
+        lastTouchX.current = e.touches[0].clientX
+      }
+    }
+    const hTouchMove = (e) => {
+      if (isDragging.current && !isTransitioning && e.touches.length === 1) {
+        const touchX = e.touches[0].clientX
+        // 移动端拖拽速度稍微调高一点
+        targetRotation.current += (touchX - lastTouchX.current) * CONFIG.INTERACTION.DRAG_SPEED * 1.5
+        lastTouchX.current = touchX
+      }
+    }
+    const hTouchEnd = () => isDragging.current = false
+
+    // 桌面端监听
+    window.addEventListener('wheel', hWheel, { passive: true })
+    window.addEventListener('mousedown', hDown)
+    window.addEventListener('mousemove', hMove)
+    window.addEventListener('mouseup', hUp)
+
+    // 移动端监听
+    window.addEventListener('touchstart', hTouchStart, { passive: true })
+    window.addEventListener('touchmove', hTouchMove, { passive: true })
+    window.addEventListener('touchend', hTouchEnd)
+
     return () => {
-      window.removeEventListener('wheel', hWheel); window.removeEventListener('mousedown', hDown);
-      window.removeEventListener('mousemove', hMove); window.removeEventListener('mouseup', hUp)
+      window.removeEventListener('wheel', hWheel)
+      window.removeEventListener('mousedown', hDown)
+      window.removeEventListener('mousemove', hMove)
+      window.removeEventListener('mouseup', hUp)
+      window.removeEventListener('touchstart', hTouchStart)
+      window.removeEventListener('touchmove', hTouchMove)
+      window.removeEventListener('touchend', hTouchEnd)
     }
   }, [hasMounted, isTransitioning])
+
+  // --- 移动端陀螺仪支持 ---
+  useEffect(() => {
+    if (!isMobile || !hasMounted) return
+
+    const handleOrientation = (e) => {
+      if (isTransitioning) return
+      // beta: 前后倾斜 (-180 ~ 180), gamma: 左右倾斜 (-90 ~ 90)
+      const beta = e.beta || 0
+      const gamma = e.gamma || 0
+      // 归一化到 -1 ~ 1 范围
+      gyroPos.current.x = Math.max(-1, Math.min(1, beta / 45))   // 前后
+      gyroPos.current.z = Math.max(-1, Math.min(1, gamma / 45))  // 左右
+    }
+
+    // iOS 13+ 需要请求权限
+    const requestPermission = async () => {
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          const permission = await DeviceOrientationEvent.requestPermission()
+          if (permission === 'granted') {
+            window.addEventListener('deviceorientation', handleOrientation)
+          }
+        } catch (err) {
+          console.log('Gyroscope permission denied')
+        }
+      } else {
+        // 非 iOS 或旧版本直接监听
+        window.addEventListener('deviceorientation', handleOrientation)
+      }
+    }
+
+    // 首次触摸时请求权限（iOS要求用户交互后才能请求）
+    const requestOnTouch = () => {
+      requestPermission()
+      window.removeEventListener('touchstart', requestOnTouch)
+    }
+    window.addEventListener('touchstart', requestOnTouch, { once: true })
+
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation)
+      window.removeEventListener('touchstart', requestOnTouch)
+    }
+  }, [isMobile, hasMounted, isTransitioning])
 
   if (!hasMounted) return <div className="bg-black w-screen h-screen" />
 
@@ -403,28 +581,34 @@ export default function RingInterface() {
 
       {/* --- 3D Ring Canvas --- */}
       {canRenderCanvas && (
-        <Canvas 
-          camera={{ position: [0, 22, globalInitialized ? 45 : CONFIG.INTRO.CAMERA_START_Z], fov: CONFIG.CAMERA.FOV }}
-          // 这里设置背景颜色，确保背景纯黑
+        <Canvas
+          camera={{
+            position: isMobile
+              ? [CONFIG.MOBILE.CAMERA.POSITION[0], CONFIG.MOBILE.CAMERA.POSITION[1], globalInitialized ? CONFIG.MOBILE.CAMERA.POSITION[2] : CONFIG.INTRO.CAMERA_START_Z]
+              : [0, 22, globalInitialized ? 45 : CONFIG.INTRO.CAMERA_START_Z],
+            fov: isMobile ? CONFIG.MOBILE.CAMERA.FOV : CONFIG.CAMERA.FOV
+          }}
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
         >
-          <color attach="background" args={['#000000']} /> 
+          <color attach="background" args={['#000000']} />
           <ambientLight intensity={3} />
-          <SceneContent 
-            targetRotation={targetRotation} setActiveProject={setActiveProject} 
+          <SceneContent
+            targetRotation={targetRotation} setActiveProject={setActiveProject}
             activeProject={activeProject} onNavigate={handleNavigate}
             isTransitioning={isTransitioning} introActive={!isLoading} mousePos={mousePos}
+            isMobile={isMobile} gyroPos={gyroPos}
           />
         </Canvas>
       )}
 
       <style jsx global>{`
-        .main-wrapper { 
-          width: 100vw; height: 100vh; 
-          background: transparent; 
-          cursor: grab; position: relative; overflow: hidden; font-family: -apple-system, sans-serif; 
+        .main-wrapper {
+          width: 100vw; height: 100vh;
+          background: transparent;
+          cursor: grab; position: relative; overflow: hidden; font-family: -apple-system, sans-serif;
+          touch-action: none; /* 防止移动端默认手势干扰 */
         }
-        
+
         .is-blurring canvas { filter: blur(${CONFIG.TRANSITION.BLUR_STRENGTH}); transition: filter 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .clou-loader-overlay { position: absolute; inset: 0; z-index: 600; background: #000; display: flex; align-items: center; justify-content: center; animation: overlayFadeIn ${CONFIG.TRANSITION.FADE_TIME} ease forwards; }
         @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -448,6 +632,26 @@ export default function RingInterface() {
         @keyframes revealTitle {
           0% { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-20px); }
           100% { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); }
+        }
+
+        /* --- 移动端样式 --- */
+        @media (max-width: ${CONFIG.MOBILE.BREAKPOINT}px) {
+          .home-title-wrapper {
+            bottom: 24px;
+            left: 20px;
+            right: 20px;
+          }
+          .home-title-text {
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+          }
+          .stagger-letter {
+            font-size: 8vw;
+          }
+          .wipe-text {
+            font-size: 8px;
+            letter-spacing: 0.5em;
+          }
         }
       `}</style>
     </div>
