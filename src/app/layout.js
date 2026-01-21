@@ -45,18 +45,35 @@ export default function RootLayout({ children }) {
             position: fixed;
             top: 0;
             left: 0;
-            height: 80px; 
+            height: 80px;
             z-index: 9999;
             pointer-events: none;
             padding-top: 45px;
-            
+
             /* 让宽度和Padding的变化产生平滑动画 */
-            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1),
                         padding 0.8s cubic-bezier(0.16, 1, 0.3, 1),
                         color 0.5s ease; /* 颜色也加过渡 */
-            
+
             /* 关键：防止padding把宽度撑爆 */
             box-sizing: border-box;
+          }
+
+          /* 移动端导航适配 */
+          @media (max-width: 768px) {
+            .global-nav {
+              width: 100% !important;
+              height: 10vh;
+              padding: 0 20px !important;
+              padding-top: 0 !important;
+            }
+            .logo {
+              font-size: 20px;
+              letter-spacing: 0.02em;
+            }
+            .about-btn {
+              font-size: 12px;
+            }
           }
 
           /* --- 颜色控制核心 --- */
@@ -85,6 +102,8 @@ export default function RootLayout({ children }) {
             color: inherit;
             pointer-events: auto;
             white-space: nowrap;
+            opacity: 0;
+            animation: navFadeIn 0.8s ease forwards 0.3s;
           }
 
           .about-btn {
@@ -95,13 +114,19 @@ export default function RootLayout({ children }) {
             text-decoration: none;
             color: inherit;
             pointer-events: auto;
-            opacity: 1;
+            opacity: 0;
+            animation: navFadeIn 0.8s ease forwards 0.5s;
             transition: opacity 0.3s;
             white-space: nowrap;
           }
 
           .about-btn:hover {
             opacity: 0.6;
+          }
+
+          @keyframes navFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
           }
         `}</style>
       </body>
