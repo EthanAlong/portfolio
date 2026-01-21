@@ -992,6 +992,44 @@ const realProjects = [
       }
        
     ]
+  },
+  {
+    id: "local-ai-deploy", 
+    title: ["AI", "Generative","Workflow"], // 数组格式：支持精准控制两行排版
+    year: "2026",
+    category: "AI Generation / Architectural Visualization",
+    ringImage: "/local-ai-deploy/1.webp", 
+    description: "A modular ComfyUI workflow leveraging the FLUX model to bridge the gap between architectural conceptualization and high-fidelity visualization.",
+    mainImage: "/local-ai-deploy/1.webp",
+    location: "Digital",
+    sector: "Architectural Design Technology",
+    status: "Workflow Developed / In Use",
+    scale: "-",
+    architect: "-", 
+    contribution: "Node Graph Design / FLUX Implementation / Pipeline Integration",
+    content: [
+      {
+        type: 'textBlock',
+        title: 'Project Description',
+        text: 'This project documents the establishment of a high-precision generative AI workflow tailored specifically for architectural design. Moving away from "black-box" generation, this approach utilizes the node-based architecture of ComfyUI alongside the advanced FLUX transformer model to achieve granular control over the output. The central goal is to create a pipeline where architectural intent (perspective, scale, and form) is preserved while harnessing the creative potential of AI for materiality, lighting, and atmospheric context. This digital workspace represents a shift from linear rendering to iterative, modular design generation.'
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        customTitle: "ComfyUI Node Graph",    // 【新参数】覆盖左侧的 "Plate Index"
+        labels: ["Two Images Combination FLUX Workflow"],   // 【新参数】覆盖右侧的 "01"
+        images: ['/local-ai-deploy/2.webp']
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        customTitle: "ComfyUI Node Graph",    // 【新参数】覆盖左侧的 "Plate Index"
+        labels: ["One Images Edit FLUX Workflow"],   // 【新参数】覆盖右侧的 "01"
+        images: ['/local-ai-deploy/3.webp']
+      },
+      
+       
+    ]
   }
 ];
 

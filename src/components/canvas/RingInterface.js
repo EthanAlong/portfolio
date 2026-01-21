@@ -77,7 +77,7 @@ function DataNetwork() {
   const { points, linesGeometry } = useMemo(() => {
     const particleCount = 150; // 粒子数量
     const radius = 160;         // 分布半径
-    const connectionDist = 28; // 连线距离阈值
+    const connectionDist = 35; // 连线距离阈值
 
     const positions = new Float32Array(particleCount * 3);
     const particles = [];
@@ -144,7 +144,7 @@ function DataNetwork() {
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.4}           // 点的大小
+          size={0.5}           // 点的大小
           color="#aaaaaa"      // 浅灰色节点
           transparent
           opacity={0.8}
@@ -157,7 +157,7 @@ function DataNetwork() {
         <lineBasicMaterial
           color="#555555"      // 深灰色连线
           transparent
-          opacity={0.15}       // 初始透明度 (会被 useFrame 覆盖)
+          opacity={0.45}       // 初始透明度 (会被 useFrame 覆盖)
           depthWrite={false}   // 关键：防止线条遮挡
         />
       </lineSegments>
