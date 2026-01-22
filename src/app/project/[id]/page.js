@@ -117,17 +117,33 @@ export default function ProjectPage({ params }) {
 
   /**
    * 曝光动效监视（Intersection Observer）
+   * 桌面端和移动端都使用相同的观察器，但选择不同的元素
    */
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add(styles.visible)
+          if (entry.isIntersecting) {
+            // 桌面端使用 visible，移动端使用 mobileVisible
+            if (isMobile) {
+              entry.target.classList.add(styles.mobileVisible)
+            } else {
+              entry.target.classList.add(styles.visible)
+            }
+          }
         })
       },
       { threshold: 0.05 }
     )
-    document.querySelectorAll(`.${styles.revealItem}, .${styles.metaItem}`).forEach(el => observer.observe(el))
+
+    if (isMobile) {
+      // 移动端监听所有带 reveal 类的元素
+      document.querySelectorAll(`.${styles.mobileReveal}, .${styles.mobileHeroReveal}, .${styles.mobileTitleReveal}, .${styles.mobileMetaReveal}, .${styles.mobileContentReveal}, .${styles.mobileImageReveal}`).forEach(el => observer.observe(el))
+    } else {
+      // 桌面端保持原有逻辑
+      document.querySelectorAll(`.${styles.revealItem}, .${styles.metaItem}`).forEach(el => observer.observe(el))
+    }
+
     return () => observer.disconnect()
   }, [project, isMobile])
 
@@ -157,15 +173,20 @@ export default function ProjectPage({ params }) {
           <button onClick={() => router.push('/')} className={styles.backButton}>
             ← Back
           </button>
-          <Link href="/" className={styles.mobileLogo}>
-            EthanDigital
-          </Link>
+          <div className={styles.mobileNavRight}>
+            <Link href="/" className={styles.mobileLogo}>
+              EthanDigital
+            </Link>
+            <Link href="/about" className={styles.mobileAbout}>
+              About
+            </Link>
+          </div>
         </nav>
 
         {/* 主内容区 - 自然滚动 */}
         <div className={styles.mobileContent}>
-          {/* Hero 区域 */}
-          <div className={styles.mobileHero}>
+          {/* Hero 区域 - 缩放淡入 */}
+          <div className={`${styles.mobileHero} ${styles.mobileHeroReveal}`}>
             <img
               src={project.mainImage}
               alt={getTitleString()}
@@ -174,8 +195,8 @@ export default function ProjectPage({ params }) {
             />
           </div>
 
-          {/* 项目标题 */}
-          <div className={styles.mobileTitleSection}>
+          {/* 项目标题 - 从左滑入 */}
+          <div className={`${styles.mobileTitleSection} ${styles.mobileTitleReveal}`}>
             <h1 className={styles.mobileTitle}>
               {getTitleString().toUpperCase()}
             </h1>
@@ -184,7 +205,7 @@ export default function ProjectPage({ params }) {
             </div>
           </div>
 
-          {/* Metadata 两列 Grid */}
+          {/* Metadata 两列 Grid - 逐个淡入 */}
           <div className={styles.mobileMetaGrid}>
             {[
               { label: "Location", value: project.location },
@@ -194,25 +215,29 @@ export default function ProjectPage({ params }) {
               { label: "Architect", value: project.architect },
               { label: "Contribution", value: project.contribution }
             ].map((item, i) => (
-              <div key={i} className={styles.mobileMetaItem}>
+              <div
+                key={i}
+                className={`${styles.mobileMetaItem} ${styles.mobileMetaReveal}`}
+                style={{ transitionDelay: `${i * 0.08}s` }}
+              >
                 <span className={styles.mobileMetaLabel}>{item.label}</span>
                 <span className={styles.mobileMetaValue}>{item.value || "—"}</span>
               </div>
             ))}
           </div>
 
-          {/* 项目简介 */}
-          <div className={styles.mobileBriefing}>
+          {/* 项目简介 - 淡入 */}
+          <div className={`${styles.mobileBriefing} ${styles.mobileContentReveal}`}>
             <h2 className={styles.mobileSectionTitle}>BRIEFING</h2>
             <p className={styles.mobileBriefingText}>{project.description}</p>
           </div>
 
-          {/* 动态内容渲染 */}
+          {/* 动态内容渲染 - 带淡入效果 */}
           {project.content?.map((block, idx) => {
             // 文字模块
             if (block.type === 'textBlock') {
               return (
-                <div key={idx} className={styles.mobileContentSection}>
+                <div key={idx} className={`${styles.mobileContentSection} ${styles.mobileContentReveal}`}>
                   <h2 className={styles.mobileSectionTitle}>{block.title}</h2>
                   <p className={styles.mobileText}>{block.text}</p>
                 </div>
@@ -224,7 +249,11 @@ export default function ProjectPage({ params }) {
               return (
                 <div key={idx} className={styles.mobileImageGrid}>
                   {block.images.map((img, i) => (
-                    <div key={i} className={styles.mobileImageItem}>
+                    <div
+                      key={i}
+                      className={`${styles.mobileImageItem} ${styles.mobileReveal}`}
+                      style={{ transitionDelay: `${i * 0.1}s` }}
+                    >
                       <img
                         src={img}
                         alt=""
@@ -244,7 +273,7 @@ export default function ProjectPage({ params }) {
             // 视频嵌入模块
             if (block.type === 'videoEmbed') {
               return (
-                <div key={idx} className={styles.mobileVideoSection}>
+                <div key={idx} className={`${styles.mobileVideoSection} ${styles.mobileContentReveal}`}>
                   <DelayedVideo
                     src={block.src}
                     className={styles.mobileVideo}
@@ -263,7 +292,11 @@ export default function ProjectPage({ params }) {
               return (
                 <div key={idx} className={styles.mobileImageGrid}>
                   {block.items.map((item, i) => (
-                    <div key={i} className={styles.mobileImageItem}>
+                    <div
+                      key={i}
+                      className={`${styles.mobileImageItem} ${styles.mobileReveal}`}
+                      style={{ transitionDelay: `${i * 0.1}s` }}
+                    >
                       {item.type === 'image' && (
                         <>
                           <img
@@ -300,16 +333,16 @@ export default function ProjectPage({ params }) {
             return null
           })}
 
-          {/* 项目导航 */}
+          {/* 项目导航 - 显示完整项目名称 */}
           <div className={styles.mobileProjectNav}>
             {prevProject && (
               <Link href={`/project/${prevProject.id}`} className={styles.mobileNavLink}>
-                ← {Array.isArray(prevProject.title) ? prevProject.title[0] : prevProject.title}
+                ← {Array.isArray(prevProject.title) ? prevProject.title.join(' ') : prevProject.title}
               </Link>
             )}
             {nextProject && (
               <Link href={`/project/${nextProject.id}`} className={styles.mobileNavLink}>
-                {Array.isArray(nextProject.title) ? nextProject.title[0] : nextProject.title} →
+                {Array.isArray(nextProject.title) ? nextProject.title.join(' ') : nextProject.title} →
               </Link>
             )}
           </div>

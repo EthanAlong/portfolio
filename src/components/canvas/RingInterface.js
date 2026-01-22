@@ -691,11 +691,29 @@ export default function RingInterface() {
       setIsMobile(mobile)
       if (mobile) {
         targetRotation.current = RING_PARAMS.mobile.ring.initialOffset
+        // 移动端禁止 body 滚动
+        document.body.style.overflow = 'hidden'
+        document.body.style.position = 'fixed'
+        document.body.style.width = '100%'
+        document.body.style.height = '100%'
+      } else {
+        // 桌面端恢复正常
+        document.body.style.overflow = ''
+        document.body.style.position = ''
+        document.body.style.width = ''
+        document.body.style.height = ''
       }
     }
     checkMobile()
     window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+      // 清理：恢复 body 样式
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+      document.body.style.height = ''
+    }
   }, [])
 
   /**
@@ -1041,7 +1059,7 @@ export default function RingInterface() {
         }
 
         /* ============================================ */
-        /* 初始加载动画 */
+        /* 初始加载动画 - 解耦文字和进度条 */
         /* ============================================ */
         .initial-loader {
           position: absolute;
@@ -1054,33 +1072,67 @@ export default function RingInterface() {
           justify-content: center;
         }
 
+        /* 文字动画 - 使用 transform 实现 GPU 加速 */
         .wipe-text {
           color: white;
           font-size: 10px;
           font-weight: 900;
           letter-spacing: 0.8em;
-          clip-path: inset(0 100% 0 0);
-          animation: textWipe 1.5s ease forwards 0.5s;
+          position: relative;
+          overflow: hidden;
+          /* GPU 加速层 */
+          will-change: transform;
+          transform: translateZ(0);
         }
 
-        @keyframes textWipe {
-          0% { clip-path: inset(0 100% 0 0); }
-          100% { clip-path: inset(0 0 0 0); }
+        .wipe-text::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: black;
+          /* 独立的 GPU 加速层 - 与进度条完全解耦 */
+          will-change: transform;
+          transform: translateX(0);
+          animation: textWipeMask 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.5s;
         }
 
+        @keyframes textWipeMask {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(101%); }
+        }
+
+        /* 进度条容器 - 独立的动画层 */
         .loading-bar-container {
           width: 120px;
           height: 1px;
           background: rgba(255,255,255,0.1);
           margin-top: 24px;
           overflow: hidden;
+          position: relative;
+          /* 独立的 GPU 加速层 */
+          will-change: transform;
+          transform: translateZ(0);
         }
 
+        /* 进度条填充 - 使用 transform 实现平滑动画 */
         .loading-bar-fill {
-          width: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 30%;
           height: 100%;
           background: white;
-          animation: barSlide 2s infinite;
+          /* 独立的 GPU 加速层 - 与文字动画完全解耦 */
+          will-change: transform;
+          animation: barSlideSmooth 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes barSlideSmooth {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(400%); }
         }
 
         /* ============================================ */
@@ -1163,14 +1215,23 @@ export default function RingInterface() {
           animation: fadeIn 0.4s ease forwards 0.2s;
         }
 
-        /* 移动端触摸区域设置 */
+        /* 移动端触摸区域设置 - 禁止整页滚动 */
         .is-mobile {
-          touch-action: pan-y;
+          touch-action: none;  /* 禁止所有触摸滚动 */
           cursor: default;
+          overflow: hidden;    /* 防止任何溢出滚动 */
+          position: fixed;     /* 固定定位防止页面移动 */
+          inset: 0;
         }
 
         .is-mobile .ring-canvas {
           touch-action: none;
+        }
+
+        /* 移动端预览区域也禁止滚动 */
+        .is-mobile .mobile-preview {
+          touch-action: none;
+          overflow: hidden;
         }
 
         /* ============================================ */

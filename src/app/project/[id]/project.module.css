@@ -291,6 +291,12 @@
   padding: 8px 0;
 }
 
+.mobileNavRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .mobileLogo {
   font-size: 16px;
   font-weight: 900;
@@ -298,6 +304,21 @@
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+}
+
+.mobileAbout {
+  font-size: 11px;
+  font-weight: 600;
+  color: #000;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.mobileAbout:hover {
+  opacity: 1;
 }
 
 /* --- 主内容区 --- */
@@ -467,26 +488,37 @@
   flex-direction: column;
   gap: 16px;
   border-top: 1px solid #eee;
+  /* 确保容器宽度正确 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mobileNavLink {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 12px;
+  padding: 16px 16px;
   background: #f5f5f5;
   text-decoration: none;
   color: #000;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   transition: background 0.2s ease;
-  /* 允许文字换行，确保完整显示 */
+  /* 确保文字完整显示 */
   text-align: center;
-  line-height: 1.3;
+  line-height: 1.4;
   min-height: 56px;
-  word-break: break-word;
-  hyphens: auto;
+  /* 允许自动换行 */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  /* 移除可能导致截断的属性 */
+  overflow: visible;
+  text-overflow: clip;
+  /* 确保宽度正确 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mobileNavLink:hover {
@@ -501,6 +533,83 @@
 /* --- 底部留白 --- */
 .mobileFooterSpace {
   height: 60px;
+}
+
+/* ============================================================
+   【 移动端淡入动画 - Mobile Fade-in Effects 】
+   ============================================================ */
+
+/* 通用淡入基础样式 */
+.mobileReveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.2, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.mobileReveal.mobileVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero 图片特殊动画 - 缩放淡入 */
+.mobileHeroReveal {
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 0.6s ease-out,
+              transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.mobileHeroReveal.mobileVisible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 标题区域动画 - 从左滑入 */
+.mobileTitleReveal {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.6s ease-out 0.1s,
+              transform 0.6s cubic-bezier(0.2, 1, 0.3, 1) 0.1s;
+}
+
+.mobileTitleReveal.mobileVisible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 元数据网格动画 - 逐个淡入 */
+.mobileMetaReveal {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.5s ease-out,
+              transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.mobileMetaReveal.mobileVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 内容区块动画 */
+.mobileContentReveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.2, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.mobileContentReveal.mobileVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 图片网格动画 */
+.mobileImageReveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease-out,
+              transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 /* ============================================================
