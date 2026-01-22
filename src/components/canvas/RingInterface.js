@@ -58,7 +58,7 @@ const RING_PARAMS = {
       fov: 50,                   // 视野角度
     },
     interaction: {
-      dragSpeed: 0.008,          // 触摸滑动灵敏度
+      dragSpeed: 0.028,          // 触摸滑动灵敏度
       damping: 5,                // 阻尼感（值越大越快停下）
     },
     layout: {
