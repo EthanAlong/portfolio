@@ -13,17 +13,35 @@ import { useEffect, useState } from 'react'
  * - 全局导航栏（Logo + About 按钮）
  * - 路由切换时的颜色主题过渡
  * - 字母动效（Logo 逐字滑入）
+ *
+ * 特殊处理：
+ * - 移动端项目详情页：隐藏全局导航栏，使用页面自带的导航栏（带返回按钮）
  * ============================================================
  */
 
 // Logo 文字，用于逐字动画
 const LOGO_TEXT = "EthanDigital"
+const MOBILE_BREAKPOINT = 768
 
 export default function RootLayout({ children }) {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   const isHome = pathname === '/'
+  const isProjectPage = pathname.startsWith('/project/')
+
+  /**
+   * 移动端检测
+   */
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // 动态类名：控制颜色主题
   const themeClass = isHome ? 'nav-home' : 'nav-project'
@@ -41,31 +59,40 @@ export default function RootLayout({ children }) {
 
   if (!mounted) return <html lang="en"><body>{children}</body></html>
 
+  /**
+   * 判断是否隐藏全局导航栏
+   * - 移动端项目详情页使用自己的导航栏（带返回按钮）
+   */
+  const shouldHideGlobalNav = isMobile && isProjectPage
+
   return (
     <html lang="en">
       <body style={{ margin: 0, padding: 0 }} suppressHydrationWarning={true}>
 
-        <nav className={`global-nav ${themeClass}`} style={navStyle}>
-          <div className="nav-wrapper">
-            {/* Logo 字母逐个动画 */}
-            <Link href="/" className="logo">
-              {LOGO_TEXT.split('').map((char, i) => (
-                <span
-                  key={i}
-                  className="logo-letter"
-                  style={{ animationDelay: `${0.3 + i * 0.05}s` }}
-                >
-                  {char}
-                </span>
-              ))}
-            </Link>
-            {/* About 按钮带下划线动效 */}
-            <Link href="/about" className="about-btn">
-              <span className="about-text">ABOUT</span>
-              <span className="about-underline"></span>
-            </Link>
-          </div>
-        </nav>
+        {/* 全局导航栏 - 移动端详情页时隐藏 */}
+        {!shouldHideGlobalNav && (
+          <nav className={`global-nav ${themeClass}`} style={navStyle}>
+            <div className="nav-wrapper">
+              {/* Logo 字母逐个动画 */}
+              <Link href="/" className="logo">
+                {LOGO_TEXT.split('').map((char, i) => (
+                  <span
+                    key={i}
+                    className="logo-letter"
+                    style={{ animationDelay: `${0.3 + i * 0.05}s` }}
+                  >
+                    {char}
+                  </span>
+                ))}
+              </Link>
+              {/* About 按钮带下划线动效 */}
+              <Link href="/about" className="about-btn">
+                <span className="about-text">ABOUT</span>
+                <span className="about-underline"></span>
+              </Link>
+            </div>
+          </nav>
+        )}
 
         {children}
 

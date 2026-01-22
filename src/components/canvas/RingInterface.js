@@ -157,15 +157,24 @@ const CONFIG = {
   },
 }
 
-// --- 【核心组件：数据网络 (DataNetwork)】 ---
-function DataNetwork() {
+/**
+ * ============================================================
+ * 【 核心组件：数据网络 (DataNetwork) 】
+ * ============================================================
+ *
+ * 背景装饰性粒子网络
+ * 移动端减少粒子数量以提升性能
+ * ============================================================
+ */
+function DataNetwork({ isMobile = false }) {
   const groupRef = useRef()
   const linesRef = useRef()
 
   const { points, linesGeometry } = useMemo(() => {
-    const particleCount = 150;
-    const radius = 160;
-    const connectionDist = 35;
+    // 移动端减少粒子数量以提升性能
+    const particleCount = isMobile ? 60 : 150
+    const radius = isMobile ? 120 : 160
+    const connectionDist = isMobile ? 30 : 35
 
     const positions = new Float32Array(particleCount * 3);
     const particles = [];
@@ -197,8 +206,8 @@ function DataNetwork() {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
 
-    return { points: positions, linesGeometry: geometry };
-  }, []);
+    return { points: positions, linesGeometry: geometry }
+  }, [isMobile])
 
   useFrame((state, delta) => {
     if (groupRef.current) {
@@ -356,7 +365,14 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
         onPointerOut={() => !isMobile && setHover(false)}
         onClick={(e) => {
           e.stopPropagation()
-          onNavigate(item.id)
+          /**
+           * 移动端禁用 Ring 上的点击
+           * 只允许通过 HTML 预览区域点击进入详情页
+           * 避免在滑动旋转时误触
+           */
+          if (!isMobile) {
+            onNavigate(item.id)
+          }
         }}
       />
     </Suspense>
@@ -513,7 +529,7 @@ function SceneContent({
       let maxFocusIndex = 0
       let maxFocusStrength = -1
 
-      projects.forEach((item, index) => {
+      projects.forEach((_, index) => {
         // 1. 计算项目在环上的静态角度
         const itemAngle = index * anglePerItem
 
@@ -568,7 +584,7 @@ function SceneContent({
   return (
     <>
       <group ref={bgGroup}>
-        <DataNetwork />
+        <DataNetwork isMobile={isMobile} />
       </group>
 
       <group ref={tiltGroup}>
@@ -613,8 +629,6 @@ function SceneContent({
  */
 function MobilePreview({ activeProject, onNavigate, isTransitioning }) {
   if (!activeProject || isTransitioning) return null
-
-  const { preview } = RING_PARAMS.mobile
 
   const getTitleString = () => {
     if (!activeProject) return ""
@@ -688,7 +702,7 @@ export default function RingInterface() {
    * 处理 CLOU 风格选中更新（从 SceneContent 回调）
    * 移动端使用：当焦点项目变化时更新预览区域
    */
-  const handleFocusUpdate = (index, project) => {
+  const handleFocusUpdate = (_index, project) => {
     if (project && project !== activeProject) {
       setActiveProject(project)
     }
@@ -899,6 +913,25 @@ export default function RingInterface() {
             fov: params.camera.fov
           }}
           className="ring-canvas"
+          /**
+           * WebGL 性能优化配置
+           * - powerPreference: 优先使用高性能 GPU
+           * - antialias: 移动端关闭抗锯齿以提升性能
+           * - alpha: 禁用透明背景
+           * - stencil: 禁用模板缓冲
+           * - depth: 启用深度缓冲
+           */
+          gl={{
+            powerPreference: "high-performance",
+            antialias: !isMobile,  // 移动端关闭抗锯齿
+            alpha: false,
+            stencil: false,
+            depth: true,
+          }}
+          // 移动端限制像素比以提升性能
+          dpr={isMobile ? [1, 1.5] : [1, 2]}
+          // 性能模式
+          performance={{ min: 0.5 }}
         >
           <color attach="background" args={['#000000']} />
           <ambientLight intensity={3} />
@@ -971,6 +1004,9 @@ export default function RingInterface() {
           align-items: center;
           justify-content: center;
           animation: overlayFadeIn ${CONFIG.TRANSITION.FADE_TIME} ease forwards;
+          /* 防止文字溢出 */
+          padding: 20px;
+          box-sizing: border-box;
         }
 
         @keyframes overlayFadeIn {
@@ -978,9 +1014,20 @@ export default function RingInterface() {
           to { opacity: 1; }
         }
 
+        /* 字母容器 - 允许换行 */
+        .letter-wrapper {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: center;
+          max-width: 90vw;
+          text-align: center;
+        }
+
         .stagger-letter {
           color: white;
-          font-size: 5vw;
+          /* 使用 clamp 确保字体大小在合理范围内 */
+          font-size: clamp(1.5rem, 5vw, 4rem);
           font-weight: 900;
           text-transform: uppercase;
           display: inline-block;
@@ -1131,7 +1178,12 @@ export default function RingInterface() {
         /* ============================================ */
         @media (max-width: ${CONFIG.BREAKPOINT}px) {
           .stagger-letter {
-            font-size: 8vw;
+            /* 移动端使用更小的字体，确保长标题不溢出 */
+            font-size: clamp(1rem, 6vw, 2rem);
+          }
+          .letter-wrapper {
+            max-width: 95vw;
+            line-height: 1.2;
           }
           .wipe-text {
             font-size: 8px;
