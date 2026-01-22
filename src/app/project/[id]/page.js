@@ -1,4 +1,49 @@
 "use client"
+/**
+ * ============================================================
+ * 【 project/[id]/page.js - 项目详情页 】
+ * ============================================================
+ *
+ * 文件概述：
+ * 动态路由页面，展示单个项目的详细信息。
+ * 支持桌面端（左右两栏布局）和移动端（单列滚动布局）。
+ *
+ * 主要功能：
+ * 1. 动态路由 - 根据 URL 中的 [id] 参数加载对应项目
+ * 2. 响应式布局 - 桌面端两栏，移动端单列
+ * 3. 平滑滚动 - 桌面端使用 Lenis 实现丝滑滚动效果
+ * 4. 曝光动画 - 使用 IntersectionObserver 实现滚动触发的淡入效果
+ * 5. 动态内容 - 支持 textBlock、imageGrid、videoEmbed、mixedGrid 等内容类型
+ * 6. 项目导航 - 底部的上一个/下一个项目切换
+ *
+ * 布局结构（桌面端）：
+ * ┌─────────────┬───────────────────────┐
+ * │   Sidebar   │      Viewport         │
+ * │  (38.2%)    │      (61.8%)          │
+ * │             │                       │
+ * │  - Title    │  - Briefing           │
+ * │  - Metadata │  - Hero Image         │
+ * │  - Actions  │  - Meta Grid          │
+ * │             │  - Content Blocks     │
+ * └─────────────┴───────────────────────┘
+ *
+ * 布局结构（移动端）：
+ * ┌───────────────────────┐
+ * │   Fixed Nav Bar       │
+ * ├───────────────────────┤
+ * │   Hero Image          │
+ * │   Title Section       │
+ * │   Meta Grid (2-col)   │
+ * │   Briefing            │
+ * │   Content Blocks      │
+ * │   Project Nav         │
+ * └───────────────────────┘
+ *
+ * 作者：Ethan
+ * 最后更新：2026-01
+ * ============================================================
+ */
+
 import React, { use, useEffect, useRef, useState } from 'react'
 import { projects } from '@/data/projects'
 import Link from 'next/link'
@@ -7,12 +52,10 @@ import styles from './project.module.css'
 import Lenis from 'lenis'
 
 /**
- * ============================================================
- * 【 项目详情页配置 】
- * ============================================================
+ * 页面配置
  */
 const PAGE_CONFIG = {
-  BREAKPOINT: 768,  // 移动端断点
+  BREAKPOINT: 768,  // 移动端断点（px），与全局保持一致
 }
 
 /**

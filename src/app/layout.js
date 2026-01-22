@@ -1,27 +1,42 @@
 "use client"
+/**
+ * ============================================================
+ * 【 layout.js - 全局布局组件 】
+ * ============================================================
+ *
+ * 文件概述：
+ * Next.js App Router 的根布局文件，为所有页面提供共享的 UI 元素。
+ *
+ * 主要功能：
+ * 1. 全局导航栏 - Logo（逐字滑入动画）+ About 按钮（下划线展开动效）
+ * 2. 主题切换 - 首页白色主题，项目页黑色主题，自动过渡
+ * 3. 响应式处理 - 移动端特定页面隐藏全局导航栏
+ *
+ * 导航栏显示逻辑：
+ * - 桌面端：所有页面都显示全局导航栏
+ * - 移动端首页(Ring)：显示全局导航栏
+ * - 移动端项目详情页：隐藏全局导航栏，使用页面自带的导航栏（带 Back 按钮）
+ * - 移动端 About 页：隐藏全局导航栏，使用页面自带的导航栏
+ *
+ * Logo 点击行为：
+ * - 在首页点击：刷新页面（避免 Next.js 导航导致的黑屏闪烁）
+ * - 在其他页面点击：导航回首页
+ *
+ * 作者：Ethan
+ * 最后更新：2026-01
+ * ============================================================
+ */
+
 import "./globals.css"
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 /**
- * ============================================================
- * 【 全局布局组件 - RootLayout 】
- * ============================================================
- *
- * 职责：
- * - 全局导航栏（Logo + About 按钮）
- * - 路由切换时的颜色主题过渡
- * - 字母动效（Logo 逐字滑入）
- *
- * 特殊处理：
- * - 移动端项目详情页：隐藏全局导航栏，使用页面自带的导航栏（带返回按钮）
- * ============================================================
+ * 常量配置
  */
-
-// Logo 文字，用于逐字动画
-const LOGO_TEXT = "EthanDigital"
-const MOBILE_BREAKPOINT = 768
+const LOGO_TEXT = "EthanDigital"  // Logo 文字，用于逐字动画
+const MOBILE_BREAKPOINT = 768     // 移动端断点（px）
 
 export default function RootLayout({ children }) {
   const pathname = usePathname()
@@ -30,6 +45,7 @@ export default function RootLayout({ children }) {
 
   const isHome = pathname === '/'
   const isProjectPage = pathname.startsWith('/project/')
+  const isAboutPage = pathname === '/about'
 
   /**
    * 移动端检测
@@ -61,9 +77,10 @@ export default function RootLayout({ children }) {
 
   /**
    * 判断是否隐藏全局导航栏
-   * - 移动端项目详情页使用自己的导航栏（带返回按钮）
+   * - 移动端项目详情页：使用页面自带的导航栏（带返回按钮）
+   * - 移动端 About 页面：使用页面自带的导航栏
    */
-  const shouldHideGlobalNav = isMobile && isProjectPage
+  const shouldHideGlobalNav = isMobile && (isProjectPage || isAboutPage)
 
   return (
     <html lang="en">
@@ -73,8 +90,17 @@ export default function RootLayout({ children }) {
         {!shouldHideGlobalNav && (
           <nav className={`global-nav ${themeClass}`} style={navStyle}>
             <div className="nav-wrapper">
-              {/* Logo 字母逐个动画 */}
-              <Link href="/" className="logo">
+              {/* Logo 字母逐个动画 - 首页点击时刷新而非导航 */}
+              <Link
+                href="/"
+                className="logo"
+                onClick={(e) => {
+                  if (isHome) {
+                    e.preventDefault()
+                    window.location.reload()
+                  }
+                }}
+              >
                 {LOGO_TEXT.split('').map((char, i) => (
                   <span
                     key={i}

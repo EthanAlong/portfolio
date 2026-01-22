@@ -1,4 +1,40 @@
 "use client"
+/**
+ * ============================================================
+ * 【 RingInterface.js - 3D 项目展示环形界面 】
+ * ============================================================
+ *
+ * 文件概述：
+ * 这是 Portfolio 网站的核心交互组件，实现了一个 3D 环形项目展示界面。
+ * 支持桌面端（鼠标悬停 + 滚轮旋转）和移动端（触摸滑动 + CLOU 风格弹出）。
+ *
+ * 主要功能：
+ * 1. 3D 环形布局 - 项目图片围成一个可旋转的环
+ * 2. 响应式设计 - 桌面端和移动端有不同的交互模式
+ * 3. 入场动画 - 首次加载时显示 "INITIALIZING DATA" 加载动画
+ * 4. 转场动画 - 点击项目时的模糊、旋转加速、标题逐字显示效果
+ * 5. 返回动画 - 从项目页返回时的旋转动画
+ *
+ * 技术栈：
+ * - React Three Fiber (R3F) - React 的 Three.js 渲染器
+ * - @react-three/drei - R3F 的实用工具库
+ * - Next.js App Router - 页面路由
+ *
+ * 文件结构：
+ * - RING_PARAMS: 移动端/桌面端的分离式参数配置
+ * - CONFIG: 通用配置（动画时间、断点等）
+ * - DataNetwork: 背景粒子网络组件
+ * - ProjectItem: 单个项目图片组件
+ * - CentralDisplay: 桌面端中央大图预览
+ * - SceneContent: 3D 场景核心逻辑
+ * - MobilePreview: 移动端 HTML 预览区域
+ * - RingInterface: 主入口组件
+ *
+ * 作者：Ethan
+ * 最后更新：2026-01
+ * ============================================================
+ */
+
 import React, { useRef, useState, useEffect, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Image, Text } from '@react-three/drei'
@@ -6,8 +42,14 @@ import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
 import { projects } from '@/data/projects'
 
-// 防止生产环境返回首页时重复运行 Initial Loading
+/**
+ * 全局状态变量（模块级别）
+ * 这些变量在组件重新挂载时保持不变，用于跨导航的状态管理
+ */
+// 防止生产环境返回首页时重复运行 Initial Loading 动画
 let globalInitialized = false;
+// 记录最后一次旋转的时间戳，用于确保每次返回都会触发旋转动画
+let lastSpinTimestamp = 0;
 
 /**
  * ============================================================
@@ -670,6 +712,8 @@ export default function RingInterface() {
 
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showOverlay, setShowOverlay] = useState(false)
+  // 移动端返回时的快速过渡状态
+  const [isReturning, setIsReturning] = useState(globalInitialized)
 
   // 获取初始旋转偏移
   const getInitialOffset = (mobile) =>
@@ -731,21 +775,65 @@ export default function RingInterface() {
    */
   useEffect(() => {
     setHasMounted(true)
+
     const timer = setTimeout(() => {
       setCanRenderCanvas(true)
       if (!globalInitialized) {
+        // 首次加载：显示加载动画后旋转
         setTimeout(() => {
           setIsLoading(false)
           targetRotation.current += CONFIG.INTRO.SPIN_KICK
           globalInitialized = true
+          lastSpinTimestamp = Date.now()
         }, 2500)
       } else {
+        // 返回页面：显示快速过渡后旋转
         setTimeout(() => {
+          setIsReturning(false) // 隐藏返回过渡层
           targetRotation.current += CONFIG.INTRO.SPIN_KICK
-        }, 100)
+          lastSpinTimestamp = Date.now()
+        }, 400) // 400ms 的过渡时间
       }
     }, 300)
     return () => clearTimeout(timer)
+  }, [])
+
+  /**
+   * 监听页面可见性变化 - 确保从其他页面返回时触发旋转
+   * 这可以捕获浏览器后退/前进按钮的情况
+   */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && globalInitialized) {
+        const now = Date.now()
+        // 如果距离上次旋转超过1秒，触发新的旋转
+        if (now - lastSpinTimestamp > 1000) {
+          targetRotation.current += CONFIG.INTRO.SPIN_KICK
+          lastSpinTimestamp = now
+        }
+      }
+    }
+
+    // 监听 popstate 事件（浏览器后退/前进）
+    const handlePopState = () => {
+      if (globalInitialized) {
+        const now = Date.now()
+        if (now - lastSpinTimestamp > 500) {
+          setTimeout(() => {
+            targetRotation.current += CONFIG.INTRO.SPIN_KICK
+            lastSpinTimestamp = Date.now()
+          }, 200)
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('popstate', handlePopState)
+    }
   }, [])
 
   /**
@@ -878,6 +966,13 @@ export default function RingInterface() {
           <div className="loading-bar-container">
             <div className="loading-bar-fill" />
           </div>
+        </div>
+      )}
+
+      {/* 移动端返回时的快速过渡 */}
+      {isReturning && !isLoading && (
+        <div className="return-transition">
+          <div className="return-loader" />
         </div>
       )}
 
@@ -1133,6 +1228,51 @@ export default function RingInterface() {
         @keyframes barSlideSmooth {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(400%); }
+        }
+
+        /* ============================================ */
+        /* 返回页面过渡动画 - 移动端优化 */
+        /* ============================================ */
+        .return-transition {
+          position: absolute;
+          inset: 0;
+          z-index: 450;
+          background: black;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: returnFadeOut 0.4s ease-out forwards;
+        }
+
+        .return-loader {
+          width: 40px;
+          height: 2px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 1px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .return-loader::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 50%;
+          height: 100%;
+          background: white;
+          animation: returnLoaderSlide 0.6s ease-in-out infinite;
+        }
+
+        @keyframes returnFadeOut {
+          0% { opacity: 1; }
+          70% { opacity: 1; }
+          100% { opacity: 0; pointer-events: none; }
+        }
+
+        @keyframes returnLoaderSlide {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
         }
 
         /* ============================================ */

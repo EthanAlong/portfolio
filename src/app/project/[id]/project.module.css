@@ -1,4 +1,46 @@
-/* src/app/project/[id]/project.module.css */
+/**
+ * ============================================================
+ * 【 project.module.css - 项目详情页 & About 页样式 】
+ * ============================================================
+ *
+ * 文件概述：
+ * 定义项目详情页和 About 页面的所有样式。
+ * 包含桌面端两栏布局和移动端单列布局的完整样式系统。
+ *
+ * 样式结构：
+ * 1. .projectTheme - 桌面端主题（两栏布局）
+ *    - .sidebar - 左侧边栏（标题、元数据、操作按钮）
+ *    - .viewport - 右侧内容区（可滚动）
+ *    - .container - 内容容器
+ *
+ * 2. .mobileTheme - 移动端主题（单列滚动）
+ *    - .mobileNav - 固定导航栏
+ *    - .mobileContent - 主内容区
+ *    - .mobileHero - 主图区域
+ *    - .mobileTitleSection - 标题区域
+ *    - .mobileMetaGrid - 元数据网格（2列）
+ *    - .mobileImageGrid - 图片网格
+ *    - .mobileProjectNav - 项目导航（上一个/下一个）
+ *
+ * 3. 动画类：
+ *    - .revealItem / .visible - 桌面端曝光动画
+ *    - .mobileReveal / .mobileVisible - 移动端曝光动画
+ *    - .mobileHeroReveal - 主图缩放淡入
+ *    - .mobileTitleReveal - 标题左滑入
+ *    - .mobileMetaReveal - 元数据逐个淡入
+ *    - .mobileContentReveal - 内容区块淡入
+ *
+ * CSS 变量（在 .projectTheme 中定义）：
+ * - --sidebar-width: 左侧边栏宽度
+ * - --viewport-width: 右侧内容区宽度
+ * - --title-size: 标题字号
+ * - --briefing-size: 引言字号
+ * - 等等...
+ *
+ * 作者：Ethan
+ * 最后更新：2026-01
+ * ============================================================
+ */
 
 .projectTheme {
   /* =============================================
