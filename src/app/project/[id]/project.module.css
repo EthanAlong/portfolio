@@ -244,3 +244,258 @@
 .gridSystem { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 3vw; row-gap: 8vh; width: 100%; }
 .colFull { grid-column: span 12; }
 .colHalf { grid-column: span 6; }
+
+/* ============================================================
+   【 移动端样式 - Mobile Layout 】
+   ============================================================
+
+   设计原则：
+   - 单列垂直滚动布局
+   - 原生滚动体验
+   - 紧凑但清晰的排版
+   ============================================================ */
+
+.mobileTheme {
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* --- 固定导航栏 --- */
+.mobileNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.mobileLogo {
+  font-size: 16px;
+  font-weight: 900;
+  color: #000;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* --- 主内容区 --- */
+.mobileContent {
+  padding-top: 50px; /* 导航栏高度 */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- Hero 区域 --- */
+.mobileHero {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.mobileHeroImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- 标题区域 --- */
+.mobileTitleSection {
+  padding: 24px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.mobileTitle {
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px 0;
+}
+
+.mobileSubtitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+/* --- Metadata 两列 Grid --- */
+.mobileMetaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.mobileMetaItem {
+  padding: 16px 0;
+  border-bottom: 1px solid #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobileMetaItem:nth-child(odd) {
+  padding-right: 12px;
+  border-right: 1px solid #f5f5f5;
+}
+
+.mobileMetaItem:nth-child(even) {
+  padding-left: 12px;
+}
+
+.mobileMetaLabel {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #999;
+}
+
+.mobileMetaValue {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* --- 项目简介 --- */
+.mobileBriefing {
+  padding: 24px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.mobileSectionTitle {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #000;
+}
+
+.mobileBriefingText {
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #333;
+  margin: 0;
+}
+
+/* --- 内容区块 --- */
+.mobileContentSection {
+  padding: 24px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.mobileText {
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #333;
+  margin: 0;
+}
+
+/* --- 图片网格 --- */
+.mobileImageGrid {
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mobileImageItem {
+  width: 100%;
+}
+
+.mobileImg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mobileCaption {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #000;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* --- 视频区块 --- */
+.mobileVideoSection {
+  padding: 24px 16px;
+}
+
+.mobileVideo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* --- 项目导航 --- */
+.mobileProjectNav {
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid #eee;
+}
+
+.mobileNavLink {
+  display: block;
+  padding: 16px;
+  background: #f5f5f5;
+  text-decoration: none;
+  color: #000;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: background 0.2s ease;
+}
+
+.mobileNavLink:hover {
+  background: #eee;
+}
+
+/* --- 底部留白 --- */
+.mobileFooterSpace {
+  height: 60px;
+}
+
+/* ============================================================
+   【 响应式断点覆盖 】
+   ============================================================ */
+@media (max-width: 768px) {
+  /* 隐藏桌面端样式 */
+  .projectTheme {
+    display: none !important;
+  }
+}
