@@ -7,6 +7,7 @@
 Combining the high-performance rendering capabilities of **React Three Fiber** with the server-side advantages of **Next.js**, this project delivers a digital experience characterized by spatial depth, parallax effects, and seamless cinematic transitions.
 
 > **Documentation**: [中文文档](./DOCUMENTATION_CN.md)
+> **Documentation**: [English Documentation](./DOCUMENTATION_ENG.md)
 
 ---
 
