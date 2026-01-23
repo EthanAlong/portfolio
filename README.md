@@ -159,5 +159,5 @@ MIT © 2026 EthanDigital
 
 ## 🔗 Links
 
-- **Live Demo**: [Coming Soon]
+- **Live Demo**: [www.ethanhdigital.com]
 - **Documentation (中文)**: [DOCUMENTATION_CN.md](./DOCUMENTATION_CN.md)
