@@ -266,23 +266,95 @@ const realProjects = [
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/2430-7th-st/2.webp']
+        images: ['/2430-7th-st/2.webp'],
+        customTitle: "Exterior Rendering",
+        labels: ["Main View"]
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/2430-7th-st/3.webp']
+        images: ['/2430-7th-st/3.webp'],
+        customTitle: "Exterior Rendering",
+        labels: ["Main View"]
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/2430-7th-st/4.webp']
+        images: ['/2430-7th-st/4.webp'],
+        customTitle: "Exterior Rendering",
+        labels: ["Rear View"] 
       },
       {
         type: 'imageGrid',
         columns: 1, // 一张图占据 100% 宽度
-        images: ['/2430-7th-st/5.webp']
+        images: ['/2430-7th-st/5.webp'],
+        customTitle: "Exterior Rendering",
+        labels: ["Rear View"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/6.webp'],
+        customTitle: "Exterior Rendering",
+        labels: ["Side View"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 2, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/7.webp', '/2430-7th-st/8.webp' ],
+        customTitle: "Colored Elevations",
+        labels: ["Front", "Left"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 2, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/9.webp', '/2430-7th-st/10.webp' ],
+        customTitle: "Colored Elevations",
+        labels: ["Rear", "Right"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/11.webp'],
+        customTitle: "Interior Rendering",
+        labels: ["Living Room"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/12.webp'],
+        customTitle: "Interior Rendering",
+        labels: ["Bathroom"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/13.webp'],
+        customTitle: "Interior Rendering",
+        labels: ["Kitchen"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/14.webp'],
+        customTitle: "Interior Rendering",
+        labels: ["Living Room"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/15.webp'],
+        customTitle: "Interior Rendering",
+        labels: ["Bathroom"]
+      },
+      {
+        type: 'imageGrid',
+        columns: 1, // 一张图占据 100% 宽度
+        images: ['/2430-7th-st/16.webp'],
+        customTitle: "Interior Rendering",
+        labels: ["Bathroom"]
       }
+
     ]
   },
   {
