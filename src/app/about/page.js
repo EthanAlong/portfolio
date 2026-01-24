@@ -55,14 +55,25 @@ const EFFECT_CONFIG = {
     cursorBlink: 530,     // 光标闪烁频率（毫秒）
     showCursor: true,     // 是否显示光标
   },
-  // 技能标签光效参数
-  glow: {
-    enabled: true,        // 是否启用光效
-    intensity: 0.6,       // 光效强度 (0-1)
-    duration: 2,          // 一次闪烁周期（秒）
-    delay: 0.15,          // 每个标签的延迟间隔（秒）
-    color: 'rgba(0, 100, 255, 0.3)',  // 光效颜色
-    hoverColor: 'rgba(0, 150, 255, 0.5)',  // hover 时的光效颜色
+  // 技能标签渐变流动效果参数
+  gradient: {
+    enabled: true,        // 是否启用渐变效果
+    duration: 3,          // 一次流动周期（秒）
+    delay: 0.3,           // 每个标签的延迟间隔（秒）
+    // 渐变颜色组（低明度版本）
+    colors: [
+      '#1e3a5f',          // 深蓝
+      '#3d2a5c',          // 深紫
+      '#1a4a4a',          // 深青
+      '#1e3a5f',          // 深蓝（循环）
+    ],
+    // hover 时的渐变颜色（稍亮）
+    hoverColors: [
+      '#2d5a8a',          // 蓝
+      '#5a4080',          // 紫
+      '#2a6a6a',          // 青
+      '#2d5a8a',          // 蓝（循环）
+    ],
   }
 }
 
@@ -129,31 +140,35 @@ const Typewriter = ({ text, config = EFFECT_CONFIG.typewriter, onComplete }) => 
 
 /**
  * ============================================================
- * 【 带光效的技能标签组件 】
+ * 【 渐变流动效果的技能标签组件 】
  * ============================================================
  */
-const GlowLabel = ({ children, index = 0, config = EFFECT_CONFIG.glow }) => {
+const GradientLabel = ({ children, index = 0, config = EFFECT_CONFIG.gradient }) => {
   if (!config.enabled) {
     return <span>{children}</span>
   }
 
   const animationDelay = index * config.delay
+  const gradientColors = config.colors.join(', ')
+  const hoverGradientColors = config.hoverColors.join(', ')
 
   return (
     <span
-      className="glow-label"
+      className="gradient-label"
       style={{
-        '--glow-intensity': config.intensity,
-        '--glow-duration': `${config.duration}s`,
-        '--glow-delay': `${animationDelay}s`,
-        '--glow-color': config.color,
-        '--glow-hover-color': config.hoverColor,
+        '--gradient-duration': `${config.duration}s`,
+        '--gradient-delay': `${animationDelay}s`,
+        '--gradient-colors': gradientColors,
+        '--gradient-hover-colors': hoverGradientColors,
       }}
     >
       {children}
     </span>
   )
 }
+
+// 保持向后兼容
+const GlowLabel = GradientLabel
 
 /**
  * ============================================================
@@ -279,7 +294,7 @@ export default function AboutPage() {
                 <span className={styles.mobileMetaLabel}>{item.label}</span>
                 <span className={styles.mobileMetaValue}>
                   {item.isSkill ? (
-                    <GlowLabel index={i} config={EFFECT_CONFIG.glow}>
+                    <GlowLabel index={i} config={EFFECT_CONFIG.gradient}>
                       {item.value}
                     </GlowLabel>
                   ) : item.value}
@@ -375,47 +390,44 @@ export default function AboutPage() {
           }
 
           /* ============================================ */
-          /* 技能标签光效样式 */
+          /* 技能标签渐变流动样式 */
           /* ============================================ */
-          .glow-label {
+          .gradient-label {
             display: inline-block;
             position: relative;
+            background: linear-gradient(
+              90deg,
+              var(--gradient-colors)
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow var(--gradient-duration) linear infinite;
+            animation-delay: var(--gradient-delay);
             transition: all 0.3s ease;
+            font-weight: 700;
           }
 
-          .glow-label::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -4px;
-            right: -4px;
-            bottom: -2px;
-            background: var(--glow-color);
-            border-radius: 4px;
-            opacity: 0;
-            z-index: -1;
-            animation: glowPulse var(--glow-duration) ease-in-out infinite;
-            animation-delay: var(--glow-delay);
-          }
-
-          .glow-label:hover::before {
-            background: var(--glow-hover-color);
-            opacity: var(--glow-intensity);
-            animation: none;
-          }
-
-          .glow-label:hover {
+          .gradient-label:hover {
+            background: linear-gradient(
+              90deg,
+              var(--gradient-hover-colors)
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: gradientFlow calc(var(--gradient-duration) * 0.5) linear infinite;
             transform: translateY(-1px);
+            filter: brightness(1.2);
           }
 
-          @keyframes glowPulse {
-            0%, 100% {
-              opacity: 0;
-              transform: scale(0.95);
+          @keyframes gradientFlow {
+            0% {
+              background-position: 0% center;
             }
-            50% {
-              opacity: var(--glow-intensity);
-              transform: scale(1);
+            100% {
+              background-position: 200% center;
             }
           }
         `}</style>
@@ -467,19 +479,19 @@ export default function AboutPage() {
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Tech Stack</span>
               <span className={styles.metaValue}>
-                <GlowLabel index={0} config={EFFECT_CONFIG.glow}>Python / Grasshopper</GlowLabel>
+                <GlowLabel index={0} config={EFFECT_CONFIG.gradient}>Python / Grasshopper</GlowLabel>
               </span>
               <span className={styles.metaValue}>
-                <GlowLabel index={1} config={EFFECT_CONFIG.glow}>UE5 / React / Three.js</GlowLabel>
+                <GlowLabel index={1} config={EFFECT_CONFIG.gradient}>UE5 / React / Three.js</GlowLabel>
               </span>
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>LA Expertise</span>
               <span className={styles.metaValue}>
-                <GlowLabel index={2} config={EFFECT_CONFIG.glow}>CHIP / TOC / AB 1287</GlowLabel>
+                <GlowLabel index={2} config={EFFECT_CONFIG.gradient}>CHIP / TOC / AB 1287</GlowLabel>
               </span>
               <span className={styles.metaValue}>
-                <GlowLabel index={3} config={EFFECT_CONFIG.glow}>Ministerial Review</GlowLabel>
+                <GlowLabel index={3} config={EFFECT_CONFIG.gradient}>Ministerial Review</GlowLabel>
               </span>
             </div>
             <div className={styles.metaItem}>
@@ -589,47 +601,44 @@ export default function AboutPage() {
         }
 
         /* ============================================ */
-        /* 技能标签光效样式 */
+        /* 技能标签渐变流动样式 */
         /* ============================================ */
-        .glow-label {
+        .gradient-label {
           display: inline-block;
           position: relative;
+          background: linear-gradient(
+            90deg,
+            var(--gradient-colors)
+          );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gradientFlow var(--gradient-duration) linear infinite;
+          animation-delay: var(--gradient-delay);
           transition: all 0.3s ease;
+          font-weight: 700;
         }
 
-        .glow-label::before {
-          content: '';
-          position: absolute;
-          top: -2px;
-          left: -4px;
-          right: -4px;
-          bottom: -2px;
-          background: var(--glow-color);
-          border-radius: 4px;
-          opacity: 0;
-          z-index: -1;
-          animation: glowPulse var(--glow-duration) ease-in-out infinite;
-          animation-delay: var(--glow-delay);
-        }
-
-        .glow-label:hover::before {
-          background: var(--glow-hover-color);
-          opacity: var(--glow-intensity);
-          animation: none;
-        }
-
-        .glow-label:hover {
+        .gradient-label:hover {
+          background: linear-gradient(
+            90deg,
+            var(--gradient-hover-colors)
+          );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          animation: gradientFlow calc(var(--gradient-duration) * 0.5) linear infinite;
           transform: translateY(-1px);
+          filter: brightness(1.2);
         }
 
-        @keyframes glowPulse {
-          0%, 100% {
-            opacity: 0;
-            transform: scale(0.95);
+        @keyframes gradientFlow {
+          0% {
+            background-position: 0% center;
           }
-          50% {
-            opacity: var(--glow-intensity);
-            transform: scale(1);
+          100% {
+            background-position: 200% center;
           }
         }
       `}</style>

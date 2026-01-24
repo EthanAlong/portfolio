@@ -184,7 +184,7 @@ const CONFIG = {
 
   // --- 转场序列控制 ---
   TRANSITION: {
-    SPIN_ACCEL: 5.0,             // [1] 点击瞬间：旋转加速度
+    SPIN_ACCEL: 4.9,             // [1] 点击瞬间：旋转加速度
     EXPAND_SCALE: 2.5,           // [1] 点击瞬间：半径扩张倍数
     EXPAND_SPEED: 0.005,         // [1] 点击瞬间：半径扩张的物理速度
     BLUR_STRENGTH: "30px",       // [1] 点击瞬间：同步开启的模糊强度
