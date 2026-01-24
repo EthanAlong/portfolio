@@ -715,6 +715,11 @@ export default function RingInterface() {
   // 移动端返回时的快速过渡状态
   const [isReturning, setIsReturning] = useState(globalInitialized)
 
+  // 图片预加载进度状态
+  const [loadProgress, setLoadProgress] = useState(0)
+  // 转场预加载进度状态
+  const [transitionProgress, setTransitionProgress] = useState(0)
+
   // 获取初始旋转偏移
   const getInitialOffset = (mobile) =>
     mobile ? RING_PARAMS.mobile.ring.initialOffset : RING_PARAMS.desktop.ring.initialOffset
@@ -771,7 +776,12 @@ export default function RingInterface() {
   }
 
   /**
-   * 初始化和入场动画
+   * 初始化和入场动画 - 带图片预加载
+   *
+   * 进度显示逻辑：
+   * - actualProgress: 实际图片加载进度
+   * - displayProgress (loadProgress): 显示给用户的进度，平滑追赶实际进度
+   * - 确保有视觉上从 0% 开始的加载过程
    */
   useEffect(() => {
     setHasMounted(true)
@@ -779,13 +789,77 @@ export default function RingInterface() {
     const timer = setTimeout(() => {
       setCanRenderCanvas(true)
       if (!globalInitialized) {
-        // 首次加载：显示加载动画后旋转
-        setTimeout(() => {
-          setIsLoading(false)
-          targetRotation.current += CONFIG.INTRO.SPIN_KICK
-          globalInitialized = true
-          lastSpinTimestamp = Date.now()
-        }, 2500)
+        // 首次加载：预加载所有 Ring 图片
+        const ringImages = projects.map(p => p.ringImage)
+        let loaded = 0
+        const total = ringImages.length
+        let actualProgress = 0
+        let displayProgress = 0
+        let isComplete = false
+        const startTime = Date.now()
+
+        // 平滑进度动画：让显示进度追赶实际进度
+        const animateProgress = () => {
+          if (isComplete && displayProgress >= 100) return
+
+          // 计算目标进度（实际进度或100%）
+          const targetProgress = isComplete ? 100 : actualProgress
+
+          // 平滑递增：每帧增加一定量，但不超过目标
+          if (displayProgress < targetProgress) {
+            // 速度：每帧增加 2-4%，确保有视觉过渡
+            const increment = Math.max(2, (targetProgress - displayProgress) * 0.15)
+            displayProgress = Math.min(targetProgress, displayProgress + increment)
+            setLoadProgress(Math.round(displayProgress))
+          }
+
+          if (displayProgress < 100 || !isComplete) {
+            requestAnimationFrame(animateProgress)
+          }
+        }
+
+        // 开始进度动画
+        requestAnimationFrame(animateProgress)
+
+        // 图片预加载
+        if (total === 0) {
+          isComplete = true
+          actualProgress = 100
+        } else {
+          ringImages.forEach((src) => {
+            const img = new window.Image()
+            img.onload = img.onerror = () => {
+              loaded++
+              actualProgress = Math.round((loaded / total) * 100)
+              if (loaded >= total) {
+                isComplete = true
+              }
+            }
+            img.src = src
+          })
+        }
+
+        // 检查完成状态并结束加载
+        const checkComplete = () => {
+          if (isComplete && displayProgress >= 99) {
+            setLoadProgress(100)
+            // 确保最少显示 2 秒的加载动画（让文字动画和进度动画都完成）
+            const minLoadTime = 2000
+            const elapsed = Date.now() - startTime
+            const remaining = Math.max(300, minLoadTime - elapsed)
+
+            setTimeout(() => {
+              setIsLoading(false)
+              targetRotation.current += CONFIG.INTRO.SPIN_KICK
+              globalInitialized = true
+              lastSpinTimestamp = Date.now()
+            }, remaining)
+          } else {
+            setTimeout(checkComplete, 100)
+          }
+        }
+        checkComplete()
+
       } else {
         // 返回页面：显示快速过渡后旋转
         setTimeout(() => {
@@ -920,29 +994,89 @@ export default function RingInterface() {
 
   /**
    * 导航处理：触发转场动画并跳转到项目详情页
+   * 使用平滑进度动画，确保有视觉上的加载过程
    */
   const handleNavigate = (id) => {
     setIsTransitioning(true)
+    setTransitionProgress(0)
 
     // 预加载目标项目的图片资源
     const targetProject = projects.find(p => p.id === id)
+    let actualProgress = 0
+    let displayProgress = 0
+    let isComplete = false
+
+    // 平滑进度动画
+    const animateTransitionProgress = () => {
+      if (isComplete && displayProgress >= 100) return
+
+      const targetProgress = isComplete ? 100 : actualProgress
+
+      if (displayProgress < targetProgress) {
+        const increment = Math.max(3, (targetProgress - displayProgress) * 0.2)
+        displayProgress = Math.min(targetProgress, displayProgress + increment)
+        setTransitionProgress(Math.round(displayProgress))
+      }
+
+      if (displayProgress < 100 || !isComplete) {
+        requestAnimationFrame(animateTransitionProgress)
+      }
+    }
+
     if (targetProject) {
       const imagesToPreload = [targetProject.mainImage]
       if (targetProject.content) {
         const contentImages = targetProject.content
           .filter(block => block.type === 'imageGrid')
           .flatMap(block => block.images)
-          .slice(0, 4)
+          .slice(0, 4) // 预加载前 4 张内容图片
         imagesToPreload.push(...contentImages)
       }
-      imagesToPreload.forEach(src => {
-        const img = new window.Image()
-        img.src = src
-      })
+
+      let loaded = 0
+      const total = imagesToPreload.length
+
+      if (total === 0) {
+        isComplete = true
+        actualProgress = 100
+      } else {
+        imagesToPreload.forEach(src => {
+          const img = new window.Image()
+          img.onload = img.onerror = () => {
+            loaded++
+            actualProgress = Math.round((loaded / total) * 100)
+            if (loaded >= total) {
+              isComplete = true
+            }
+          }
+          img.src = src
+        })
+      }
+    } else {
+      isComplete = true
+      actualProgress = 100
     }
 
+    // 启动进度动画
+    requestAnimationFrame(animateTransitionProgress)
+
     setTimeout(() => setShowOverlay(true), CONFIG.TRANSITION.OVERLAY_DELAY)
-    setTimeout(() => router.push(`/project/${id}`), CONFIG.TRANSITION.NAVIGATE_DELAY)
+
+    // 等待预加载完成或最长 CONFIG.TRANSITION.NAVIGATE_DELAY 后导航
+    const startTime = Date.now()
+    const minDelay = CONFIG.TRANSITION.NAVIGATE_DELAY
+
+    const checkAndNavigate = () => {
+      if (isComplete && displayProgress >= 95) {
+        setTransitionProgress(100)
+        const elapsed = Date.now() - startTime
+        const remaining = Math.max(200, minDelay - elapsed)
+        setTimeout(() => router.push(`/project/${id}`), remaining)
+      } else {
+        setTimeout(checkAndNavigate, 50)
+      }
+    }
+    checkAndNavigate()
   }
 
   /**
@@ -963,8 +1097,9 @@ export default function RingInterface() {
       {isLoading && (
         <div className="initial-loader">
           <div className="wipe-text">INITIALIZING DATA</div>
+          <div className="load-progress-text">{loadProgress}%</div>
           <div className="loading-bar-container">
-            <div className="loading-bar-fill" />
+            <div className="loading-bar-fill" style={{ width: `${loadProgress}%` }} />
           </div>
         </div>
       )}
@@ -976,7 +1111,7 @@ export default function RingInterface() {
         </div>
       )}
 
-      {/* 转场遮罩层：项目标题逐字动画 */}
+      {/* 转场遮罩层：项目标题逐字动画 + 预加载进度 */}
       {showOverlay && (
         <div className="clou-loader-overlay">
           <div className="letter-wrapper">
@@ -992,6 +1127,16 @@ export default function RingInterface() {
                 {char === ' ' ? '\u00A0' : char}
               </span>
             ))}
+          </div>
+          {/* 转场预加载进度条 */}
+          <div className="transition-progress-wrapper">
+            <div className="transition-progress-bar">
+              <div
+                className="transition-progress-fill"
+                style={{ width: `${transitionProgress}%` }}
+              />
+            </div>
+            <div className="transition-progress-text">{transitionProgress}%</div>
           </div>
         </div>
       )}
@@ -1114,6 +1259,7 @@ export default function RingInterface() {
           z-index: 600;
           background: #000;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           animation: overlayFadeIn ${CONFIG.TRANSITION.FADE_TIME} ease forwards;
@@ -1151,6 +1297,43 @@ export default function RingInterface() {
         @keyframes letterUp {
           from { opacity: 0; transform: translateY(50%); }
           to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 转场预加载进度条 */
+        .transition-progress-wrapper {
+          position: absolute;
+          bottom: 60px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          opacity: 0;
+          animation: fadeInProgress 0.5s ease forwards 0.8s;
+        }
+
+        .transition-progress-bar {
+          width: 120px;
+          height: 1px;
+          background: rgba(255,255,255,0.1);
+          overflow: hidden;
+          position: relative;
+        }
+
+        .transition-progress-fill {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: white;
+          transition: width 0.3s ease-out;
+        }
+
+        .transition-progress-text {
+          color: rgba(255,255,255,0.6);
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.3em;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         /* ============================================ */
@@ -1199,12 +1382,29 @@ export default function RingInterface() {
           100% { transform: translateX(101%); }
         }
 
+        /* 加载进度百分比文字 */
+        .load-progress-text {
+          color: white;
+          font-size: 24px;
+          font-weight: 300;
+          letter-spacing: 0.2em;
+          margin-top: 16px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          opacity: 0;
+          animation: fadeInProgress 0.5s ease forwards 0.8s;
+        }
+
+        @keyframes fadeInProgress {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
         /* 进度条容器 - 独立的动画层 */
         .loading-bar-container {
           width: 120px;
           height: 1px;
           background: rgba(255,255,255,0.1);
-          margin-top: 24px;
+          margin-top: 16px;
           overflow: hidden;
           position: relative;
           /* 独立的 GPU 加速层 */
@@ -1212,17 +1412,16 @@ export default function RingInterface() {
           transform: translateZ(0);
         }
 
-        /* 进度条填充 - 使用 transform 实现平滑动画 */
+        /* 进度条填充 - 真实进度显示 */
         .loading-bar-fill {
           position: absolute;
           top: 0;
           left: 0;
-          width: 30%;
           height: 100%;
           background: white;
-          /* 独立的 GPU 加速层 - 与文字动画完全解耦 */
-          will-change: transform;
-          animation: barSlideSmooth 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          transition: width 0.3s ease-out;
+          /* 独立的 GPU 加速层 */
+          will-change: width;
         }
 
         @keyframes barSlideSmooth {

@@ -190,6 +190,26 @@ export default function ProjectPage({ params }) {
     return () => observer.disconnect()
   }, [project, isMobile])
 
+  /**
+   * 后台预加载剩余图片
+   * 进入详情页后，在后台加载所有尚未加载的图片
+   */
+  useEffect(() => {
+    if (!project || !project.content) return
+
+    // 收集所有图片 URL（跳过前 4 张，因为已在转场时预加载）
+    const allImages = project.content
+      .filter(block => block.type === 'imageGrid')
+      .flatMap(block => block.images)
+      .slice(4) // 跳过前 4 张
+
+    // 后台加载剩余图片
+    allImages.forEach(src => {
+      const img = new window.Image()
+      img.src = src
+    })
+  }, [project])
+
   if (!project) return null
 
   const onImageLoad = () => {

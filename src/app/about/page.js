@@ -12,6 +12,8 @@
  * 1. 响应式布局 - 桌面端使用 project.module.css 的两栏布局
  * 2. 移动端适配 - 单列滚动，带有自定义导航栏
  * 3. 曝光动画 - 使用 IntersectionObserver 实现滚动触发的淡入效果
+ * 4. 打字机效果 - Manifesto 文字逐字显示
+ * 5. 技能标签光效 - 可控参数的闪烁效果
  *
  * 样式复用：
  * 复用 project/[id]/project.module.css 中的样式，保持与项目详情页一致的视觉风格
@@ -26,7 +28,7 @@
  * ============================================================
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -38,6 +40,137 @@ import styles from '../project/[id]/project.module.css'
 const PAGE_CONFIG = {
   BREAKPOINT: 768,  // 移动端断点（与全局保持一致）
 }
+
+/**
+ * ============================================================
+ * 【 特效参数配置 - 设计师控制台 】
+ * ============================================================
+ * 修改这些参数来调整特效表现
+ */
+const EFFECT_CONFIG = {
+  // 打字机效果参数
+  typewriter: {
+    charDelay: 30,        // 每个字符的延迟（毫秒）
+    startDelay: 500,      // 开始打字前的延迟（毫秒）
+    cursorBlink: 530,     // 光标闪烁频率（毫秒）
+    showCursor: true,     // 是否显示光标
+  },
+  // 技能标签光效参数
+  glow: {
+    enabled: true,        // 是否启用光效
+    intensity: 0.6,       // 光效强度 (0-1)
+    duration: 2,          // 一次闪烁周期（秒）
+    delay: 0.15,          // 每个标签的延迟间隔（秒）
+    color: 'rgba(0, 100, 255, 0.3)',  // 光效颜色
+    hoverColor: 'rgba(0, 150, 255, 0.5)',  // hover 时的光效颜色
+  }
+}
+
+/**
+ * ============================================================
+ * 【 打字机效果组件 】
+ * ============================================================
+ */
+const Typewriter = ({ text, config = EFFECT_CONFIG.typewriter, onComplete }) => {
+  const [displayText, setDisplayText] = useState('')
+  const [showCursor, setShowCursor] = useState(true)
+  const [isComplete, setIsComplete] = useState(false)
+
+  useEffect(() => {
+    let charIndex = 0
+    let timeout
+
+    // 开始延迟
+    const startTimeout = setTimeout(() => {
+      const typeChar = () => {
+        if (charIndex < text.length) {
+          setDisplayText(text.slice(0, charIndex + 1))
+          charIndex++
+          timeout = setTimeout(typeChar, config.charDelay)
+        } else {
+          setIsComplete(true)
+          onComplete && onComplete()
+        }
+      }
+      typeChar()
+    }, config.startDelay)
+
+    return () => {
+      clearTimeout(startTimeout)
+      clearTimeout(timeout)
+    }
+  }, [text, config.charDelay, config.startDelay, onComplete])
+
+  // 光标闪烁
+  useEffect(() => {
+    if (!config.showCursor) return
+
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev)
+    }, config.cursorBlink)
+
+    return () => clearInterval(cursorInterval)
+  }, [config.showCursor, config.cursorBlink])
+
+  return (
+    <span className="typewriter-text">
+      {displayText}
+      {config.showCursor && !isComplete && (
+        <span
+          className="typewriter-cursor"
+          style={{ opacity: showCursor ? 1 : 0 }}
+        >
+          |
+        </span>
+      )}
+    </span>
+  )
+}
+
+/**
+ * ============================================================
+ * 【 带光效的技能标签组件 】
+ * ============================================================
+ */
+const GlowLabel = ({ children, index = 0, config = EFFECT_CONFIG.glow }) => {
+  if (!config.enabled) {
+    return <span>{children}</span>
+  }
+
+  const animationDelay = index * config.delay
+
+  return (
+    <span
+      className="glow-label"
+      style={{
+        '--glow-intensity': config.intensity,
+        '--glow-duration': `${config.duration}s`,
+        '--glow-delay': `${animationDelay}s`,
+        '--glow-color': config.color,
+        '--glow-hover-color': config.hoverColor,
+      }}
+    >
+      {children}
+    </span>
+  )
+}
+
+/**
+ * ============================================================
+ * 【 LinkedIn 图标组件 】
+ * ============================================================
+ */
+const LinkedInIcon = ({ size = 24 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    style={{ display: 'block' }}
+  >
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  </svg>
+)
 
 export default function AboutPage() {
   const router = useRouter()
@@ -117,23 +250,26 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* 核心宣言 */}
+          {/* 核心宣言 - 打字机效果 */}
           <div className={`${styles.mobileBriefing} ${styles.mobileContentReveal}`}>
             <h2 className={styles.mobileSectionTitle}>MANIFESTO</h2>
             <p className={styles.mobileBriefingText}>
-              I DECODE COMPLEX URBAN ORDINANCES THROUGH ALGORITHMIC PRECISION TO UNLOCK ARCHITECTURAL POTENTIAL.
+              <Typewriter
+                text="I DECODE COMPLEX URBAN ORDINANCES THROUGH ALGORITHMIC PRECISION TO UNLOCK ARCHITECTURAL POTENTIAL."
+                config={EFFECT_CONFIG.typewriter}
+              />
             </p>
           </div>
 
-          {/* Metadata Grid */}
+          {/* Metadata Grid - 带光效的技能标签 */}
           <div className={styles.mobileMetaGrid}>
             {[
-              { label: "Contact", value: "ethan_along@outlook.com" },
-              { label: "Focus", value: "Regulatory Innovation" },
-              { label: "Tech Stack", value: "Python / GH / React" },
-              { label: "LA Expertise", value: "CHIP / TOC / AB 1287" },
-              { label: "Education", value: "UCLA Arch & UD" },
-              { label: "Location", value: "Los Angeles, CA" }
+              { label: "Contact", value: "ethan_along@outlook.com", isSkill: false },
+              { label: "Focus", value: "Regulatory Innovation", isSkill: false },
+              { label: "Tech Stack", value: "Python / GH / React", isSkill: true },
+              { label: "LA Expertise", value: "CHIP / TOC / AB 1287", isSkill: true },
+              { label: "Education", value: "UCLA Arch & UD", isSkill: false },
+              { label: "Location", value: "Los Angeles, CA", isSkill: false }
             ].map((item, i) => (
               <div
                 key={i}
@@ -141,7 +277,13 @@ export default function AboutPage() {
                 style={{ transitionDelay: `${i * 0.08}s` }}
               >
                 <span className={styles.mobileMetaLabel}>{item.label}</span>
-                <span className={styles.mobileMetaValue}>{item.value}</span>
+                <span className={styles.mobileMetaValue}>
+                  {item.isSkill ? (
+                    <GlowLabel index={i} config={EFFECT_CONFIG.glow}>
+                      {item.value}
+                    </GlowLabel>
+                  ) : item.value}
+                </span>
               </div>
             ))}
           </div>
@@ -167,27 +309,116 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* 社交链接 */}
+          {/* 社交链接 - 带 LinkedIn 图标 */}
           <div className={`${styles.mobileContentSection} ${styles.mobileContentReveal}`}>
             <h2 className={styles.mobileSectionTitle}>CONNECT</h2>
             <Link
               href="https://www.linkedin.com/in/yixiang-huang-08b70620a/"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: 'block', width: '120px', height: '150px', position: 'relative' }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '120px' }}
             >
-              <Image
-                src="/qrcode-linkedin.png"
-                alt="LinkedIn QR Code"
-                fill
-                style={{ objectFit: 'cover' }}
-              />
+              {/* LinkedIn 图标 */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                marginBottom: '8px',
+                color: '#0A66C2'
+              }}>
+                <LinkedInIcon size={18} />
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase'
+                }}>
+                  LinkedIn
+                </span>
+              </div>
+              {/* 二维码 */}
+              <div style={{ width: '120px', height: '150px', position: 'relative' }}>
+                <Image
+                  src="/qrcode-linkedin.png"
+                  alt="LinkedIn QR Code"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
             </Link>
           </div>
 
           {/* 底部留白 */}
           <div className={styles.mobileFooterSpace} />
         </div>
+
+        {/* 特效样式 */}
+        <style jsx global>{`
+          /* ============================================ */
+          /* 打字机效果样式 */
+          /* ============================================ */
+          .typewriter-text {
+            display: inline;
+          }
+
+          .typewriter-cursor {
+            display: inline-block;
+            margin-left: 2px;
+            font-weight: 100;
+            color: inherit;
+            animation: cursorBlink 1s step-end infinite;
+          }
+
+          @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+          }
+
+          /* ============================================ */
+          /* 技能标签光效样式 */
+          /* ============================================ */
+          .glow-label {
+            display: inline-block;
+            position: relative;
+            transition: all 0.3s ease;
+          }
+
+          .glow-label::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -4px;
+            right: -4px;
+            bottom: -2px;
+            background: var(--glow-color);
+            border-radius: 4px;
+            opacity: 0;
+            z-index: -1;
+            animation: glowPulse var(--glow-duration) ease-in-out infinite;
+            animation-delay: var(--glow-delay);
+          }
+
+          .glow-label:hover::before {
+            background: var(--glow-hover-color);
+            opacity: var(--glow-intensity);
+            animation: none;
+          }
+
+          .glow-label:hover {
+            transform: translateY(-1px);
+          }
+
+          @keyframes glowPulse {
+            0%, 100% {
+              opacity: 0;
+              transform: scale(0.95);
+            }
+            50% {
+              opacity: var(--glow-intensity);
+              transform: scale(1);
+            }
+          }
+        `}</style>
       </main>
     )
   }
@@ -214,9 +445,12 @@ export default function AboutPage() {
 
       <section className={styles.viewport}>
         <div className={styles.container}>
-          {/* 核心宣言 */}
+          {/* 核心宣言 - 打字机效果 */}
           <div className={`${styles.revealItem} ${styles.briefingText}`}>
-            I DECODE COMPLEX URBAN ORDINANCES THROUGH ALGORITHMIC PRECISION TO UNLOCK ARCHITECTURAL POTENTIAL.
+            <Typewriter
+              text="I DECODE COMPLEX URBAN ORDINANCES THROUGH ALGORITHMIC PRECISION TO UNLOCK ARCHITECTURAL POTENTIAL."
+              config={EFFECT_CONFIG.typewriter}
+            />
           </div>
 
           <div className={styles.metaGrid}>
@@ -232,13 +466,21 @@ export default function AboutPage() {
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Tech Stack</span>
-              <span className={styles.metaValue}>Python / Grasshopper</span>
-              <span className={styles.metaValue}>UE5 / React / Three.js</span>
+              <span className={styles.metaValue}>
+                <GlowLabel index={0} config={EFFECT_CONFIG.glow}>Python / Grasshopper</GlowLabel>
+              </span>
+              <span className={styles.metaValue}>
+                <GlowLabel index={1} config={EFFECT_CONFIG.glow}>UE5 / React / Three.js</GlowLabel>
+              </span>
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>LA Expertise</span>
-              <span className={styles.metaValue}>CHIP / TOC / AB 1287</span>
-              <span className={styles.metaValue}>Ministerial Review</span>
+              <span className={styles.metaValue}>
+                <GlowLabel index={2} config={EFFECT_CONFIG.glow}>CHIP / TOC / AB 1287</GlowLabel>
+              </span>
+              <span className={styles.metaValue}>
+                <GlowLabel index={3} config={EFFECT_CONFIG.glow}>Ministerial Review</GlowLabel>
+              </span>
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Education</span>
@@ -271,7 +513,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* 社交二维码链接模块 */}
+          {/* 社交二维码链接模块 - 带 LinkedIn 图标 */}
           <div className={styles.revealItem} style={{ marginTop: '4rem', paddingBottom: '4rem' }}>
             <h3 style={{
               fontSize: '14px',
@@ -287,13 +529,35 @@ export default function AboutPage() {
 
             <div style={{ display: 'flex', gap: '2rem' }}>
               <Link href="https://www.linkedin.com/in/yixiang-huang-08b70620a/" target="_blank" rel="noopener noreferrer">
-                <div style={{ width: '150px', height: '186px', background: '#f0f0f0', position: 'relative', cursor: 'pointer' }}>
-                  <Image
-                    src="/qrcode-linkedin.png"
-                    alt="LinkedIn QR Code"
-                    fill
-                    style={{ objectFit: 'cover' }}
-                  />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+                  {/* LinkedIn 图标和标签 */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '12px',
+                    color: '#0A66C2',
+                    transition: 'color 0.3s ease'
+                  }}>
+                    <LinkedInIcon size={22} />
+                    <span style={{
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase'
+                    }}>
+                      LinkedIn
+                    </span>
+                  </div>
+                  {/* 二维码 */}
+                  <div style={{ width: '150px', height: '186px', background: '#f0f0f0', position: 'relative' }}>
+                    <Image
+                      src="/qrcode-linkedin.png"
+                      alt="LinkedIn QR Code"
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
                 </div>
               </Link>
             </div>
@@ -301,6 +565,74 @@ export default function AboutPage() {
 
         </div>
       </section>
+
+      {/* 特效样式 */}
+      <style jsx global>{`
+        /* ============================================ */
+        /* 打字机效果样式 */
+        /* ============================================ */
+        .typewriter-text {
+          display: inline;
+        }
+
+        .typewriter-cursor {
+          display: inline-block;
+          margin-left: 2px;
+          font-weight: 100;
+          color: inherit;
+          animation: cursorBlink 1s step-end infinite;
+        }
+
+        @keyframes cursorBlink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+
+        /* ============================================ */
+        /* 技能标签光效样式 */
+        /* ============================================ */
+        .glow-label {
+          display: inline-block;
+          position: relative;
+          transition: all 0.3s ease;
+        }
+
+        .glow-label::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -4px;
+          right: -4px;
+          bottom: -2px;
+          background: var(--glow-color);
+          border-radius: 4px;
+          opacity: 0;
+          z-index: -1;
+          animation: glowPulse var(--glow-duration) ease-in-out infinite;
+          animation-delay: var(--glow-delay);
+        }
+
+        .glow-label:hover::before {
+          background: var(--glow-hover-color);
+          opacity: var(--glow-intensity);
+          animation: none;
+        }
+
+        .glow-label:hover {
+          transform: translateY(-1px);
+        }
+
+        @keyframes glowPulse {
+          0%, 100% {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          50% {
+            opacity: var(--glow-intensity);
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </main>
   )
 }
