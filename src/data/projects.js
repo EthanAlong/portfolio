@@ -1065,6 +1065,66 @@ const realProjects = [
        
     ]
   },
+  
+  {
+  "id": "exposition-park",
+  "title": ["Exposition Park", "Urban Loop"],
+  "year": "2022 (UCLA Graduate Project)",
+  "category": "Urban Design & Mixed-Use",
+  "ringImage": "/exposition-park/1.webp",
+  "mainImage": "/exposition-park/1.webp",
+  "description": "A graduate research project at UCLA exploring a comprehensive urban loop strategy for Exposition Park. The design integrates three distinct mixed-use hubs—Logistics, Culinary, and Retail—connected by an efficient circulator to enable free-flowing exchange and programmatic synergy.",
+  "location": "Los Angeles, CA",
+  "sector": "Academic Research / Urban Infrastructure",
+  "status": "Conceptual Design",
+  "scale": "Large-Scale Urban Masterplan",
+  "architect": "UCLA A.UD (Graduate Work)",
+  "contribution": "Masterplanning, Circulation Strategy, Architectural Design, Visualization",
+  "content": [
+    {
+      "type": "textBlock",
+      "title": "The Integrated Loop Strategy",
+      "text": "Developed during graduate studies at UCLA, this project proposes an infrastructural loop that redefines Exposition Park. The central thesis investigates how a continuous circulation system can seamlessly connect disparate programmatic functions—specifically logistics distribution, food culture, and commercial retail—creating a highly efficient, self-sustaining urban ecosystem where goods, people, and services flow freely."
+    },
+    {
+      "type": "imageGrid",
+      "columns": 2,
+      "images": ["/exposition-park/1.webp", "/exposition-park/2.webp"],
+      "customTitle": "Conceptual Collages",
+      "labels": ["Urban Assemblage", "Programmatic Overlay"]
+    },
+    {
+      "type": "imageGrid",
+      "columns": 3,
+      "images": ["/exposition-park/3.webp", "/exposition-park/4.webp", "/exposition-park/5.webp"],
+      "customTitle": "Flow Analysis Diagrams",
+      "labels": ["Loop Circulation System", "Logistics & Mobility Flow", "Pedestrian Integration"]
+    },
+    {
+      "type": "imageGrid",
+      "columns": 1,
+      "images": ["/exposition-park/6.webp"],
+      "customTitle": "Architectural Visualization",
+      "labels": ["Culinary Complex (Food District)"]
+    },
+    {
+      "type": "imageGrid",
+      "columns": 3,
+      "images": ["/exposition-park/7.webp", "/exposition-park/8.webp", "/exposition-park/9.webp"],
+      "customTitle": "Logistics Hub & Analysis",
+      "labels": ["Logistics Complex Render", "Operational Analysis", "Systems Diagram"]
+    },
+    {
+      "type": "imageGrid",
+      "columns": 1,
+      "images": ["/exposition-park/10.webp"],
+      "customTitle": "Architectural Visualization",
+      "labels": ["Commercial Retail Complex"]
+    }
+  ]
+  },
+  //Computational Design / AI Generation
+  // ============================================================================
   {
     id: "local-ai-deploy", 
     title: ["AI", "Generative","Workflow"], // 数组格式：支持精准控制两行排版
@@ -1102,7 +1162,65 @@ const realProjects = [
       
        
     ]
-  }
+  },
+  
+  {
+  "id": "unit-schedule-plugin",
+  "title": ["Unit Schedule", "Plugin"],
+  "year": "2026",
+  "category": "Revit Plugin",
+  "ringImage": "/unit-schedule-plugin/1.webp",
+  "description": "A professional Revit plugin for generating comprehensive unit schedules with area analysis, open space tracking, and interactive visualizations for multi-family residential projects.",
+  "mainImage": "/unit-schedule-plugin/1.webp",
+  "location": "Desktop Application",
+  "sector": "BIM Tools / Revit API",
+  "status": "Completed",
+  "scale": "Revit 2025 / .NET 8.0",
+  "architect": "Personal Project",
+  "contribution": "Full-Stack Development, UI/UX Design, Revit API Integration",
+  "content": [
+    {
+      "type": "textBlock",
+      "title": "Project Overview",
+      "text": "Developed a complete Revit plugin to automate unit schedule generation for multi-family and mixed-use projects. The tool scans Revit models to identify residential units, calculate areas, and track both private open spaces (balconies, patios, terraces) and public amenities."
+    },
+    {
+      "type": "imageGrid",
+      "columns": 1,
+      "images": ["/unit-schedule-plugin/7.webp"]
+    },
+    {
+      "type": "textBlock",
+      "title": "Dashboard & Analytics",
+      "text": "Real-time statistics cards display total units, gross/net area, and efficiency ratios at a glance. Interactive charts visualize unit mix distribution and bedroom breakdown using a modern WPF interface with professional color scheme."
+    },
+    {
+      "type": "imageGrid",
+      "columns": 2,
+      "images": ["/unit-schedule-plugin/2.webp", "/unit-schedule-plugin/3.webp"]
+    },
+    {
+      "type": "textBlock",
+      "title": "Open Space Tracking",
+      "text": "Intelligent pattern matching identifies and categorizes private open spaces (balconies, patios, terraces) associated with individual units, as well as public amenities (courtyards, rooftops, pools). Coverage analysis tracks covered vs. uncovered areas for accurate sellable area calculations."
+    },
+    {
+      "type": "imageGrid",
+      "columns": 2,
+      "images": ["/unit-schedule-plugin/4.webp", "/unit-schedule-plugin/5.webp"]
+    },
+    {
+      "type": "textBlock",
+      "title": "Technical Implementation",
+      "text": "Built with C# and WPF following MVVM architecture. Utilizes Revit API's FilteredElementCollector for efficient room scanning, with support for multiple unit type detection methods (room name, comments, custom parameters). Features CSV export and comprehensive report generation."
+    },
+    {
+      "type": "imageGrid",
+      "columns": 1,
+      "images": ["/unit-schedule-plugin/6.webp"]
+    }
+  ]
+}
 ];
 
 /**
