@@ -105,7 +105,10 @@ export default function RootLayout({ children }) {
                   <span
                     key={i}
                     className="logo-letter"
-                    style={{ animationDelay: `${0.3 + i * 0.05}s` }}
+                    style={{
+                      animationDelay: `${0.3 + i * 0.05}s`,
+                      '--letter-index': i
+                    }}
                   >
                     {char}
                   </span>
@@ -198,14 +201,25 @@ export default function RootLayout({ children }) {
             }
           }
 
-          /* Logo hover 效果：字母微微波动 */
+          /* Logo hover 效果：字母依次扫描波动 */
           .logo:hover .logo-letter {
-            animation: letterWave 0.4s ease;
+            animation: letterScan 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: calc(var(--letter-index, 0) * 0.03s);
           }
 
-          @keyframes letterWave {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
+          @keyframes letterScan {
+            0% {
+              transform: translateY(0);
+              opacity: 1;
+            }
+            30% {
+              transform: translateY(-4px);
+              opacity: 0.6;
+            }
+            100% {
+              transform: translateY(0);
+              opacity: 1;
+            }
           }
 
           /* Logo 点击效果 */

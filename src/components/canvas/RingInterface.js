@@ -40,6 +40,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Image, Text } from '@react-three/drei'
 import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
+import gsap from 'gsap'
 import { projects, RING_CATEGORIES } from '@/data/projects'
 import { Html, Line } from '@react-three/drei'
 
@@ -262,7 +263,11 @@ const CONFIG = {
   // --- 开场动画 ---
   INTRO: {
     SPIN_KICK: Math.PI * 0.9,    // 开场旋转总量
+    SPIN_DURATION: 1.8,          // 入场旋转时长 (GSAP)
+    SPIN_EASE: "power3.out",     // 入场旋转缓动（快启动慢结束）
     CAMERA_START_Z: 70,          // 开场相机起始深度
+    CAMERA_DURATION: 2.0,        // 相机推进时长 (GSAP)
+    CAMERA_EASE: "power2.out",   // 相机缓动
     FADE_DURATION: 1.5,          // 黑场渐显时间
   },
 
@@ -271,9 +276,15 @@ const CONFIG = {
 
   // --- 转场序列控制 ---
   TRANSITION: {
-    SPIN_ACCEL: 4.9,             // [1] 点击瞬间：旋转加速度
+    // GSAP 动画参数 - 旋转和扩张使用相同缓动，确保同步
+    SPIN_DURATION: 1.8,          // 转场旋转动画时长（秒）
+    SPIN_EASE: "power2.inOut",   // 转场旋转缓动曲线（平滑进出）
+    SPIN_AMOUNT: Math.PI * 2,    // 转场旋转量（一整圈）
+
     EXPAND_SCALE: 2.5,           // [1] 点击瞬间：半径扩张倍数
-    EXPAND_SPEED: 0.005,         // [1] 点击瞬间：半径扩张的物理速度
+    EXPAND_DURATION: 1.8,        // 半径扩张动画时长（与旋转同步）
+    EXPAND_EASE: "power2.inOut", // 半径扩张缓动（与旋转相同）
+
     BLUR_STRENGTH: "30px",       // [1] 点击瞬间：同步开启的模糊强度
 
     OVERLAY_DELAY: 800,          // [2] 黑色遮罩层淡入的延迟时间 (毫秒)
@@ -890,6 +901,10 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
   // 半径状态（用于平滑过渡）
   const currentRadius = useRef(ring.radius)
 
+  // 桌面端 GSAP hover 动画 refs
+  const hoverTween = useRef(null)
+  const targetY = useRef(0)
+
   useFrame(() => {
     if (!ref.current) return
 
@@ -942,20 +957,17 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
        * 桌面端 Hover 弹出逻辑
        *
        * 鼠标悬停时项目向外弹出并上浮
+       * Y 轴位移由 GSAP 控制，带回弹缓动效果
        */
       const lerpSpeed = selection.lerpSpeed
       const baseRadius = ring.radius
       const targetRadius = hovered ? baseRadius + (ring.hoverOut || 0) : baseRadius
       currentRadius.current = THREE.MathUtils.lerp(currentRadius.current, targetRadius, lerpSpeed)
 
-      // 更新位置
+      // 更新位置（Y 轴由 GSAP 的 targetY.current 控制）
       ref.current.position.set(
         Math.sin(angle) * currentRadius.current,
-        THREE.MathUtils.lerp(
-          ref.current.position.y,
-          hovered ? visuals.selectedTranslateY : 0,
-          lerpSpeed
-        ),
+        targetY.current,
         Math.cos(angle) * currentRadius.current
       )
 
@@ -982,9 +994,33 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
             e.stopPropagation()
             setHover(true)
             setActiveProject(item)
+
+            // 取消之前的动画
+            if (hoverTween.current) hoverTween.current.kill()
+
+            // GSAP 弹出动画（带回弹缓动）
+            hoverTween.current = gsap.to(targetY, {
+              current: visuals.selectedTranslateY,
+              duration: 0.4,
+              ease: "back.out(1.7)"
+            })
           }
         }}
-        onPointerOut={() => !isMobile && setHover(false)}
+        onPointerOut={() => {
+          if (!isMobile) {
+            setHover(false)
+
+            // 取消之前的动画
+            if (hoverTween.current) hoverTween.current.kill()
+
+            // GSAP 收回动画
+            hoverTween.current = gsap.to(targetY, {
+              current: 0,
+              duration: 0.3,
+              ease: "power2.out"
+            })
+          }
+        }}
         onClick={(e) => {
           e.stopPropagation()
           /**
@@ -1110,6 +1146,33 @@ function SceneContent({
   const lookAtTarget = params.camera.lookAt
   const damping = params.interaction.damping
 
+  // GSAP 转场动画
+  useEffect(() => {
+    if (isTransitioning) {
+      // 创建动画时间轴
+      const tl = gsap.timeline()
+
+      // 旋转加速动画
+      tl.to(targetRotation, {
+        current: targetRotation.current + CONFIG.TRANSITION.SPIN_AMOUNT,
+        duration: CONFIG.TRANSITION.SPIN_DURATION,
+        ease: CONFIG.TRANSITION.SPIN_EASE,
+      }, 0)
+
+      // 半径扩张动画
+      tl.to(transitionRadiusScale, {
+        current: CONFIG.TRANSITION.EXPAND_SCALE,
+        duration: CONFIG.TRANSITION.EXPAND_DURATION,
+        ease: CONFIG.TRANSITION.EXPAND_EASE,
+      }, 0) // 0 表示与上一个动画同时开始
+
+      // 清理函数
+      return () => {
+        tl.kill()
+      }
+    }
+  }, [isTransitioning])
+
   useFrame((state, delta) => {
     // --- 相机入场动画 ---
     if (introActive) {
@@ -1117,23 +1180,18 @@ function SceneContent({
       state.camera.lookAt(new THREE.Vector3(...lookAtTarget))
     }
 
-    // --- 转场动画：加速旋转 + 半径扩张 ---
+    // --- 平滑插值旋转角度 ---
+    // 转场时直接跟随 GSAP 动画的目标值，不使用 damp 阻尼
     if (isTransitioning) {
-      targetRotation.current += delta * CONFIG.TRANSITION.SPIN_ACCEL
-      transitionRadiusScale.current = THREE.MathUtils.lerp(
-        transitionRadiusScale.current,
-        CONFIG.TRANSITION.EXPAND_SCALE,
-        CONFIG.TRANSITION.EXPAND_SPEED
+      scrollRotation.current = targetRotation.current
+    } else {
+      scrollRotation.current = THREE.MathUtils.damp(
+        scrollRotation.current,
+        targetRotation.current,
+        damping,
+        delta
       )
     }
-
-    // --- 平滑插值旋转角度 ---
-    scrollRotation.current = THREE.MathUtils.damp(
-      scrollRotation.current,
-      targetRotation.current,
-      damping,
-      delta
-    )
 
     // --- 更新环形旋转 ---
     if (spinGroup.current) {
@@ -1463,7 +1521,14 @@ export default function RingInterface() {
 
             setTimeout(() => {
               setIsLoading(false)
-              targetRotation.current += CONFIG.INTRO.SPIN_KICK
+
+              // 使用 GSAP 执行入场旋转
+              gsap.to(targetRotation, {
+                current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
+                duration: CONFIG.INTRO.SPIN_DURATION,
+                ease: CONFIG.INTRO.SPIN_EASE,
+              })
+
               globalInitialized = true
               lastSpinTimestamp = Date.now()
             }, remaining)
@@ -1477,7 +1542,14 @@ export default function RingInterface() {
         // 返回页面：显示快速过渡后旋转
         setTimeout(() => {
           setIsReturning(false) // 隐藏返回过渡层
-          targetRotation.current += CONFIG.INTRO.SPIN_KICK
+
+          // 使用 GSAP 执行返回旋转
+          gsap.to(targetRotation, {
+            current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
+            duration: CONFIG.INTRO.SPIN_DURATION,
+            ease: CONFIG.INTRO.SPIN_EASE,
+          })
+
           lastSpinTimestamp = Date.now()
         }, 400) // 400ms 的过渡时间
       }
@@ -1495,7 +1567,11 @@ export default function RingInterface() {
         const now = Date.now()
         // 如果距离上次旋转超过1秒，触发新的旋转
         if (now - lastSpinTimestamp > 1000) {
-          targetRotation.current += CONFIG.INTRO.SPIN_KICK
+          gsap.to(targetRotation, {
+            current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
+            duration: CONFIG.INTRO.SPIN_DURATION,
+            ease: CONFIG.INTRO.SPIN_EASE,
+          })
           lastSpinTimestamp = now
         }
       }
@@ -1507,7 +1583,11 @@ export default function RingInterface() {
         const now = Date.now()
         if (now - lastSpinTimestamp > 500) {
           setTimeout(() => {
-            targetRotation.current += CONFIG.INTRO.SPIN_KICK
+            gsap.to(targetRotation, {
+              current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
+              duration: CONFIG.INTRO.SPIN_DURATION,
+              ease: CONFIG.INTRO.SPIN_EASE,
+            })
             lastSpinTimestamp = Date.now()
           }, 200)
         }
@@ -1851,6 +1931,12 @@ export default function RingInterface() {
           height: 100%;
         }
 
+        /* Canvas 模糊过渡 - 基础状态 */
+        .ring-canvas canvas {
+          filter: blur(0);
+          transition: filter 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         /* 移动端 Canvas 只占底部区域 */
         .is-mobile .ring-canvas {
           top: auto !important;
@@ -1861,9 +1947,9 @@ export default function RingInterface() {
         /* ============================================ */
         /* 转场动画样式 */
         /* ============================================ */
+        /* 转场时的模糊状态 */
         .is-blurring canvas {
           filter: blur(${CONFIG.TRANSITION.BLUR_STRENGTH});
-          transition: filter 1.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .clou-loader-overlay {
