@@ -120,44 +120,45 @@ const RING_PARAMS = {
     /**
      * ============================================================
      * 分类弧线与标签控制台（移动端）
+     * Category Arc & Label Control Panel (Mobile)
      * ============================================================
      */
     category: {
-      // --- 弧线位置控制 ---
-      arcOffset: 4,              // 弧线距离项目圆环的径向偏移
-      arcGap: 0.06,              // 弧线之间的角度间隔
-      arcYOffset: 0.3,           // 每条弧线的Y轴错开量
-      arcYBase: 0.5,             // 弧线基础Y轴高度
+      // --- 弧线位置控制 / Arc Position Control ---
+      arcOffset: 4,              // 弧线距离项目圆环的径向偏移 / Radial offset from project ring
+      arcGap: 0.06,              // 弧线之间的角度间隔（弧度）/ Angular gap between arcs (radians)
+      arcYOffset: 0.3,           // 每条弧线的Y轴错开量 / Y-axis stagger per arc
+      arcYBase: 0.5,             // 弧线基础Y轴高度 / Base Y position for arcs
 
-      // --- 弧线颜色控制 ---
-      arcColor: '#ffffff',       // 弧线基础颜色
-      arcOpacity: 0.25,          // 弧线基础透明度
+      // --- 弧线颜色控制 / Arc Color Control ---
+      arcColor: '#ffffff',       // 弧线基础颜色 / Base arc color
+      arcOpacity: 0.25,          // 弧线基础透明度 / Base arc opacity
 
-      // --- 弧线样式 ---
-      arcWidth: 1,               // 弧线宽度
+      // --- 弧线样式 / Arc Style ---
+      arcWidth: 1,               // 弧线宽度 / Arc line width
 
-      // --- 流动光晕效果 ---
-      flowEnabled: true,         // 是否启用流动效果
-      flowColor: '#ffffff',      // 流动光斑颜色
-      flowSpeed: 0.4,            // 流动速度（弧度/秒）
-      flowLength: 0.25,          // 流动光斑长度（弧度）
-      flowIntensity: 0.7,        // 流动光斑亮度
-      flowPause: 2.5,            // 每次流动后的暂停时间（秒）
+      // --- 流动光晕效果 / Flowing Glow Effect ---
+      flowEnabled: true,         // 是否启用流动效果 / Enable flow animation
+      flowColor: '#ffffff',      // 流动光斑颜色 / Flow glow color
+      flowSpeed: 0.4,            // 流动速度（弧度/秒，固定角速度）/ Flow speed (radians/sec, fixed angular velocity)
+      flowLength: 0.25,          // 流动光斑基础长度（弧度）/ Base glow length (radians)
+      flowIntensity: 0.7,        // 流动光斑亮度 / Flow glow intensity
+      flowPause: 2.5,            // 每次流动后的暂停时间（秒）/ Pause duration after each flow (seconds)
 
-      // --- 标签位置控制 ---
-      labelOffset: 5,            // 标签距离弧线的额外偏移
-      labelYOffset: 1.5,         // 标签Y轴偏移（悬浮高度）
-      labelColor: '#ffffff',     // 标签颜色
-      labelFontSize: '10px',     // 标签字号
-      labelGlowRadius: 6,        // 标签文字发光半径
-      labelGlowOpacity: 0.4,     // 标签发光透明度
+      // --- 标签位置控制 / Label Position Control ---
+      labelOffset: 5,            // 标签距离弧线的额外偏移 / Extra offset from arc to label
+      labelYOffset: 1.5,         // 标签Y轴偏移（悬浮高度）/ Label Y offset (hover height)
+      labelColor: '#ffffff',     // 标签颜色 / Label color
+      labelFontSize: '10px',     // 标签字号 / Label font size
+      labelGlowRadius: 6,        // 标签文字发光半径 (px) / Label text glow radius (px)
+      labelGlowOpacity: 0.4,     // 标签发光透明度 / Label glow opacity
 
-      // --- 连接线 ---
-      connectorColor: '#ffffff', // 连接线颜色
-      connectorOpacity: 0.2,     // 连接线透明度
+      // --- 连接线 / Connector Line ---
+      connectorColor: '#ffffff', // 连接线颜色 / Connector line color
+      connectorOpacity: 0.2,     // 连接线透明度 / Connector line opacity
 
-      // --- 动画 ---
-      fadeSpeed: 0.15,           // 标签淡入淡出速度
+      // --- 动画 / Animation ---
+      fadeSpeed: 0.15,           // 标签淡入淡出速度 / Label fade in/out speed
     },
   },
 
@@ -209,44 +210,45 @@ const RING_PARAMS = {
     /**
      * ============================================================
      * 分类弧线与标签控制台（桌面端）
+     * Category Arc & Label Control Panel (Desktop)
      * ============================================================
      */
     category: {
-      // --- 弧线位置控制 ---
-      arcOffset: 6,              // 弧线距离项目圆环的径向偏移（正值=更远）
-      arcGap: 0.08,              // 弧线之间的角度间隔（弧度）
-      arcYOffset: 0.5,           // 每条弧线的Y轴错开量
-      arcYBase: 1,               // 弧线基础Y轴高度
+      // --- 弧线位置控制 / Arc Position Control ---
+      arcOffset: 6,              // 弧线距离项目圆环的径向偏移（正值=更远）/ Radial offset from ring (positive = farther)
+      arcGap: 0.08,              // 弧线之间的角度间隔（弧度）/ Angular gap between arcs (radians)
+      arcYOffset: 0.5,           // 每条弧线的Y轴错开量 / Y-axis stagger per arc
+      arcYBase: 1,               // 弧线基础Y轴高度 / Base Y position for arcs
 
-      // --- 弧线颜色控制 ---
-      arcColor: '#ffffff',       // 弧线基础颜色
-      arcOpacity: 0.3,           // 弧线基础透明度
+      // --- 弧线颜色控制 / Arc Color Control ---
+      arcColor: '#ffffff',       // 弧线基础颜色 / Base arc color
+      arcOpacity: 0.3,           // 弧线基础透明度 / Base arc opacity
 
-      // --- 弧线样式 ---
-      arcWidth: 1.5,             // 弧线宽度
+      // --- 弧线样式 / Arc Style ---
+      arcWidth: 1.5,             // 弧线宽度 / Arc line width
 
-      // --- 流动光晕效果 ---
-      flowEnabled: true,         // 是否启用流动效果
-      flowColor: '#ffffff',      // 流动光斑颜色
-      flowSpeed: 0.5,            // 流动速度（弧度/秒，所有弧线速度相同）
-      flowLength: 0.3,           // 流动光斑长度（弧度，约17度）
-      flowIntensity: 0.9,        // 流动光斑亮度
-      flowPause: 2.0,            // 每次流动后的暂停时间（秒）
+      // --- 流动光晕效果 / Flowing Glow Effect ---
+      flowEnabled: true,         // 是否启用流动效果 / Enable flow animation
+      flowColor: '#ffffff',      // 流动光斑颜色 / Flow glow color
+      flowSpeed: 0.5,            // 流动速度（弧度/秒，固定角速度）/ Flow speed (radians/sec, fixed angular velocity)
+      flowLength: 0.3,           // 流动光斑基础长度（弧度，约17度）/ Base glow length (radians, ~17 degrees)
+      flowIntensity: 0.9,        // 流动光斑亮度 / Flow glow intensity
+      flowPause: 2.0,            // 每次流动后的暂停时间（秒）/ Pause duration after each flow (seconds)
 
-      // --- 标签位置控制 ---
-      labelOffset: 4,            // 标签距离弧线的额外偏移
-      labelYOffset: 2,           // 标签Y轴偏移（悬浮高度）
-      labelColor: '#ffffff',     // 标签颜色（统一白色）
-      labelFontSize: '12px',     // 标签字号
-      labelGlowRadius: 10,       // 标签文字发光半径 (px)
-      labelGlowOpacity: 0.5,     // 标签发光透明度
+      // --- 标签位置控制 / Label Position Control ---
+      labelOffset: 4,            // 标签距离弧线的额外偏移 / Extra offset from arc to label
+      labelYOffset: 2,           // 标签Y轴偏移（悬浮高度）/ Label Y offset (hover height)
+      labelColor: '#ffffff',     // 标签颜色（统一白色）/ Label color (unified white)
+      labelFontSize: '12px',     // 标签字号 / Label font size
+      labelGlowRadius: 10,       // 标签文字发光半径 (px) / Label text glow radius (px)
+      labelGlowOpacity: 0.5,     // 标签发光透明度 / Label glow opacity
 
-      // --- 连接线 ---
-      connectorColor: '#ffffff', // 连接线颜色
-      connectorOpacity: 0.2,     // 连接线透明度
+      // --- 连接线 / Connector Line ---
+      connectorColor: '#ffffff', // 连接线颜色 / Connector line color
+      connectorOpacity: 0.2,     // 连接线透明度 / Connector line opacity
 
-      // --- 动画 ---
-      fadeSpeed: 0.12,           // 标签淡入淡出速度
+      // --- 动画 / Animation ---
+      fadeSpeed: 0.12,           // 标签淡入淡出速度 / Label fade in/out speed
     },
   },
 };
@@ -394,18 +396,25 @@ function getSortedProjects(projectList) {
 
 /**
  * 计算每个类别的弧段布局
- * 返回: { [categoryId]: { startAngle, endAngle, midAngle, count, startIndex, endIndex } }
+ * Calculate arc segment layout for each category
  *
- * 弧线位置说明：
+ * @returns { [categoryId]: { startAngle, endAngle, midAngle, count, startIndex, endIndex } }
+ *
+ * 弧线位置说明 / Arc Position Notes:
  * - 项目中心位于角度 index * anglePerItem
- * - 弧线应该从第一个项目的左边缘到最后一个项目的右边缘
+ *   Project center is at angle: index * anglePerItem
+ * - 弧线从第一个项目的左边缘延伸到最后一个项目的右边缘
+ *   Arc extends from left edge of first project to right edge of last project
  * - 即从 startIndex * anglePerItem - halfAngle 到 (endIndex + 1) * anglePerItem - halfAngle
+ *   i.e., from startIndex * anglePerItem - halfAngle to (endIndex + 1) * anglePerItem - halfAngle
  */
 function getCategoryLayout(sortedProjects) {
   const layout = {};
   const total = sortedProjects.length;
+  // 每个项目占据的角度 / Angle per project
   const anglePerItem = (Math.PI * 2) / total;
-  const halfAngle = anglePerItem / 2;  // 半个项目的角度，用于偏移
+  // 半个项目的角度，用于偏移 / Half angle for offset
+  const halfAngle = anglePerItem / 2;
 
   let currentCategory = null;
 
@@ -413,36 +422,40 @@ function getCategoryLayout(sortedProjects) {
     const type = project.type || 'professional';
 
     if (type !== currentCategory) {
-      // 保存上一个类别的结束位置
+      // 保存上一个类别的结束位置 / Save end position of previous category
       if (currentCategory !== null) {
         const endIndex = index - 1;
         layout[currentCategory].endIndex = endIndex;
         // 弧线结束在最后一个项目和下一个项目的中间
+        // Arc ends between last project and next project
         layout[currentCategory].endAngle = (endIndex + 1) * anglePerItem - halfAngle;
         layout[currentCategory].count = endIndex - layout[currentCategory].startIndex + 1;
         layout[currentCategory].midAngle =
           (layout[currentCategory].startAngle + layout[currentCategory].endAngle) / 2;
       }
 
-      // 开始新的类别
+      // 开始新的类别 / Start new category
       currentCategory = type;
       layout[type] = {
         startIndex: index,
         // 弧线开始在前一个项目和当前项目的中间
+        // Arc starts between previous project and current project
         startAngle: index * anglePerItem - halfAngle,
         endIndex: index,
         endAngle: (index + 1) * anglePerItem - halfAngle,
         count: 1,
-        midAngle: index * anglePerItem,  // 中点就是项目中心
+        // 中点就是项目中心 / Midpoint is at project center
+        midAngle: index * anglePerItem,
       };
     }
   });
 
-  // 处理最后一个类别
+  // 处理最后一个类别 / Handle the last category
   if (currentCategory !== null) {
     const endIndex = sortedProjects.length - 1;
     layout[currentCategory].endIndex = endIndex;
     // 最后一个类别的弧线结束在最后一个项目和第一个项目的中间
+    // Last category arc ends between last project and first project
     layout[currentCategory].endAngle = (endIndex + 1) * anglePerItem - halfAngle;
     layout[currentCategory].count = endIndex - layout[currentCategory].startIndex + 1;
     layout[currentCategory].midAngle =
@@ -454,56 +467,74 @@ function getCategoryLayout(sortedProjects) {
 
 /**
  * ============================================================
- * 【 分类弧线组件 - CategoryArc 】
+ * 【 分类弧线组件 / Category Arc Component - CategoryArc 】
  * ============================================================
  *
  * 带流动光晕效果的弧线
- * 单向流动：从头部发射到尾部，然后暂停，再重新开始
- * 使用与项目相同的 sin/cos 坐标系统，确保位置对齐
+ * Arc with flowing glow effect
+ *
+ * 特性 / Features:
+ * - 单向流动：从头部发射到尾部，然后暂停，再重新开始
+ *   Unidirectional flow: emits from head to tail, pauses, then restarts
+ * - 使用与项目相同的 sin/cos 坐标系统，确保位置对齐
+ *   Uses same sin/cos coordinate system as projects for alignment
+ *
+ * @param {number} startAngle - 弧线起始角度 / Arc start angle (radians)
+ * @param {number} endAngle - 弧线结束角度 / Arc end angle (radians)
+ * @param {boolean} isMobile - 是否移动端 / Is mobile device
+ * @param {boolean} isVisible - 是否可见 / Is visible
+ * @param {number} categoryIndex - 类别索引（用于Y轴错开）/ Category index (for Y offset)
+ * @param {number} flowLengthMultiplier - 光晕长度倍率 / Glow length multiplier
  */
 function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex, flowLengthMultiplier = 1.0 }) {
   const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop;
   const { arcOffset, arcGap, arcYOffset, arcYBase, arcColor, arcWidth, arcOpacity, flowEnabled, flowColor, flowSpeed, flowLength: baseFlowLength, flowIntensity, flowPause, fadeSpeed } = params.category;
   const ringRadius = params.ring.radius;
 
-  // 计算弧线实际半径和Y位置
+  // 计算弧线实际半径和Y位置 / Calculate actual arc radius and Y position
   const arcRadius = ringRadius + arcOffset;
   const yPosition = arcYBase + categoryIndex * arcYOffset;
 
-  // 应用间隔：缩短弧线两端
+  // 应用间隔：缩短弧线两端 / Apply gap: shorten both ends of arc
   const adjustedStartAngle = startAngle + arcGap / 2;
   const adjustedEndAngle = endAngle - arcGap / 2;
-  const arcLength = adjustedEndAngle - adjustedStartAngle; // 弧线的角度长度
+  // 弧线的角度长度 / Arc angular length
+  const arcLength = adjustedEndAngle - adjustedStartAngle;
 
   // 光晕长度：基础长度 * 弧线长度比例 * 类别倍率
-  // 这样长弧线的光晕也会长一点
+  // Glow length: base * arc proportion * category multiplier
+  // 这样长弧线的光晕也会长一点 / Longer arcs get longer glows
   const flowLength = baseFlowLength * (arcLength / (Math.PI / 2)) * flowLengthMultiplier;
 
-  // 淡入淡出
+  // 淡入淡出透明度 / Fade in/out opacity
   const [opacity, setOpacity] = useState(0);
 
   // 流动动画状态：当前角度位置（弧度）
+  // Flow animation state: current angle position (radians)
   const [flowAngle, setFlowAngle] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const pauseTimer = useRef(0);
 
   // 每个弧线有不同的初始延迟，避免同步
+  // Different initial delay per arc to avoid synchronization
   const initialDelay = useRef(categoryIndex * 0.8);
 
   useFrame((_, delta) => {
+    // 更新透明度 / Update opacity
     const target = isVisible ? arcOpacity : 0;
     setOpacity(prev => THREE.MathUtils.lerp(prev, target, fadeSpeed));
 
     // 流动动画（单向，固定角速度）
+    // Flow animation (unidirectional, fixed angular velocity)
     if (flowEnabled && isVisible) {
-      // 初始延迟
+      // 初始延迟 / Initial delay
       if (initialDelay.current > 0) {
         initialDelay.current -= delta;
         return;
       }
 
       if (isPaused) {
-        // 暂停计时
+        // 暂停计时 / Pause timer
         pauseTimer.current += delta;
         if (pauseTimer.current >= flowPause) {
           setIsPaused(false);
@@ -512,9 +543,10 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
         }
       } else {
         // 正在流动 - 使用固定的角速度（弧度/秒）
+        // Flowing - use fixed angular velocity (radians/second)
         const newAngle = flowAngle + delta * flowSpeed;
         if (newAngle >= arcLength + flowLength) {
-          // 到达终点，进入暂停
+          // 到达终点，进入暂停 / Reached end, enter pause
           setIsPaused(true);
           setFlowAngle(0);
         } else {
@@ -525,10 +557,12 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
   });
 
   // 基础弧线点 - 使用与项目相同的坐标系统
-  // 项目位置: x = sin(angle) * r, z = cos(angle) * r
+  // Base arc points - use same coordinate system as projects
+  // 项目位置 / Project position: x = sin(angle) * r, z = cos(angle) * r
   const basePoints = useMemo(() => {
     const points = [];
-    const segments = 150; // 增加采样点数，使曲线更平滑
+    // 增加采样点数，使曲线更平滑 / More segments for smoother curve
+    const segments = 150;
     for (let i = 0; i <= segments; i++) {
       const t = i / segments;
       const angle = adjustedStartAngle + t * (adjustedEndAngle - adjustedStartAngle);
@@ -542,11 +576,13 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
   }, [adjustedStartAngle, adjustedEndAngle, arcRadius, yPosition]);
 
   // 计算流动光斑的点（单向流动，固定角度长度）
+  // Calculate flow glow points (unidirectional, fixed angular length)
   const flowPoints = useMemo(() => {
     if (!flowEnabled || isPaused || flowAngle <= 0) return null;
 
     const points = [];
-    const segments = 30; // 光斑的采样点数
+    // 光斑的采样点数 / Glow segment count
+    const segments = 30;
     const flowStartAngle = adjustedStartAngle + Math.max(0, flowAngle - flowLength);
     const flowEndAngle = adjustedStartAngle + Math.min(arcLength, flowAngle);
 
@@ -565,12 +601,13 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
   }, [adjustedStartAngle, arcLength, arcRadius, yPosition, flowAngle, flowLength, flowEnabled, isPaused]);
 
   // 计算光斑透明度（淡入淡出效果）
+  // Calculate glow opacity (fade in/out effect)
   const flowOpacity = useMemo(() => {
     if (flowAngle < flowLength) {
-      // 淡入
+      // 淡入 / Fade in
       return (flowAngle / flowLength) * flowIntensity;
     } else if (flowAngle > arcLength - flowLength) {
-      // 淡出
+      // 淡出 / Fade out
       return Math.max(0, ((arcLength + flowLength - flowAngle) / flowLength)) * flowIntensity;
     }
     return flowIntensity;
@@ -578,7 +615,7 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
 
   return (
     <group>
-      {/* 基础弧线 */}
+      {/* 基础弧线 / Base arc line */}
       <Line
         points={basePoints}
         color={arcColor}
@@ -587,10 +624,10 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
         opacity={opacity}
       />
 
-      {/* 流动光斑 */}
+      {/* 流动光斑 / Flowing glow */}
       {flowEnabled && flowPoints && flowPoints.length > 1 && (
         <>
-          {/* 光斑核心 */}
+          {/* 光斑核心 / Glow core */}
           <Line
             points={flowPoints}
             color={flowColor}
@@ -598,7 +635,7 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
             transparent
             opacity={opacity * flowOpacity}
           />
-          {/* 光斑发光外层 */}
+          {/* 光斑发光外层 / Glow outer layer */}
           <Line
             points={flowPoints}
             color={flowColor}
@@ -614,18 +651,28 @@ function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex,
 
 /**
  * ============================================================
- * 【 分类标签组件 - CategoryLabel 】
+ * 【 分类标签组件 / Category Label Component - CategoryLabel 】
  * ============================================================
  *
  * 使用 Html 组件悬浮在圆环外侧
+ * Uses Html component to float outside the ring
+ *
  * 旋转时 fade out，停止后 fade in
+ * Fades out when spinning, fades in when stopped
+ *
+ * @param {number} midAngle - 类别弧线中点角度 / Category arc midpoint angle
+ * @param {string} label - 标签文字 / Label text
+ * @param {boolean} isSpinning - 是否正在旋转 / Is ring spinning
+ * @param {boolean} isMobile - 是否移动端 / Is mobile device
+ * @param {boolean} isVisible - 是否可见 / Is visible
+ * @param {number} categoryIndex - 类别索引 / Category index
  */
 function CategoryLabel({ midAngle, label, isSpinning, isMobile, isVisible, categoryIndex }) {
   const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop;
   const { arcOffset, arcYBase, arcYOffset, labelOffset, labelYOffset, labelColor, labelFontSize, labelGlowRadius, labelGlowOpacity, fadeSpeed } = params.category;
   const ringRadius = params.ring.radius;
 
-  // 计算标签实际距离和Y位置
+  // 计算标签实际距离和Y位置 / Calculate label distance and Y position
   const labelDistance = ringRadius + arcOffset + labelOffset;
   const yPosition = arcYBase + categoryIndex * arcYOffset + labelYOffset;
 
@@ -633,16 +680,18 @@ function CategoryLabel({ midAngle, label, isSpinning, isMobile, isVisible, categ
   const targetOpacity = useRef(0);
 
   // 根据可见性和旋转状态更新目标透明度
+  // Update target opacity based on visibility and spinning state
   useEffect(() => {
     targetOpacity.current = (isVisible && !isSpinning) ? 1 : 0;
   }, [isSpinning, isVisible]);
 
-  // 平滑插值透明度
+  // 平滑插值透明度 / Smoothly interpolate opacity
   useFrame(() => {
     setOpacity(prev => THREE.MathUtils.lerp(prev, targetOpacity.current, fadeSpeed));
   });
 
   // 计算标签在 3D 空间中的位置（与项目使用相同的坐标系）
+  // Calculate label position in 3D space (same coordinate system as projects)
   const position = useMemo(() => {
     const x = Math.sin(midAngle) * labelDistance;
     const z = Math.cos(midAngle) * labelDistance;
@@ -680,17 +729,27 @@ function CategoryLabel({ midAngle, label, isSpinning, isMobile, isVisible, categ
 
 /**
  * ============================================================
- * 【 分类连接线组件 - CategoryConnector 】
+ * 【 分类连接线组件 / Category Connector Component - CategoryConnector 】
  * ============================================================
  *
  * 从弧线中点连接到标签位置
+ * Connects from arc midpoint to label position
+ *
+ * 虚线样式，与标签同步淡入淡出
+ * Dashed line style, fades in/out with label
+ *
+ * @param {number} midAngle - 类别弧线中点角度 / Category arc midpoint angle
+ * @param {boolean} isSpinning - 是否正在旋转 / Is ring spinning
+ * @param {boolean} isMobile - 是否移动端 / Is mobile device
+ * @param {boolean} isVisible - 是否可见 / Is visible
+ * @param {number} categoryIndex - 类别索引 / Category index
  */
 function CategoryConnector({ midAngle, isSpinning, isMobile, isVisible, categoryIndex }) {
   const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop;
   const { arcOffset, arcYBase, arcYOffset, labelOffset, labelYOffset, connectorColor, connectorOpacity, fadeSpeed } = params.category;
   const ringRadius = params.ring.radius;
 
-  // 计算实际距离和Y位置
+  // 计算实际距离和Y位置 / Calculate actual distances and Y positions
   const arcRadius = ringRadius + arcOffset;
   const labelDistance = ringRadius + arcOffset + labelOffset;
   const arcY = arcYBase + categoryIndex * arcYOffset;
@@ -699,23 +758,28 @@ function CategoryConnector({ midAngle, isSpinning, isMobile, isVisible, category
   const [opacity, setOpacity] = useState(0);
   const targetOpacity = useRef(0);
 
+  // 更新目标透明度 / Update target opacity
   useEffect(() => {
     targetOpacity.current = (isVisible && !isSpinning) ? connectorOpacity : 0;
   }, [isSpinning, isVisible, connectorOpacity]);
 
+  // 平滑插值透明度 / Smoothly interpolate opacity
   useFrame(() => {
     setOpacity(prev => THREE.MathUtils.lerp(prev, targetOpacity.current, fadeSpeed));
   });
 
+  // 计算连接线的两个端点
+  // Calculate connector line endpoints
   const points = useMemo(() => {
-    // 与项目使用相同的坐标系：x = sin(angle) * r, z = cos(angle) * r
+    // 与项目使用相同的坐标系 / Same coordinate system as projects
+    // x = sin(angle) * r, z = cos(angle) * r
     const innerX = Math.sin(midAngle) * arcRadius;
     const innerZ = Math.cos(midAngle) * arcRadius;
     const outerX = Math.sin(midAngle) * (labelDistance - 1);
     const outerZ = Math.cos(midAngle) * (labelDistance - 1);
     return [
-      new THREE.Vector3(innerX, arcY, innerZ),
-      new THREE.Vector3(outerX, labelY - 0.5, outerZ),
+      new THREE.Vector3(innerX, arcY, innerZ),       // 弧线端 / Arc end
+      new THREE.Vector3(outerX, labelY - 0.5, outerZ), // 标签端 / Label end
     ];
   }, [midAngle, arcRadius, labelDistance, arcY, labelY]);
 
@@ -735,25 +799,33 @@ function CategoryConnector({ midAngle, isSpinning, isMobile, isVisible, category
 
 /**
  * ============================================================
- * 【 分类装饰组 - CategoryDecorations 】
+ * 【 分类装饰组 / Category Decorations Group - CategoryDecorations 】
  * ============================================================
  *
  * 包含所有类别的弧线、标签和连接线
- * isVisible: 控制整体可见性（loading完成后才显示）
+ * Contains all category arcs, labels, and connectors
+ *
+ * @param {Array} sortedProjects - 按类别排序的项目数组 / Projects sorted by category
+ * @param {boolean} isSpinning - 是否正在旋转 / Is ring spinning
+ * @param {boolean} isMobile - 是否移动端 / Is mobile device
+ * @param {boolean} isVisible - 控制整体可见性（loading完成后才显示）
+ *                              Controls visibility (shows after loading completes)
  */
 function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible }) {
+  // 计算类别布局 / Calculate category layout
   const categoryLayout = useMemo(
     () => getCategoryLayout(sortedProjects),
     [sortedProjects]
   );
 
+  // 组装类别数据 / Assemble category data
   const categoryEntries = useMemo(() => {
     return Object.entries(RING_CATEGORIES).map(([key, cat], index) => ({
       key,
       ...cat,
       layout: categoryLayout[cat.id],
       categoryIndex: index,
-    })).filter(entry => entry.layout); // 过滤掉没有项目的类别
+    })).filter(entry => entry.layout); // 过滤掉没有项目的类别 / Filter out empty categories
   }, [categoryLayout]);
 
   return (

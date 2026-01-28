@@ -2,19 +2,27 @@
 
 /**
  * ============================================================
- * 【 RING_CATEGORIES - 圆环分类常量 】
+ * 【 RING_CATEGORIES - 圆环分类常量 / Ring Category Constants 】
  * ============================================================
  *
  * 定义项目分类，用于在圆环上按类别分区展示
- * - PROFESSIONAL: 建筑实践项目
- * - ACADEMIC: 学术研究项目
- * - SOFTWARE_AI: 软件与AI工具
+ * Defines project categories for segmented display on the ring
+ *
+ * 类别说明 / Category Description:
+ * - PROFESSIONAL: 建筑实践项目 / Professional architecture projects
+ * - ACADEMIC: 学术研究项目 / Academic research projects
+ * - SOFTWARE_AI: 软件与AI工具 / Software & AI tools
+ *
+ * 扩展方式 / How to extend:
+ * 1. 在此添加新类别对象 / Add new category object here
+ * 2. 在项目数据中添加对应的 type 字段 / Add corresponding type field to project data
  */
 export const RING_CATEGORIES = {
   PROFESSIONAL: {
-    id: 'professional',
-    label: 'Professional',
+    id: 'professional',           // 类别ID / Category ID
+    label: 'Professional',        // 显示标签 / Display label
     // 光晕长度倍率：相对于基础 flowLength 的倍数
+    // Glow length multiplier: relative to base flowLength
     flowLengthMultiplier: 1.0,
   },
   ACADEMIC: {
@@ -25,7 +33,8 @@ export const RING_CATEGORIES = {
   SOFTWARE_AI: {
     id: 'software-ai',
     label: 'Software & AI',
-    flowLengthMultiplier: 1.5,  // 弧线短，光晕长一点更明显
+    // 弧线短，光晕长一点更明显 / Short arc, longer glow for visibility
+    flowLengthMultiplier: 1.5,
   },
 };
 
