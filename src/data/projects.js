@@ -2,12 +2,42 @@
 
 /**
  * ============================================================
+ * 【 RING_CATEGORIES - 圆环分类常量 】
+ * ============================================================
+ *
+ * 定义项目分类，用于在圆环上按类别分区展示
+ * - PROFESSIONAL: 建筑实践项目
+ * - ACADEMIC: 学术研究项目
+ * - SOFTWARE_AI: 软件与AI工具
+ */
+export const RING_CATEGORIES = {
+  PROFESSIONAL: {
+    id: 'professional',
+    label: 'Professional',
+    // 光晕长度倍率：相对于基础 flowLength 的倍数
+    flowLengthMultiplier: 1.0,
+  },
+  ACADEMIC: {
+    id: 'academic',
+    label: 'Academic',
+    flowLengthMultiplier: 1.0,
+  },
+  SOFTWARE_AI: {
+    id: 'software-ai',
+    label: 'Software & AI',
+    flowLengthMultiplier: 1.5,  // 弧线短，光晕长一点更明显
+  },
+};
+
+/**
+ * ============================================================
  * 【 真实项目库 - REAL PROJECTS 】
  * ============================================================
  */
 const realProjects = [
   {
-    id: "1104-labrea-ave", 
+    id: "1104-labrea-ave",
+    type: "professional",
     title: ["La Brea", "Collection"], // 数组格式：支持精准控制两行排版
     year: "2024",
     category: "Mixed Use",
@@ -39,7 +69,8 @@ const realProjects = [
     ]
   },
   {
-    id: "325-douglas-st", 
+    id: "325-douglas-st",
+    type: "professional",
     title: ["325", "Douglas","St"], // 数组格式：支持精准控制两行排版
     year: "2024",
     category: "Multi-Family Residential (TOC)",
@@ -76,7 +107,8 @@ const realProjects = [
     ]
   },
   {
-    id: "7221-mushmel", 
+    id: "7221-mushmel",
+    type: "professional",
     title: ["7221", "Mushmel","court"], // 数组格式：支持精准控制两行排版
     year: "2025",
     category: "Multi-Family Residential",
@@ -118,7 +150,8 @@ const realProjects = [
     ]
   },
   {
-    id: "4070-laurelcanyon-blvd", 
+    id: "4070-laurelcanyon-blvd",
+    type: "professional",
     title: ["4070", "Laurel ","place"], // 数组格式：支持精准控制两行排版
     year: "2025",
     category: "Adaptive Reuse / Commercial Remodel",
@@ -160,7 +193,8 @@ const realProjects = [
     ]
   },
   {
-    id: "1770-sawtelle-blvd", 
+    id: "1770-sawtelle-blvd",
+    type: "professional",
     title: ["1770", "Sawtelle ","place"], // 数组格式：支持精准控制两行排版
     year: "2022",
     category: "Mixed-Use / Affordable Housing",
@@ -202,7 +236,8 @@ const realProjects = [
     ]
   },
   {
-    id: "323-boylston-st", 
+    id: "323-boylston-st",
+    type: "professional",
     title: ["Boylston", "Apartments"], // 数组格式：支持精准控制两行排版
     year: "2025",
     category: "Multi-Family Residential",
@@ -244,7 +279,8 @@ const realProjects = [
     ]
   },
   {
-    id: "2430-7th-st", 
+    id: "2430-7th-st",
+    type: "professional",
     title: ["7th Street", "Townhouses"], // 数组格式：支持精准控制两行排版
     year: "2025",
     category: "Multi-Family Residential",
@@ -358,7 +394,8 @@ const realProjects = [
     ]
   },
   {
-    id: "328-douglas-st", 
+    id: "328-douglas-st",
+    type: "professional",
     title: ["Douglas II", "Apartments"], // 数组格式：支持精准控制两行排版
     year: "2023",
     category: "Multi-Family Residential (TOC)",
@@ -400,7 +437,8 @@ const realProjects = [
     ]
   },
   {
-    id: "838-malcolm-ave", 
+    id: "838-malcolm-ave",
+    type: "professional",
     title: ["Malcolm", "House"], // 数组格式：支持精准控制两行排版
     year: "2025",
     category: "Single Family Residence",
@@ -428,7 +466,8 @@ const realProjects = [
     ]
   },
   {
-    id: "2169-lindaflora-dr", 
+    id: "2169-lindaflora-dr",
+    type: "professional",
     title: ["Linda Flora", "Residence"], // 数组格式：支持精准控制两行排版
     year: "2022",
     category: "Single-Family Residential",
@@ -470,7 +509,8 @@ const realProjects = [
     ]
   },
   {
-    id: "4355-melrose-ave", 
+    id: "4355-melrose-ave",
+    type: "professional",
     title: ["Melose-Edge", "Apartments"], // 数组格式：支持精准控制两行排版
     year: "2025",
     category: "Mixed-Use / Multi-Family",
@@ -507,7 +547,8 @@ const realProjects = [
     ]
   },
   {
-    id: "8325-beverly-blvd", 
+    id: "8325-beverly-blvd",
+    type: "professional",
     title: [ "Beverly ","Flores"], // 数组格式：支持精准控制两行排版
     year: "2023",
     category: "Mixed-Use / Residential",
@@ -539,7 +580,8 @@ const realProjects = [
     ]
   },
   {
-    id: "10706-ohio-ave", 
+    id: "10706-ohio-ave",
+    type: "professional",
     title: [ "Ohio ","place"], // 数组格式：支持精准控制两行排版
     year: "2024",
     category: "Multi-Family Residential",
@@ -581,7 +623,8 @@ const realProjects = [
     ]
   },
   {
-    id: "11580-pico-blvd", 
+    id: "11580-pico-blvd",
+    type: "professional",
     title: [ "Pico ","Center"], // 数组格式：支持精准控制两行排版
     year: "2024",
     category: "Mixed-Use",
@@ -628,7 +671,8 @@ const realProjects = [
     ]
   },
   {
-    id: "vertical-shanghai", 
+    id: "vertical-shanghai",
+    type: "academic",
     title: ["Vertical", "Shanghai "], // 数组格式：支持精准控制两行排版
     year: "2014",
     category: "Speculative High-Rise",
@@ -725,7 +769,8 @@ const realProjects = [
     ]
   },
   {
-    id: "digital-escape", 
+    id: "digital-escape",
+    type: "academic",
     title: ["Digital", "Escape"], // 数组格式：支持精准控制两行排版
     year: "2022",
     category: "Digital Media",
@@ -789,7 +834,8 @@ const realProjects = [
     ]
   },
   {
-    id: "in-the-mood-for-love", 
+    id: "in-the-mood-for-love",
+    type: "academic",
     title: ["In The Mood", "For Love"], // 数组格式：支持精准控制两行排版
     year: "2017",
     category: "Urban Renovation",
@@ -841,7 +887,8 @@ const realProjects = [
     ]
   },
   {
-    id: "mosaic-bookstore", 
+    id: "mosaic-bookstore",
+    type: "professional",
     title: ["Mosaic", "Bookstore"], // 数组格式：支持精准控制两行排版
     year: "2019",
     category: "Interior Design / Installation",
@@ -906,7 +953,8 @@ const realProjects = [
     ]
   },
   {
-    id: "traditional-chinese-medicine", 
+    id: "traditional-chinese-medicine",
+    type: "academic",
     title: ["Traditional", "Chinese Medicine"], // 数组格式：支持精准控制两行排版
     year: "2020",
     category: "Urban Renovation / Cultural",
@@ -953,7 +1001,8 @@ const realProjects = [
     ]
   },
   {
-    id: "river-residence", 
+    id: "river-residence",
+    type: "academic",
     title: ["River", "Residence"], // 数组格式：支持精准控制两行排版
     year: "2018",
     category: "Adaptive Reuse / Urban Waterfront",
@@ -1013,7 +1062,8 @@ const realProjects = [
     ]
   },
   {
-    id: "pulse-station", 
+    id: "pulse-station",
+    type: "academic",
     title: ["Pulse", "Station"], // 数组格式：支持精准控制两行排版
     year: "2022",
     category: "Speculative Design / XR Narrative",
@@ -1068,6 +1118,7 @@ const realProjects = [
   
   {
   "id": "exposition-park",
+  "type": "academic",
   "title": ["Exposition Park", "Urban Loop"],
   "year": "2022 (UCLA Graduate Project)",
   "category": "Urban Design & Mixed-Use",
@@ -1126,7 +1177,8 @@ const realProjects = [
   //Computational Design / AI Generation
   // ============================================================================
   {
-    id: "local-ai-deploy", 
+    id: "local-ai-deploy",
+    type: "software-ai",
     title: ["AI", "Generative","Workflow"], // 数组格式：支持精准控制两行排版
     year: "2026",
     category: "AI Generation / Architectural Visualization",
@@ -1166,6 +1218,7 @@ const realProjects = [
   
   {
   "id": "unit-schedule-plugin",
+  "type": "software-ai",
   "title": ["Unit Schedule", "Plugin"],
   "year": "2026",
   "category": "Revit Plugin",

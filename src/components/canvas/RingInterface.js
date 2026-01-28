@@ -40,7 +40,8 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Image, Text } from '@react-three/drei'
 import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
-import { projects } from '@/data/projects'
+import { projects, RING_CATEGORIES } from '@/data/projects'
+import { Html, Line } from '@react-three/drei'
 
 /**
  * 全局状态变量（模块级别）
@@ -66,7 +67,7 @@ let lastSpinTimestamp = 0;
 const RING_PARAMS = {
   /**
    * 移动端配置 - CLOU Style
-   * 参考 CLOU Architects 官网：项目在屏幕最左侧位置触发弹出
+   
    */
   mobile: {
     selection: {
@@ -116,6 +117,48 @@ const RING_PARAMS = {
       titleMargin: 12,           // 标题与图片间距 (px)
       padding: '10px 20px',      // 容器内边距
     },
+    /**
+     * ============================================================
+     * 分类弧线与标签控制台（移动端）
+     * ============================================================
+     */
+    category: {
+      // --- 弧线位置控制 ---
+      arcOffset: 4,              // 弧线距离项目圆环的径向偏移
+      arcGap: 0.06,              // 弧线之间的角度间隔
+      arcYOffset: 0.3,           // 每条弧线的Y轴错开量
+      arcYBase: 0.5,             // 弧线基础Y轴高度
+
+      // --- 弧线颜色控制 ---
+      arcColor: '#ffffff',       // 弧线基础颜色
+      arcOpacity: 0.25,          // 弧线基础透明度
+
+      // --- 弧线样式 ---
+      arcWidth: 1,               // 弧线宽度
+
+      // --- 流动光晕效果 ---
+      flowEnabled: true,         // 是否启用流动效果
+      flowColor: '#ffffff',      // 流动光斑颜色
+      flowSpeed: 0.4,            // 流动速度（弧度/秒）
+      flowLength: 0.25,          // 流动光斑长度（弧度）
+      flowIntensity: 0.7,        // 流动光斑亮度
+      flowPause: 2.5,            // 每次流动后的暂停时间（秒）
+
+      // --- 标签位置控制 ---
+      labelOffset: 5,            // 标签距离弧线的额外偏移
+      labelYOffset: 1.5,         // 标签Y轴偏移（悬浮高度）
+      labelColor: '#ffffff',     // 标签颜色
+      labelFontSize: '10px',     // 标签字号
+      labelGlowRadius: 6,        // 标签文字发光半径
+      labelGlowOpacity: 0.4,     // 标签发光透明度
+
+      // --- 连接线 ---
+      connectorColor: '#ffffff', // 连接线颜色
+      connectorOpacity: 0.2,     // 连接线透明度
+
+      // --- 动画 ---
+      fadeSpeed: 0.15,           // 标签淡入淡出速度
+    },
   },
 
   /**
@@ -162,6 +205,48 @@ const RING_PARAMS = {
       yOffset: -5.5,             // Y轴偏移
       zOffset: -5,               // Z轴偏移
       textY: -12.5,              // 标题文字Y位置
+    },
+    /**
+     * ============================================================
+     * 分类弧线与标签控制台（桌面端）
+     * ============================================================
+     */
+    category: {
+      // --- 弧线位置控制 ---
+      arcOffset: 6,              // 弧线距离项目圆环的径向偏移（正值=更远）
+      arcGap: 0.08,              // 弧线之间的角度间隔（弧度）
+      arcYOffset: 0.5,           // 每条弧线的Y轴错开量
+      arcYBase: 1,               // 弧线基础Y轴高度
+
+      // --- 弧线颜色控制 ---
+      arcColor: '#ffffff',       // 弧线基础颜色
+      arcOpacity: 0.3,           // 弧线基础透明度
+
+      // --- 弧线样式 ---
+      arcWidth: 1.5,             // 弧线宽度
+
+      // --- 流动光晕效果 ---
+      flowEnabled: true,         // 是否启用流动效果
+      flowColor: '#ffffff',      // 流动光斑颜色
+      flowSpeed: 0.5,            // 流动速度（弧度/秒，所有弧线速度相同）
+      flowLength: 0.3,           // 流动光斑长度（弧度，约17度）
+      flowIntensity: 0.9,        // 流动光斑亮度
+      flowPause: 2.0,            // 每次流动后的暂停时间（秒）
+
+      // --- 标签位置控制 ---
+      labelOffset: 4,            // 标签距离弧线的额外偏移
+      labelYOffset: 2,           // 标签Y轴偏移（悬浮高度）
+      labelColor: '#ffffff',     // 标签颜色（统一白色）
+      labelFontSize: '12px',     // 标签字号
+      labelGlowRadius: 10,       // 标签文字发光半径 (px)
+      labelGlowOpacity: 0.5,     // 标签发光透明度
+
+      // --- 连接线 ---
+      connectorColor: '#ffffff', // 连接线颜色
+      connectorOpacity: 0.2,     // 连接线透明度
+
+      // --- 动画 ---
+      fadeSpeed: 0.12,           // 标签淡入淡出速度
     },
   },
 };
@@ -279,6 +364,429 @@ function DataNetwork({ isMobile = false }) {
       </lineSegments>
     </group>
   )
+}
+
+/**
+ * ============================================================
+ * 【 分类工具函数 / Category Utility Functions 】
+ * ============================================================
+ */
+
+/**
+ * 按类别排序项目数组
+ * Sort projects by category
+ *
+ * 确保同类别项目聚集在连续的弧段上
+ * Ensures projects of the same category are grouped in continuous arc segments
+ *
+ * @param {Array} projectList - 项目数组 / Project array
+ * @returns {Array} 排序后的项目数组 / Sorted project array
+ */
+function getSortedProjects(projectList) {
+  // 类别排序顺序 / Category sort order
+  const order = ['professional', 'academic', 'software-ai'];
+  return [...projectList].sort((a, b) => {
+    const aType = a.type || 'professional';
+    const bType = b.type || 'professional';
+    return order.indexOf(aType) - order.indexOf(bType);
+  });
+}
+
+/**
+ * 计算每个类别的弧段布局
+ * 返回: { [categoryId]: { startAngle, endAngle, midAngle, count, startIndex, endIndex } }
+ *
+ * 弧线位置说明：
+ * - 项目中心位于角度 index * anglePerItem
+ * - 弧线应该从第一个项目的左边缘到最后一个项目的右边缘
+ * - 即从 startIndex * anglePerItem - halfAngle 到 (endIndex + 1) * anglePerItem - halfAngle
+ */
+function getCategoryLayout(sortedProjects) {
+  const layout = {};
+  const total = sortedProjects.length;
+  const anglePerItem = (Math.PI * 2) / total;
+  const halfAngle = anglePerItem / 2;  // 半个项目的角度，用于偏移
+
+  let currentCategory = null;
+
+  sortedProjects.forEach((project, index) => {
+    const type = project.type || 'professional';
+
+    if (type !== currentCategory) {
+      // 保存上一个类别的结束位置
+      if (currentCategory !== null) {
+        const endIndex = index - 1;
+        layout[currentCategory].endIndex = endIndex;
+        // 弧线结束在最后一个项目和下一个项目的中间
+        layout[currentCategory].endAngle = (endIndex + 1) * anglePerItem - halfAngle;
+        layout[currentCategory].count = endIndex - layout[currentCategory].startIndex + 1;
+        layout[currentCategory].midAngle =
+          (layout[currentCategory].startAngle + layout[currentCategory].endAngle) / 2;
+      }
+
+      // 开始新的类别
+      currentCategory = type;
+      layout[type] = {
+        startIndex: index,
+        // 弧线开始在前一个项目和当前项目的中间
+        startAngle: index * anglePerItem - halfAngle,
+        endIndex: index,
+        endAngle: (index + 1) * anglePerItem - halfAngle,
+        count: 1,
+        midAngle: index * anglePerItem,  // 中点就是项目中心
+      };
+    }
+  });
+
+  // 处理最后一个类别
+  if (currentCategory !== null) {
+    const endIndex = sortedProjects.length - 1;
+    layout[currentCategory].endIndex = endIndex;
+    // 最后一个类别的弧线结束在最后一个项目和第一个项目的中间
+    layout[currentCategory].endAngle = (endIndex + 1) * anglePerItem - halfAngle;
+    layout[currentCategory].count = endIndex - layout[currentCategory].startIndex + 1;
+    layout[currentCategory].midAngle =
+      (layout[currentCategory].startAngle + layout[currentCategory].endAngle) / 2;
+  }
+
+  return layout;
+}
+
+/**
+ * ============================================================
+ * 【 分类弧线组件 - CategoryArc 】
+ * ============================================================
+ *
+ * 带流动光晕效果的弧线
+ * 单向流动：从头部发射到尾部，然后暂停，再重新开始
+ * 使用与项目相同的 sin/cos 坐标系统，确保位置对齐
+ */
+function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex, flowLengthMultiplier = 1.0 }) {
+  const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop;
+  const { arcOffset, arcGap, arcYOffset, arcYBase, arcColor, arcWidth, arcOpacity, flowEnabled, flowColor, flowSpeed, flowLength: baseFlowLength, flowIntensity, flowPause, fadeSpeed } = params.category;
+  const ringRadius = params.ring.radius;
+
+  // 计算弧线实际半径和Y位置
+  const arcRadius = ringRadius + arcOffset;
+  const yPosition = arcYBase + categoryIndex * arcYOffset;
+
+  // 应用间隔：缩短弧线两端
+  const adjustedStartAngle = startAngle + arcGap / 2;
+  const adjustedEndAngle = endAngle - arcGap / 2;
+  const arcLength = adjustedEndAngle - adjustedStartAngle; // 弧线的角度长度
+
+  // 光晕长度：基础长度 * 弧线长度比例 * 类别倍率
+  // 这样长弧线的光晕也会长一点
+  const flowLength = baseFlowLength * (arcLength / (Math.PI / 2)) * flowLengthMultiplier;
+
+  // 淡入淡出
+  const [opacity, setOpacity] = useState(0);
+
+  // 流动动画状态：当前角度位置（弧度）
+  const [flowAngle, setFlowAngle] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const pauseTimer = useRef(0);
+
+  // 每个弧线有不同的初始延迟，避免同步
+  const initialDelay = useRef(categoryIndex * 0.8);
+
+  useFrame((_, delta) => {
+    const target = isVisible ? arcOpacity : 0;
+    setOpacity(prev => THREE.MathUtils.lerp(prev, target, fadeSpeed));
+
+    // 流动动画（单向，固定角速度）
+    if (flowEnabled && isVisible) {
+      // 初始延迟
+      if (initialDelay.current > 0) {
+        initialDelay.current -= delta;
+        return;
+      }
+
+      if (isPaused) {
+        // 暂停计时
+        pauseTimer.current += delta;
+        if (pauseTimer.current >= flowPause) {
+          setIsPaused(false);
+          pauseTimer.current = 0;
+          setFlowAngle(0);
+        }
+      } else {
+        // 正在流动 - 使用固定的角速度（弧度/秒）
+        const newAngle = flowAngle + delta * flowSpeed;
+        if (newAngle >= arcLength + flowLength) {
+          // 到达终点，进入暂停
+          setIsPaused(true);
+          setFlowAngle(0);
+        } else {
+          setFlowAngle(newAngle);
+        }
+      }
+    }
+  });
+
+  // 基础弧线点 - 使用与项目相同的坐标系统
+  // 项目位置: x = sin(angle) * r, z = cos(angle) * r
+  const basePoints = useMemo(() => {
+    const points = [];
+    const segments = 150; // 增加采样点数，使曲线更平滑
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      const angle = adjustedStartAngle + t * (adjustedEndAngle - adjustedStartAngle);
+      points.push(new THREE.Vector3(
+        Math.sin(angle) * arcRadius,
+        yPosition,
+        Math.cos(angle) * arcRadius
+      ));
+    }
+    return points;
+  }, [adjustedStartAngle, adjustedEndAngle, arcRadius, yPosition]);
+
+  // 计算流动光斑的点（单向流动，固定角度长度）
+  const flowPoints = useMemo(() => {
+    if (!flowEnabled || isPaused || flowAngle <= 0) return null;
+
+    const points = [];
+    const segments = 30; // 光斑的采样点数
+    const flowStartAngle = adjustedStartAngle + Math.max(0, flowAngle - flowLength);
+    const flowEndAngle = adjustedStartAngle + Math.min(arcLength, flowAngle);
+
+    if (flowEndAngle <= flowStartAngle) return null;
+
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      const angle = flowStartAngle + t * (flowEndAngle - flowStartAngle);
+      points.push(new THREE.Vector3(
+        Math.sin(angle) * arcRadius,
+        yPosition,
+        Math.cos(angle) * arcRadius
+      ));
+    }
+    return points;
+  }, [adjustedStartAngle, arcLength, arcRadius, yPosition, flowAngle, flowLength, flowEnabled, isPaused]);
+
+  // 计算光斑透明度（淡入淡出效果）
+  const flowOpacity = useMemo(() => {
+    if (flowAngle < flowLength) {
+      // 淡入
+      return (flowAngle / flowLength) * flowIntensity;
+    } else if (flowAngle > arcLength - flowLength) {
+      // 淡出
+      return Math.max(0, ((arcLength + flowLength - flowAngle) / flowLength)) * flowIntensity;
+    }
+    return flowIntensity;
+  }, [flowAngle, flowLength, flowIntensity, arcLength]);
+
+  return (
+    <group>
+      {/* 基础弧线 */}
+      <Line
+        points={basePoints}
+        color={arcColor}
+        lineWidth={arcWidth}
+        transparent
+        opacity={opacity}
+      />
+
+      {/* 流动光斑 */}
+      {flowEnabled && flowPoints && flowPoints.length > 1 && (
+        <>
+          {/* 光斑核心 */}
+          <Line
+            points={flowPoints}
+            color={flowColor}
+            lineWidth={arcWidth * 2}
+            transparent
+            opacity={opacity * flowOpacity}
+          />
+          {/* 光斑发光外层 */}
+          <Line
+            points={flowPoints}
+            color={flowColor}
+            lineWidth={arcWidth * 4}
+            transparent
+            opacity={opacity * flowOpacity * 0.3}
+          />
+        </>
+      )}
+    </group>
+  );
+}
+
+/**
+ * ============================================================
+ * 【 分类标签组件 - CategoryLabel 】
+ * ============================================================
+ *
+ * 使用 Html 组件悬浮在圆环外侧
+ * 旋转时 fade out，停止后 fade in
+ */
+function CategoryLabel({ midAngle, label, isSpinning, isMobile, isVisible, categoryIndex }) {
+  const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop;
+  const { arcOffset, arcYBase, arcYOffset, labelOffset, labelYOffset, labelColor, labelFontSize, labelGlowRadius, labelGlowOpacity, fadeSpeed } = params.category;
+  const ringRadius = params.ring.radius;
+
+  // 计算标签实际距离和Y位置
+  const labelDistance = ringRadius + arcOffset + labelOffset;
+  const yPosition = arcYBase + categoryIndex * arcYOffset + labelYOffset;
+
+  const [opacity, setOpacity] = useState(0);
+  const targetOpacity = useRef(0);
+
+  // 根据可见性和旋转状态更新目标透明度
+  useEffect(() => {
+    targetOpacity.current = (isVisible && !isSpinning) ? 1 : 0;
+  }, [isSpinning, isVisible]);
+
+  // 平滑插值透明度
+  useFrame(() => {
+    setOpacity(prev => THREE.MathUtils.lerp(prev, targetOpacity.current, fadeSpeed));
+  });
+
+  // 计算标签在 3D 空间中的位置（与项目使用相同的坐标系）
+  const position = useMemo(() => {
+    const x = Math.sin(midAngle) * labelDistance;
+    const z = Math.cos(midAngle) * labelDistance;
+    return [x, yPosition, z];
+  }, [midAngle, labelDistance, yPosition]);
+
+  return (
+    <Html
+      position={position}
+      center
+      style={{
+        opacity,
+        transition: 'none',
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }}
+    >
+      <div
+        style={{
+          color: labelColor,
+          fontSize: labelFontSize,
+          fontWeight: 600,
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          whiteSpace: 'nowrap',
+          textShadow: `0 0 ${labelGlowRadius}px rgba(255, 255, 255, ${labelGlowOpacity}), 0 0 ${labelGlowRadius * 2}px rgba(255, 255, 255, ${labelGlowOpacity * 0.3})`,
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
+        {label}
+      </div>
+    </Html>
+  );
+}
+
+/**
+ * ============================================================
+ * 【 分类连接线组件 - CategoryConnector 】
+ * ============================================================
+ *
+ * 从弧线中点连接到标签位置
+ */
+function CategoryConnector({ midAngle, isSpinning, isMobile, isVisible, categoryIndex }) {
+  const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop;
+  const { arcOffset, arcYBase, arcYOffset, labelOffset, labelYOffset, connectorColor, connectorOpacity, fadeSpeed } = params.category;
+  const ringRadius = params.ring.radius;
+
+  // 计算实际距离和Y位置
+  const arcRadius = ringRadius + arcOffset;
+  const labelDistance = ringRadius + arcOffset + labelOffset;
+  const arcY = arcYBase + categoryIndex * arcYOffset;
+  const labelY = arcY + labelYOffset;
+
+  const [opacity, setOpacity] = useState(0);
+  const targetOpacity = useRef(0);
+
+  useEffect(() => {
+    targetOpacity.current = (isVisible && !isSpinning) ? connectorOpacity : 0;
+  }, [isSpinning, isVisible, connectorOpacity]);
+
+  useFrame(() => {
+    setOpacity(prev => THREE.MathUtils.lerp(prev, targetOpacity.current, fadeSpeed));
+  });
+
+  const points = useMemo(() => {
+    // 与项目使用相同的坐标系：x = sin(angle) * r, z = cos(angle) * r
+    const innerX = Math.sin(midAngle) * arcRadius;
+    const innerZ = Math.cos(midAngle) * arcRadius;
+    const outerX = Math.sin(midAngle) * (labelDistance - 1);
+    const outerZ = Math.cos(midAngle) * (labelDistance - 1);
+    return [
+      new THREE.Vector3(innerX, arcY, innerZ),
+      new THREE.Vector3(outerX, labelY - 0.5, outerZ),
+    ];
+  }, [midAngle, arcRadius, labelDistance, arcY, labelY]);
+
+  return (
+    <Line
+      points={points}
+      color={connectorColor}
+      lineWidth={1}
+      transparent
+      opacity={opacity}
+      dashed
+      dashSize={0.5}
+      gapSize={0.3}
+    />
+  );
+}
+
+/**
+ * ============================================================
+ * 【 分类装饰组 - CategoryDecorations 】
+ * ============================================================
+ *
+ * 包含所有类别的弧线、标签和连接线
+ * isVisible: 控制整体可见性（loading完成后才显示）
+ */
+function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible }) {
+  const categoryLayout = useMemo(
+    () => getCategoryLayout(sortedProjects),
+    [sortedProjects]
+  );
+
+  const categoryEntries = useMemo(() => {
+    return Object.entries(RING_CATEGORIES).map(([key, cat], index) => ({
+      key,
+      ...cat,
+      layout: categoryLayout[cat.id],
+      categoryIndex: index,
+    })).filter(entry => entry.layout); // 过滤掉没有项目的类别
+  }, [categoryLayout]);
+
+  return (
+    <group>
+      {categoryEntries.map(({ key, label, layout, categoryIndex, flowLengthMultiplier }) => (
+        <group key={key}>
+          <CategoryArc
+            startAngle={layout.startAngle}
+            endAngle={layout.endAngle}
+            isMobile={isMobile}
+            isVisible={isVisible}
+            categoryIndex={categoryIndex}
+            flowLengthMultiplier={flowLengthMultiplier || 1.0}
+          />
+          <CategoryLabel
+            midAngle={layout.midAngle}
+            label={label}
+            isSpinning={isSpinning}
+            isMobile={isMobile}
+            isVisible={isVisible}
+            categoryIndex={categoryIndex}
+          />
+          <CategoryConnector
+            midAngle={layout.midAngle}
+            isSpinning={isSpinning}
+            isMobile={isMobile}
+            isVisible={isVisible}
+            categoryIndex={categoryIndex}
+          />
+        </group>
+      ))}
+    </group>
+  );
 }
 
 /**
@@ -514,8 +1022,16 @@ function SceneContent({
   const scrollRotation = useRef(initialOffset)
   const transitionRadiusScale = useRef(1.0)
 
+  // 按类别排序的项目列表
+  const sortedProjects = useMemo(() => getSortedProjects(projects), [])
+
   // 存储每个项目的 focusStrength（移动端使用）
-  const focusStrengths = useRef(projects.map(() => 0))
+  const focusStrengths = useRef(sortedProjects.map(() => 0))
+
+  // 跟踪旋转速度，用于标签 fade in/out
+  const lastRotation = useRef(scrollRotation.current)
+  const [isSpinning, setIsSpinning] = useState(false)
+  const spinTimeoutRef = useRef(null)
 
   // 相机和交互参数
   const cameraTarget = params.camera.position
@@ -553,6 +1069,22 @@ function SceneContent({
       spinGroup.current.scale.setScalar(transitionRadiusScale.current)
     }
 
+    // --- 检测旋转状态（用于标签 fade in/out）---
+    const rotationDelta = Math.abs(scrollRotation.current - lastRotation.current)
+    lastRotation.current = scrollRotation.current
+
+    // 如果旋转速度超过阈值，认为正在旋转
+    const spinThreshold = 0.002
+    if (rotationDelta > spinThreshold) {
+      if (!isSpinning) setIsSpinning(true)
+      // 清除之前的超时
+      if (spinTimeoutRef.current) clearTimeout(spinTimeoutRef.current)
+      // 设置新的超时，停止旋转后延迟显示标签
+      spinTimeoutRef.current = setTimeout(() => {
+        setIsSpinning(false)
+      }, 300) // 300ms 静止后显示标签
+    }
+
     /**
      * ============================================================
      * 【 CLOU 风格选中逻辑 - 移动端专用 】
@@ -566,12 +1098,12 @@ function SceneContent({
      */
     if (isMobile && !isTransitioning) {
       const { selectionOffset } = params.selection
-      const anglePerItem = (Math.PI * 2) / projects.length
+      const anglePerItem = (Math.PI * 2) / sortedProjects.length
 
       let maxFocusIndex = 0
       let maxFocusStrength = -1
 
-      projects.forEach((_, index) => {
+      sortedProjects.forEach((_, index) => {
         // 1. 计算项目在环上的静态角度
         const itemAngle = index * anglePerItem
 
@@ -597,7 +1129,7 @@ function SceneContent({
 
       // 通知父组件当前选中的项目（用于更新预览区域）
       if (onFocusUpdate) {
-        onFocusUpdate(maxFocusIndex, projects[maxFocusIndex])
+        onFocusUpdate(maxFocusIndex, sortedProjects[maxFocusIndex])
       }
     }
 
@@ -631,11 +1163,20 @@ function SceneContent({
 
       <group ref={tiltGroup}>
         <group ref={spinGroup}>
-          {projects.map((item, i) => (
+          {/* 分类装饰：弧线、标签、连接线 */}
+          <CategoryDecorations
+            sortedProjects={sortedProjects}
+            isSpinning={isSpinning || isTransitioning}
+            isMobile={isMobile}
+            isVisible={introActive && !isTransitioning}
+          />
+
+          {/* 项目图片 */}
+          {sortedProjects.map((item, i) => (
             <ProjectItem
               key={item.id}
               index={i}
-              total={projects.length}
+              total={sortedProjects.length}
               item={item}
               setActiveProject={setActiveProject}
               onNavigate={onNavigate}
