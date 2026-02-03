@@ -1284,10 +1284,10 @@ const realProjects = [
     title: ["Robotic", "Arms", "Control"], // 数组格式：支持精准控制两行排版
     year: "2022",
     category: "Robotic Control / Architectural Visualization",
-    ringImage: "/robotic-arms/1.webp",
+    ringImage: "/robotic-arms/3.webp",
     description:
       "A custom robotic arm control interface integrating Rhino, KUKA, Unity, and MAYA for real-time manipulation and visualization of architectural models.",
-    mainImage: "/robotic-arms/1.webp",
+    mainImage: "/robotic-arms/3.webp",
     location: "Los Angeles",
     sector: "Architectural Design Technology",
     status: "Developed / In Use",
@@ -1305,14 +1305,14 @@ const realProjects = [
         columns: 1, // 一张图占据 100% 宽度
         customTitle: "Robotic Arms Manual Control", // 【新参数】覆盖左侧的 "Plate Index"
         labels: ["Video Showing KUKA Manual Control"], // 【新参数】覆盖右侧的 "01"
-        images: ["/robotic-arms/2.mp4"],
+        src: ["/robotic-arms/2.mp4"],
       },
       {
         type: "imageGrid",
         columns: 1, // 一张图占据 100% 宽度
         customTitle: "Robotic Arms Control Interface", // 【新参数】覆盖左侧的 "Plate Index"
         labels: ["Robotic Arms Control Interface"], // 【新参数】覆盖右侧的 "01"
-        images: ["/robotic-arms/3.webp"],
+        images: ["/robotic-arms/1.webp"],
       },
       {
         type: "imageGrid",
