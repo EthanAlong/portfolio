@@ -1376,8 +1376,8 @@ const realProjects = [
     title: ["Saiful Bouquet", "Web"],
     year: "2025",
     category: "Web Development",
-    ringImage: "/sb-web/1.webp",
-    mainImage: "/sb-web/1.webp",
+    ringImage: "/sb-web/tools.png",
+    mainImage: "/sb-web/tools.png",
     description:
       "A full redesign and development of the Saiful Bouquet company website, modernizing the firm's digital presence with a performance-first architecture and a project-driven content structure.",
     location: "Digital",
