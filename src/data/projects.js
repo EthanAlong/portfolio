@@ -1347,8 +1347,8 @@ const realProjects = [
     title: ["RAG", "System"],
     year: "2025",
     category: "AI / Backend Engineering",
-    ringImage: "/rag-system/1.png",
-    mainImage: "/rag-system/1.png",
+    ringImage: "/rag-system/0.webp",
+    mainImage: "/rag-system/0.webp",
     description:
       "A Retrieval-Augmented Generation system built for Saiful Bouquet, enabling engineers and architects to query internal project documentation, code references, and structural standards through a natural-language AI interface.",
     location: "Digital",
