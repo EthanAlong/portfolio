@@ -1313,6 +1313,93 @@ const realProjects = [
   //Computational Design / AI Generation
   // ============================================================================
   {
+    id: "lax-structural",
+    type: "professional",
+    title: ["LAX", "Structural"],
+    year: "2025",
+    category: "Structural / Infrastructure",
+    ringImage: "/lax-structral/1.webp",
+    mainImage: "/lax-structral/1.webp",
+    description:
+      "A structural coordination and documentation project at Los Angeles International Airport, supporting complex infrastructure upgrades within an active aviation environment at Saiful Bouquet.",
+    location: "Los Angeles International Airport, CA",
+    sector: "Aviation / Public Infrastructure",
+    status: "In Progress",
+    scale: "Large-Scale Infrastructure",
+    architect: "Saiful Bouquet",
+    contribution: "Structural Coordination, Technical Documentation, Field Review",
+    content: [
+      {
+        type: "textBlock",
+        title: "Project Overview",
+        text: "This project involves structural engineering support for ongoing infrastructure improvements at LAX. Working within the constraints of an active international airport, the scope includes coordination with multiple stakeholders, review of existing structural systems, and documentation of proposed modifications to ensure code compliance and operational continuity.",
+      },
+      {
+        type: "textBlock",
+        title: "Coordination & Delivery",
+        text: "The work required close collaboration with airport operations, civil engineers, and the construction team to sequence structural interventions with minimal disruption to live flight operations. Technical deliverables included structural drawings, calculation packages, and field observation reports aligned with FAA and LAWA standards.",
+      },
+    ],
+  },
+  {
+    id: "rag-system",
+    type: "software-ai",
+    title: ["RAG", "System"],
+    year: "2025",
+    category: "AI / Backend Engineering",
+    ringImage: "/rag-system/1.png",
+    mainImage: "/rag-system/1.png",
+    description:
+      "A Retrieval-Augmented Generation system built for Saiful Bouquet, enabling engineers and architects to query internal project documentation, code references, and structural standards through a natural-language AI interface.",
+    location: "Digital",
+    sector: "AI Engineering / Internal Tool",
+    status: "Developed / In Use",
+    scale: "-",
+    architect: "Saiful Bouquet",
+    contribution: "System Architecture, Vector DB Integration, LLM Orchestration, API Development",
+    content: [
+      {
+        type: "textBlock",
+        title: "Project Overview",
+        text: "This RAG (Retrieval-Augmented Generation) pipeline was designed to surface relevant knowledge from Saiful Bouquet's internal document corpus — including project specs, structural reports, and code references — in response to natural-language queries. By combining a vector database with an LLM backbone, the system enables staff to query years of institutional knowledge without manual search.",
+      },
+      {
+        type: "textBlock",
+        title: "Technical Architecture",
+        text: "The pipeline ingests and chunks documents into a vector store, performs semantic similarity search at query time, and passes retrieved context to a language model for grounded response generation. The system includes a lightweight API layer and a clean query interface, making it accessible to non-technical users across the firm.",
+      },
+    ],
+  },
+  {
+    id: "sb-web",
+    type: "software-ai",
+    title: ["Saiful Bouquet", "Web"],
+    year: "2025",
+    category: "Web Development",
+    ringImage: "/sb-web/1.webp",
+    mainImage: "/sb-web/1.webp",
+    description:
+      "A full redesign and development of the Saiful Bouquet company website, modernizing the firm's digital presence with a performance-first architecture and a project-driven content structure.",
+    location: "Digital",
+    sector: "Web Engineering / Brand",
+    status: "In Development",
+    scale: "-",
+    architect: "Saiful Bouquet",
+    contribution: "Frontend Development, UI/UX Design, CMS Integration",
+    content: [
+      {
+        type: "textBlock",
+        title: "Project Overview",
+        text: "This project encompasses the complete redesign and rebuild of the Saiful Bouquet public website. The goal was to shift from an outdated static presence to a dynamic, content-managed platform that accurately reflects the firm's project portfolio, capabilities, and culture.",
+      },
+      {
+        type: "textBlock",
+        title: "Design & Engineering",
+        text: "The site was built with a modern frontend stack prioritizing fast load times, accessibility, and responsive layout across devices. A structured content model allows non-technical team members to update project pages, news, and personnel profiles without code changes. Visual identity decisions were made in collaboration with firm leadership to align the digital experience with Saiful Bouquet's brand.",
+      },
+    ],
+  },
+  {
     id: "local-ai-deploy",
     type: "software-ai",
     title: ["AI", "Generative", "Workflow"], // 数组格式：支持精准控制两行排版
