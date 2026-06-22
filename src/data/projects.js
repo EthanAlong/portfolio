@@ -1569,8 +1569,8 @@ const realProjects = [
     title: ["Store Equipment", "Manager"],
     year: "2025",
     category: "Web App / Internal Tool",
-    ringImage: "/store-equipment/1.png",
-    mainImage: "/store-equipment/1.png",
+    ringImage: "/store-equipment/hero.png",
+    mainImage: "/store-equipment/hero.png",
     description:
       "A full-stack web app that retires a sprawling master spreadsheet, replacing it with a searchable catalog of 209 equipment 'cards' (each with technical specs and a spec-sheet PDF) and a drag-and-drop builder for assembling the equipment schedule of a new supermarket buildout.",
     location: "Digital",
@@ -1617,8 +1617,8 @@ const realProjects = [
     title: ["E-Commerce", "Ops Tools"],
     year: "2025",
     category: "Web Tools / Automation",
-    ringImage: "/ecommerce-tools/1.png",
-    mainImage: "/ecommerce-tools/1.png",
+    ringImage: "/ecommerce-tools/hero.png",
+    mainImage: "/ecommerce-tools/hero.png",
     description:
       "A pair of zero-install browser tools built to speed up a Whatnot squishy-toy shipping operation: a mobile-first order-logging app and a CSV-driven carton-packing planner that pre-computes which box each parcel needs.",
     location: "Digital",
