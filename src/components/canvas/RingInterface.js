@@ -354,7 +354,7 @@ function DataNetwork({ isMobile = false }) {
       groupRef.current.rotation.y -= delta * 0.03;
     }
     if (linesRef.current) {
-      const breath = 0.15 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      const breath = 0.5 + Math.sin(state.clock.elapsedTime * 2) * 0.12;
       linesRef.current.material.opacity = breath;
     }
   });
@@ -370,10 +370,10 @@ function DataNetwork({ isMobile = false }) {
             itemSize={3}
           />
         </bufferGeometry>
-        <pointsMaterial size={0.5} color="#aaaaaa" transparent opacity={0.8} sizeAttenuation={true} />
+        <pointsMaterial size={0.9} color="#ffffff" transparent opacity={0.95} sizeAttenuation={true} />
       </points>
       <lineSegments ref={linesRef} geometry={linesGeometry}>
-        <lineBasicMaterial color="#555555" transparent opacity={0.45} depthWrite={false} />
+        <lineBasicMaterial color="#aab2da" transparent opacity={0.5} depthWrite={false} />
       </lineSegments>
     </group>
   )
