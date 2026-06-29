@@ -1397,6 +1397,32 @@ const realProjects = [
         labels: ["Natural-language AI search across the structural detail catalog"],
       },
       {
+        type: "imageGrid",
+        columns: 1,
+        customTitle: "Revit Integration",
+        labels: ["Detail DB Exporter — Revit-Side Export Tool"],
+        images: ["/rag-system/3.png"],
+      },
+      {
+        type: "textBlock",
+        title: "Revit-Side Export Pipeline",
+        text: "The Detail DB Exporter is a dedicated tool that bridges Saiful Bouquet's BIM environment with the RAG knowledge base. Engineers browse structural detail drawings directly within Revit, tag each detail with structured metadata — Detail Type, Structural System, Structural Function, Location, Gravity/Seismic classification, and member descriptions — then trigger an AI-powered batch analysis before exporting the annotated dataset to the vector database. This structured export process ensures every ingested detail carries rich semantic context, dramatically improving retrieval precision at query time.",
+      },
+      {
+        type: "imageGrid",
+        columns: 1,
+        customTitle: "SB Detail Viewer",
+        labels: ["Frontend — Catalog Browse Interface"],
+        images: ["/rag-system/1.png"],
+      },
+      {
+        type: "imageGrid",
+        columns: 1,
+        customTitle: "SB Detail Viewer",
+        labels: ["Frontend — AI-Powered Detail Analysis"],
+        images: ["/rag-system/2.png"],
+      },
+      {
         type: "textBlock",
         title: "AI Descriptions & Vector Search",
         text: "For each detail, an LLM generates a structured record — a plain-language summary, a clean title, the detail type, the structural system it belongs to, and the likely phrases someone would search for. Those descriptions are embedded and indexed, so retrieval matches on meaning rather than filename, surfacing the right detail even when the query and the drawing share no exact keywords.",
