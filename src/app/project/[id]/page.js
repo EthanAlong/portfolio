@@ -137,8 +137,8 @@ export default function ProjectPage({ params }) {
     const lenis = new Lenis({
       wrapper: viewportRef.current,
       content: document.querySelector(`.${styles.container}`),
-      duration: 1.8,
-      lerp: 0.05,
+      duration: project.id === 'lax-structural' ? 1 : 1.8,
+      lerp: project.id === 'lax-structural' ? 0.12 : 0.05,
       smoothWheel: true,
     })
     lenisRef.current = lenis

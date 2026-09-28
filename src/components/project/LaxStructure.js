@@ -3,10 +3,10 @@ import { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
-import gsap from 'gsap';
+
 import { referenceLevels } from '@/app/preview/lax/referenceGeometry';
 
-function Members({ boxes, color, opacity }) {
+function Members({ boxes, color, opacity, focus, head }) {
   const ref = useRef();
   useEffect(() => {
     const matrix = new THREE.Matrix4();
@@ -22,43 +22,67 @@ function Members({ boxes, color, opacity }) {
   }, [boxes]);
   return <instancedMesh ref={ref} args={[null, null, boxes.length]}>
     <boxGeometry />
-    <meshStandardMaterial color={color} roughness={0.55} metalness={0.2} transparent opacity={opacity} depthWrite={opacity > 0.5} />
+    <StudyMaterial color={color} opacity={opacity} focus={focus} head={head} />
   </instancedMesh>;
 }
 
-export default function Structure({ chapter, motion, orbit }) {
+const neutral = new THREE.Color('#89939b');
+const accent = new THREE.Color('#76909c');
+
+function StudyMaterial({ color, opacity, focus, head, floor = false }) {
+  const material = useRef();
+  useFrame(() => {
+    const amount = focus.current;
+    material.current.opacity = opacity * (head ? 1 : 1 - amount * .87);
+    if (head && !floor) material.current.color.copy(neutral).lerp(accent, amount);
+    material.current.depthWrite = !floor && material.current.opacity > .5;
+  });
+  return <meshStandardMaterial ref={material} color={color} roughness={floor ? .8 : .55} metalness={floor ? 0 : .2} side={floor ? THREE.DoubleSide : THREE.FrontSide} transparent opacity={opacity} depthWrite={!floor} />;
+}
+
+const cameraPositions = [[37, 26, 36], [37, 31, 36], [36, 23, 31], [37, 26, 36]];
+const cameraAims = [[0, 2.5, 0], [0, 5.5, 0], [5.5, 3, 0], [0, 2.5, 0]];
+const spreads = [0, 1, .38, 0];
+const focuses = [0, 0, 1, 0];
+const smoothstep = t => t * t * (3 - 2 * t);
+
+export default function Structure({ chapter, motion, orbit, progress }) {
   const levels = useRef([]);
-  const target = useRef({ spread: 0 });
-  const cameraTarget = useRef(new THREE.Vector3(0, 3, 0));
-  const cameraMoving = useRef(true);
-  useEffect(() => {
-    cameraMoving.current = true;
-    const tween = gsap.to(target.current, { spread: chapter === 1 ? 1 : chapter === 2 ? .38 : 0, duration: motion ? 1.5 : 0, ease: 'power3.inOut' });
-    return () => tween.kill();
-  }, [chapter, motion]);
+  const focus = useRef(0);
+  const smooth = useRef(progress?.current ?? chapter / 3);
+  const scratch = useRef({ position: new THREE.Vector3(), aim: new THREE.Vector3() });
   useFrame((state, dt) => {
-    levels.current.forEach((level, i) => { if (level) level.position.y = referenceLevels[i].height + i * target.current.spread * 2.1; });
-    if (!cameraMoving.current || orbit.current) return;
-    const position = chapter === 2 ? new THREE.Vector3(36, 23, 31) : new THREE.Vector3(37, chapter === 1 ? 31 : 26, 36);
+    // Scroll drives a single continuous timeline; no chapter-triggered tweens.
+    const desired = progress?.current ?? chapter / 3;
+    const blend = motion ? 1 - Math.exp(-Math.min(dt, .05) * 12) : 1;
+    smooth.current = THREE.MathUtils.lerp(smooth.current, desired, blend);
+    const timeline = Math.min(3, Math.max(0, smooth.current * 3));
+    const segment = Math.min(2, Math.floor(timeline));
+    const t = smoothstep(timeline - segment);
+    const spread = THREE.MathUtils.lerp(spreads[segment], spreads[segment + 1], t);
+    focus.current = THREE.MathUtils.lerp(focuses[segment], focuses[segment + 1], t);
+    levels.current.forEach((level, i) => { if (level) level.position.y = referenceLevels[i].height + i * spread * 2.1; });
+    // Once dragged, retain the visitor's view while the structure keeps following scroll.
+    if (orbit.current) return;
+    const { position, aim } = scratch.current;
+    for (let axis = 0; axis < 3; axis++) {
+      position.setComponent(axis, THREE.MathUtils.lerp(cameraPositions[segment][axis], cameraPositions[segment + 1][axis], t));
+      aim.setComponent(axis, THREE.MathUtils.lerp(cameraAims[segment][axis], cameraAims[segment + 1][axis], t));
+    }
     position.multiplyScalar(Math.max(1, 1 / state.viewport.aspect));
-    const aim = chapter === 2 ? new THREE.Vector3(5.5, 3, 0) : new THREE.Vector3(0, chapter === 1 ? 5.5 : 2.5, 0);
-    const blend = motion ? 1 - Math.exp(-dt * 2.7) : 1;
     state.camera.position.lerp(position, blend);
-    cameraTarget.current.lerp(aim, blend);
-    state.controls?.target.copy(cameraTarget.current);
-    state.camera.lookAt(cameraTarget.current);
-    if (state.camera.position.distanceTo(position) < .02) cameraMoving.current = false;
+    state.controls?.target.lerp(aim, blend);
+    state.camera.lookAt(state.controls?.target ?? aim);
   });
   return <group>
     {referenceLevels.map((level, index) => <group key={index} ref={el => { levels.current[index] = el; }}>
       {level.parts.map((part, i) => {
-        const ghost = chapter === 2 && !part.head;
         return <group key={i}>
-          <Members boxes={part.beams} color={chapter === 2 && part.head ? '#76909c' : '#89939b'} opacity={ghost ? .13 : 1} />
-          <Members boxes={part.columns} color="#a3a9ae" opacity={ghost ? .1 : .85} />
+          <Members boxes={part.beams} color="#89939b" opacity={1} focus={focus} head={part.head} />
+          <Members boxes={part.columns} color="#a3a9ae" opacity={.85} focus={focus} head={part.head} />
           <mesh position={[0, .035, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <shapeGeometry args={[part.shape, 64]} />
-            <meshStandardMaterial color="#dce7ea" side={THREE.DoubleSide} transparent opacity={ghost ? .025 : .18} depthWrite={false} roughness={.8} />
+            <StudyMaterial color="#dce7ea" opacity={.18} focus={focus} head={part.head} floor />
           </mesh>
         </group>;
       })}
@@ -66,4 +90,3 @@ export default function Structure({ chapter, motion, orbit }) {
     <ContactShadows position={[0, -.05, 0]} opacity={.2} scale={65} blur={3} far={18} resolution={256} frames={1} />
   </group>;
 }
-
