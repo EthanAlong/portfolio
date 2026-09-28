@@ -1,3 +1,4 @@
+import { rhinoProjects } from './rhinoProjects'
 // src/data/projects.js
 
 /**
@@ -1812,6 +1813,8 @@ const realProjects = [
  * 保持 Ring 界面的丰满感（共计 25 个项目，日后可补充）
  * ============================================================
  */
+realProjects.push(...rhinoProjects);
+
 const placeholderCount = 25;
 const remainingCount = Math.max(0, placeholderCount - realProjects.length);
 const placeholders = Array.from({ length: remainingCount }, (_, i) => {

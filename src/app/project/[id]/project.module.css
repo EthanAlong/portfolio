@@ -247,6 +247,11 @@
   filter: grayscale(0%);
 }
 
+/* Color carries information in clearance checks and planning diagrams. */
+.projectTheme[data-preserve-color] .magazineImg {
+  filter: none;
+}
+
 /* --- 2排3列矩阵 --- */
 .metaGrid {
   display: grid;

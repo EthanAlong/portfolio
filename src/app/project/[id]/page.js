@@ -271,11 +271,11 @@ export default function ProjectPage({ params }) {
           {/* Metadata 两列 Grid - 逐个淡入 */}
           <div className={styles.mobileMetaGrid}>
             {[
-              { label: "Location", value: project.location },
+              { label: project.metadataLabels?.location || "Location", value: project.location },
               { label: "Sector", value: project.sector },
               { label: "Status", value: project.status },
-              { label: "Scale", value: project.scale },
-              { label: "Architect", value: project.architect },
+              { label: project.metadataLabels?.scale || "Scale", value: project.scale },
+              { label: project.metadataLabels?.architect || "Architect", value: project.architect },
               { label: "Contribution", value: project.contribution }
             ].map((item, i) => (
               <div
@@ -423,7 +423,7 @@ export default function ProjectPage({ params }) {
    * ============================================================
    */
   return (
-    <main className={styles.projectTheme}>
+    <main className={styles.projectTheme} data-preserve-color={project.preserveImageColor || undefined}>
 
       {/* --- 左侧侧边栏 --- */}
       <aside className={styles.sidebar}>
@@ -464,11 +464,11 @@ export default function ProjectPage({ params }) {
           {/* 参数矩阵 (2排3列) */}
           <div className={styles.metaGrid}>
             {[
-              { label: "Location", value: project.location },
+              { label: project.metadataLabels?.location || "Location", value: project.location },
               { label: "Sector", value: project.sector },
               { label: "Status", value: project.status },
-              { label: "Scale", value: project.scale },
-              { label: "Architect", value: project.architect },
+              { label: project.metadataLabels?.scale || "Scale", value: project.scale },
+              { label: project.metadataLabels?.architect || "Architect", value: project.architect },
               { label: "Contribution", value: project.contribution }
             ].map((item, i) => (
               <div key={i} className={styles.metaItem} style={{ transitionDelay: `${i * 0.1}s` }}>
