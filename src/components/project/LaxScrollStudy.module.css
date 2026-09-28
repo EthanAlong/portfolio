@@ -1,0 +1,24 @@
+.track { position: relative; height: 330vh; margin: 40px 0 80px; color: #1d1d1f; }
+.panel { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; background: #fafafa; overflow: hidden; }
+.heading { padding: 35px 28px 0; flex: 0 0 auto; }
+.heading p { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .12em; color: #777; margin: 0 0 16px; }
+.heading h2 { font-size: clamp(24px, 2.4vw, 38px); font-weight: 500; line-height: 1.15; letter-spacing: -.045em; margin: 0; }
+.scene { position: relative; flex: 1; min-height: 0; }
+.scene canvas { pointer-events: none; }
+.reset { position: absolute; right: 20px; top: 16px; background: #eeeef0; border: 0; border-radius: 24px; padding: 8px 12px; font-size: 10px; color: #777; cursor: pointer; }
+.reset:focus-visible { outline: 2px solid #0071e3; outline-offset: 3px; }
+.footer { flex: 0 0 auto; text-align: center; padding: 0 16px 25px; }
+.footer ol { list-style: none; padding: 5px; margin: 0 auto 13px; display: inline-flex; border-radius: 30px; background: #eeeef0; gap: 2px; }
+.footer li { padding: 10px 12px; font-size: 10px; color: #888; border-radius: 25px; }
+.footer li[aria-current] { background: white; color: #222; }
+.footer p { margin: 0 0 10px; color: #777; font-size: 10px; }
+.footer p span { margin-left: 10px; }
+.footer small { font-size: 9px; color: #999; }
+@media (max-width: 767px) {
+  .track { height: 300svh; margin: 20px 0 36px; }
+  .panel { top: 50px; height: calc(100svh - 50px); }
+  .heading { padding: 25px 20px 0; }
+  .heading h2 { font-size: 27px; }
+  .footer { padding-bottom: 22px; }
+  .footer li { padding: 10px; }
+}

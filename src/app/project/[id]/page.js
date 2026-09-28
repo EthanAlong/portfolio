@@ -51,6 +51,8 @@ import { useRouter } from 'next/navigation'
 import styles from './project.module.css'
 import Lenis from 'lenis'
 import WorkflowDemo from '@/components/project/WorkflowDemo'
+import dynamic from 'next/dynamic'
+const LaxScrollStudy = dynamic(() => import('@/components/project/LaxScrollStudy'), { ssr: false })
 
 /**
  * 页面配置
@@ -248,7 +250,7 @@ export default function ProjectPage({ params }) {
         </nav>
 
         {/* 主内容区 - 自然滚动 */}
-        <div className={styles.mobileContent}>
+        <div className={styles.mobileContent} style={project.id === 'lax-structural' ? { overflow: 'visible' } : undefined}>
           {/* Hero 区域 - 缩放淡入 */}
           <div className={`${styles.mobileHero} ${styles.mobileHeroReveal}`}>
             <img
@@ -297,7 +299,7 @@ export default function ProjectPage({ params }) {
             <p className={styles.mobileBriefingText}>{project.description}</p>
           </div>
 
-          {project.id === 'lax-structural' && <a className={styles.exploreStructure} href="/preview/lax">Explore the structure in 3D <span aria-hidden="true">&rarr;</span></a>}
+          {project.id === 'lax-structural' && <LaxScrollStudy />}
           {project.workflow && <WorkflowDemo key={project.id} {...project.workflow} />}
 
           {/* 动态内容渲染 - 带淡入效果 */}
@@ -484,7 +486,7 @@ export default function ProjectPage({ params }) {
             ))}
           </div>
 
-          {project.id === 'lax-structural' && <a className={styles.exploreStructure} href="/preview/lax">Explore the structure in 3D <span aria-hidden="true">&rarr;</span></a>}
+          {project.id === 'lax-structural' && <LaxScrollStudy scrollRootRef={viewportRef} />}
           {project.workflow && <WorkflowDemo key={project.id} {...project.workflow} />}
 
           {/* 动态内容渲染 */}
