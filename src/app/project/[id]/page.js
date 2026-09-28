@@ -297,6 +297,7 @@ export default function ProjectPage({ params }) {
             <p className={styles.mobileBriefingText}>{project.description}</p>
           </div>
 
+          {project.id === 'lax-structural' && <a className={styles.exploreStructure} href="/preview/lax">Explore the structure in 3D <span aria-hidden="true">&rarr;</span></a>}
           {project.workflow && <WorkflowDemo key={project.id} {...project.workflow} />}
 
           {/* 动态内容渲染 - 带淡入效果 */}
@@ -483,6 +484,7 @@ export default function ProjectPage({ params }) {
             ))}
           </div>
 
+          {project.id === 'lax-structural' && <a className={styles.exploreStructure} href="/preview/lax">Explore the structure in 3D <span aria-hidden="true">&rarr;</span></a>}
           {project.workflow && <WorkflowDemo key={project.id} {...project.workflow} />}
 
           {/* 动态内容渲染 */}
