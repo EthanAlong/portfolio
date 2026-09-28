@@ -17,7 +17,7 @@ const subscribeVisibility = (notify) => {
 };
 const readVisibility = () => !document.hidden;
 
-export default function WorkflowDemo({ title, steps, accent = '#89caba' }) {
+export default function WorkflowDemo({ title, steps }) {
   const root = useRef(null);
   const headingId = useId();
   const [index, setIndex] = useState(0);
@@ -47,7 +47,7 @@ export default function WorkflowDemo({ title, steps, accent = '#89caba' }) {
   const select = (i) => { setIndex(i); setPlayChoice(false); };
 
   return (
-    <section ref={root} className={styles.demo} style={{ '--demo-accent': accent }} aria-labelledby={headingId} data-workflow-demo>
+    <section ref={root} className={styles.demo} aria-labelledby={headingId} data-workflow-demo>
       <div className={styles.heading}>
         <div>
           <p className={styles.eyebrow}>Workflow / Rhino 8</p>
