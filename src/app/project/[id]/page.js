@@ -50,6 +50,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import styles from './project.module.css'
 import Lenis from 'lenis'
+import WorkflowDemo from '@/components/project/WorkflowDemo'
 
 /**
  * 页面配置
@@ -257,6 +258,7 @@ export default function ProjectPage({ params }) {
               onLoad={onImageLoad}
             />
           </div>
+          {project.coverCaption && <p className={styles.coverCaption}>{project.coverCaption}</p>}
 
           {/* 项目标题 - 从左滑入 */}
           <div className={`${styles.mobileTitleSection} ${styles.mobileTitleReveal}`}>
@@ -294,6 +296,8 @@ export default function ProjectPage({ params }) {
             <h2 className={styles.mobileSectionTitle}>BRIEFING</h2>
             <p className={styles.mobileBriefingText}>{project.description}</p>
           </div>
+
+          {project.workflow && <WorkflowDemo key={project.id} {...project.workflow} />}
 
           {/* 动态内容渲染 - 带淡入效果 */}
           {project.content?.map((block, idx) => {
@@ -458,7 +462,8 @@ export default function ProjectPage({ params }) {
           </div>
 
           <div className={`${styles.revealItem} ${styles.heroWrapper}`}>
-            <img src={project.mainImage} alt="Hero" className={styles.magazineImg} onLoad={onImageLoad} />
+            <img src={project.mainImage} alt={`${getTitleString()} cover`} className={styles.magazineImg} onLoad={onImageLoad} />
+            {project.coverCaption && <p className={styles.coverCaption}>{project.coverCaption}</p>}
           </div>
 
           {/* 参数矩阵 (2排3列) */}
@@ -477,6 +482,8 @@ export default function ProjectPage({ params }) {
               </div>
             ))}
           </div>
+
+          {project.workflow && <WorkflowDemo key={project.id} {...project.workflow} />}
 
           {/* 动态内容渲染 */}
           {project.content?.map((block, idx) => {

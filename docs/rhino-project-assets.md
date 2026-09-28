@@ -7,7 +7,9 @@ their metadata labels and image treatment.
 
 ## Assets
 
-Each directory has one concept cover and three actual Rhino captures:
+Each directory has one concept cover and actual Rhino captures. The original
+case studies use three captures each; workflow walkthroughs add door-review and
+floor-setup captures where needed:
 
 - `public/ada-checker/`
 - `public/storage-planner/`

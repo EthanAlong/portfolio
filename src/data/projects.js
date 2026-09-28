@@ -1371,11 +1371,13 @@ const realProjects = [
   {
     id: "rag-system",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["RAG", "System"],
     year: "2025–26",
     category: "AI / Backend Engineering",
-    ringImage: "/rag-system/0.webp",
-    mainImage: "/rag-system/0.webp",
+    ringImage: "/rag-system/cover.webp",
+    mainImage: "/rag-system/cover.webp",
     description:
       "A semantic search engine over Saiful Bouquet's library of 1,000+ structural details, rebuilt in 2026 as a cloud-native system on Azure: vision-language models extract structured metadata from every drawing, hybrid retrieval combines keyword, text-embedding and image-embedding search, and the whole stack deploys from infrastructure-as-code.",
     location: "Digital",
@@ -1450,11 +1452,13 @@ const realProjects = [
   {
     id: "sb-web",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["Saiful Bouquet", "Web"],
     year: "2025",
     category: "Web Development",
-    ringImage: "/sb-web/map0.webp",
-    mainImage: "/sb-web/map0.webp",
+    ringImage: "/sb-web/cover.webp",
+    mainImage: "/sb-web/cover.webp",
     description:
       "An internal web platform for Saiful Bouquet that pairs an interactive project atlas — mapping the firm's structural projects across campuses and cities — with a library of in-house engineering web tools, all behind a single login.",
     location: "Digital",
@@ -1512,13 +1516,15 @@ const realProjects = [
   {
     id: "local-ai-deploy",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["AI", "Generative", "Workflow"], // 数组格式：支持精准控制两行排版
     year: "2026",
     category: "AI Generation / Architectural Visualization",
-    ringImage: "/local-ai-deploy/1.webp",
+    ringImage: "/local-ai-deploy/cover.webp",
     description:
       "A modular ComfyUI workflow leveraging the FLUX model to bridge the gap between architectural conceptualization and high-fidelity visualization.",
-    mainImage: "/local-ai-deploy/1.webp",
+    mainImage: "/local-ai-deploy/cover.webp",
     location: "Digital",
     sector: "Architectural Design Technology",
     status: "Workflow Developed / In Use",
@@ -1551,13 +1557,15 @@ const realProjects = [
   {
     id: "robotic-arms",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["Robotic", "Arms", "Control"], // 数组格式：支持精准控制两行排版
     year: "2022",
     category: "Robotic Control / Architectural Visualization",
-    ringImage: "/robotic-arms/3.webp",
+    ringImage: "/robotic-arms/cover.webp",
     description:
       "A custom robotic arm control interface integrating Rhino, KUKA, Unity, and MAYA for real-time manipulation and visualization of architectural models.",
-    mainImage: "/robotic-arms/3.webp",
+    mainImage: "/robotic-arms/cover.webp",
     location: "Los Angeles",
     sector: "Architectural Design Technology",
     status: "Developed / In Use",
@@ -1611,13 +1619,15 @@ const realProjects = [
   {
     id: "unit-schedule-plugin",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["Unit Schedule", "Plugin"],
     year: "2026",
     category: "Revit Plugin",
-    ringImage: "/unit-schedule-plugin/1.webp",
+    ringImage: "/unit-schedule-plugin/cover.webp",
     description:
       "A professional Revit plugin for generating comprehensive unit schedules with area analysis, open space tracking, and interactive visualizations for multi-family residential projects.",
-    mainImage: "/unit-schedule-plugin/1.webp",
+    mainImage: "/unit-schedule-plugin/cover.webp",
     location: "Desktop Application",
     sector: "BIM Tools / Revit API",
     status: "Completed",
@@ -1676,11 +1686,13 @@ const realProjects = [
   {
     id: "store-equipment",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["Store Equipment", "Manager"],
     year: "2025",
     category: "Web App / Internal Tool",
-    ringImage: "/store-equipment/hero.webp",
-    mainImage: "/store-equipment/hero.webp",
+    ringImage: "/store-equipment/cover.webp",
+    mainImage: "/store-equipment/cover.webp",
     description:
       "A full-stack web app that retires a sprawling master spreadsheet, replacing it with a searchable catalog of 209 equipment 'cards' (each with technical specs and a spec-sheet PDF) and a drag-and-drop builder for assembling the equipment schedule of a new supermarket buildout.",
     location: "Digital",
@@ -1724,11 +1736,13 @@ const realProjects = [
   {
     id: "ecommerce-tools",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["E-Commerce", "Ops Tools"],
     year: "2025",
     category: "Web Tools / Automation",
-    ringImage: "/ecommerce-tools/hero.webp",
-    mainImage: "/ecommerce-tools/hero.webp",
+    ringImage: "/ecommerce-tools/cover.webp",
+    mainImage: "/ecommerce-tools/cover.webp",
     description:
       "A pair of zero-install browser tools built to speed up a Whatnot squishy-toy shipping operation: a mobile-first order-logging app and a CSV-driven carton-packing planner that pre-computes which box each parcel needs.",
     location: "Digital",
@@ -1772,11 +1786,13 @@ const realProjects = [
   {
     id: "teams-nudge",
     type: "software-ai",
+    preserveImageColor: true,
+    coverCaption: "AI-generated concept cover",
     title: ["Teams", "Nudge"],
     year: "2026",
     category: "macOS Utility / Automation",
-    ringImage: "/teams-nudge/1.webp",
-    mainImage: "/teams-nudge/1.webp",
+    ringImage: "/teams-nudge/cover.webp",
+    mainImage: "/teams-nudge/cover.webp",
     description:
       "A small macOS app that keeps Microsoft Teams showing 'Available' during long away-from-keyboard stretches and guarantees you never miss a 1:1 direct message — a looping alarm and always-on-top popup that only stops once acknowledged.",
     location: "Desktop (macOS)",

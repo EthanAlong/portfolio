@@ -1,7 +1,11 @@
+import { rhinoWorkflows } from './rhinoWorkflows';
+
 // Portfolio case studies, based on the local Rhino plugin documentation.
 export const rhinoProjects = [
   {
     id: 'ada-checker',
+    workflow: rhinoWorkflows['ada-checker'],
+    coverCaption: 'AI-generated concept cover',
     type: 'software-ai',
     preserveImageColor: true,
     title: ['ADA', 'Checker'],
@@ -29,6 +33,8 @@ export const rhinoProjects = [
   },
   {
     id: 'storage-planner',
+    workflow: rhinoWorkflows['storage-planner'],
+    coverCaption: 'AI-generated concept cover',
     type: 'software-ai',
     preserveImageColor: true,
     title: ['Storage', 'Planner'],
@@ -55,6 +61,8 @@ export const rhinoProjects = [
   },
   {
     id: 'zoning-envelope',
+    workflow: rhinoWorkflows['zoning-envelope'],
+    coverCaption: 'AI-generated concept cover',
     type: 'software-ai',
     preserveImageColor: true,
     title: ['Zoning', 'Envelope'],

@@ -8,9 +8,11 @@ const captures = {
   'ada-checker': {
     'floor-perspective': '../AdaChecker/docs/screenshots/auto_floor_perspective_clean.png',
     'floor-turning': '../AdaChecker/docs/screenshots/auto_floor_top_turning_only.png',
+    'floor-doors': '../AdaChecker/docs/screenshots/auto_floor_top_doors_only.png',
     'room-detail': '../AdaChecker/docs/screenshots/auto_exam_perspective_clean.png',
   },
   'storage-planner': {
+    setup: '../StoragePlanner/docs/screenshots/client/01_setup_floor_placeholders.png',
     'layout-3d': '../StoragePlanner/docs/screenshots/client/08_3d_overview_clean.png',
     'long-axis': '../StoragePlanner/docs/screenshots/client/02_variant_A_long_axis_clean.png',
     'short-axis': '../StoragePlanner/docs/screenshots/client/03_variant_B_short_axis_clean.png',
