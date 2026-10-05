@@ -1369,6 +1369,40 @@ const realProjects = [
     ],
   },
   {
+    id: "internal-tools-roi",
+    type: "software-ai",
+    title: ["Internal", "Tools ROI"],
+    year: "2026",
+    category: "Applied AI / Internal Tools",
+    ringImage: "/internal-tools-roi/hero.png",
+    mainImage: "/internal-tools-roi/hero.png",
+    description:
+      "What six months of internal tooling returned to a mid-size structural engineering practice in Los Angeles, as a live model: a searchable detail library, automated drawing QA/QC, an RFI agent, a drafting-standards intake and a signed Revit add-in suite, priced task by task from before/after timings and the measured run cost. Drag the assumptions; the conclusion holds.",
+    location: "Los Angeles / Digital",
+    sector: "Internal Tools / Applied AI",
+    status: "Live model, October 2026",
+    scale: "6 tools, 9 daily users",
+    architect: "Structural engineering practice (name withheld)",
+    contribution: "Discovery, Product Ownership, Engineering, Rollout, ROI Model",
+    content: [
+      {
+        type: "textBlock",
+        title: "Why the model exists",
+        text: "With AI writing most of the code, the expensive part of building internal tools moved: it is now reading how the organization actually works, finding the pain that costs the most, knowing who has to say yes, and shipping something small enough to be adopted. A tool that nobody uses returns nothing, so every tool here was scoped from sitting in production with the people doing the work, and every claim below is a task that measurably got shorter. The platform runs for less than a hundred dollars a month on Azure; this page is the other side of that ledger.",
+      },
+      {
+        type: "interactive",
+        component: "roi",
+        title: "The model",
+      },
+      {
+        type: "textBlock",
+        title: "What changed in the way of working",
+        text: "Each tool started as an hour next to the person who had the problem: the project manager filing RFIs, the drafter reopening a 40-minute model to copy one detail, the engineer who had stopped back-checking markups because there was no time. The decisions that made them stick were rarely technical: an approval gate so the principals kept control of the drafting standard, a log hosted in the firm’s own Microsoft 365 so IT had nothing new to approve, a no-restart workaround with every Revit fix because a restart costs an engineer half an hour. Since October 2026 the platform logs every search and every completed add-in job, so the volumes in the model are being replaced by counts.",
+      },
+    ],
+  },
+  {
     id: "rag-system",
     type: "software-ai",
     preserveImageColor: true,

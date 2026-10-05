@@ -53,6 +53,7 @@ import Lenis from 'lenis'
 import WorkflowDemo from '@/components/project/WorkflowDemo'
 import dynamic from 'next/dynamic'
 const LaxScrollStudy = dynamic(() => import('@/components/project/LaxScrollStudy'), { ssr: false })
+import RoiExplorer from '@/components/roi/RoiExplorer'
 
 /**
  * 页面配置
@@ -304,6 +305,16 @@ export default function ProjectPage({ params }) {
 
           {/* 动态内容渲染 - 带淡入效果 */}
           {project.content?.map((block, idx) => {
+            // 交互模块 / interactive block (e.g. the ROI explorer)
+            if (block.type === 'interactive' && block.component === 'roi') {
+              return (
+                <div key={idx} className={`${styles.mobileContentSection} ${styles.mobileContentReveal}`}>
+                  {block.title ? <h2 className={styles.mobileSectionTitle}>{block.title}</h2> : null}
+                  <RoiExplorer />
+                </div>
+              )
+            }
+
             // 文字模块
             if (block.type === 'textBlock') {
               return (
@@ -491,6 +502,16 @@ export default function ProjectPage({ params }) {
 
           {/* 动态内容渲染 */}
           {project.content?.map((block, idx) => {
+            // 交互模块 / interactive block (e.g. the ROI explorer)
+            if (block.type === 'interactive' && block.component === 'roi') {
+              return (
+                <div key={idx} className={`${styles.revealItem} ${styles.contentSection}`}>
+                  {block.title ? <h2 className={styles.moduleHeading}>{block.title}</h2> : null}
+                  <RoiExplorer />
+                </div>
+              );
+            }
+
             // 文字模块
             if (block.type === 'textBlock') {
               return (

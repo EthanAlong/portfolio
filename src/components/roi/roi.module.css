@@ -1,0 +1,106 @@
+/* roi.module.css — Internal Tools ROI explorer.
+   Lives inside the white, system-sans project page. One accent: markup red,
+   the colour engineers correct drawings in. Everything else is ink and paper. */
+
+.roi {
+  --ink: #111;
+  --ink-2: #555;
+  --ink-3: #8a8a8a;
+  --paper-2: #f2f2f0;
+  --rule: #e3e3e0;
+  --mark: #c21f2b;          /* markup red */
+  --mark-soft: #f6d9db;
+  --mono-nums: "tnum" 1, "lnum" 1;
+  width: 100%;
+  margin: 1.5rem 0 2.5rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ---- 1. counter ---- */
+.hero { padding: 0.5rem 0 1.25rem; border-bottom: 1px solid var(--rule); }
+.heroLabel { margin: 0 0 0.35rem; color: var(--ink-2); font-size: 0.9rem; }
+.counter { margin: 0; line-height: 1; }
+.counterValue {
+  display: inline-block;
+  font-size: clamp(2.6rem, 7.5vw, 5.4rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-feature-settings: var(--mono-nums);
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--mark);
+}
+.heroSub {
+  display: flex; flex-wrap: wrap; gap: 0.35rem 1.4rem;
+  margin: 0.9rem 0 0; color: var(--ink-2); font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+.heroSub span:first-child { color: var(--ink); font-weight: 600; }
+
+/* ---- 2. returns bar ---- */
+.barWrap { padding: 1.1rem 0 0.4rem; }
+.bar { display: flex; height: 22px; width: 100%; background: var(--paper-2); overflow: hidden; border-radius: 2px; }
+.seg {
+  height: 100%; background: var(--mark); opacity: 0.82;
+  border-right: 1px solid #fff;
+  transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1), opacity 160ms;
+}
+.seg:nth-child(even) { opacity: 0.62; }
+.segActive, .seg:hover { opacity: 1; }
+.cost { height: 100%; background: var(--ink); transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1); }
+.barLegend { display: flex; justify-content: space-between; margin-top: 0.4rem; color: var(--ink-3); font-size: 0.8rem; }
+.barLegendCost { color: var(--ink); }
+
+/* ---- controls ---- */
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; padding: 0.9rem 0 1.2rem; border-bottom: 1px solid var(--rule); }
+.toggle { display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.9rem; }
+.toggle input { width: 16px; height: 16px; accent-color: var(--mark); }
+.reset {
+  margin-left: auto; background: none; border: 1px solid var(--rule); color: var(--ink-2);
+  padding: 0.3rem 0.7rem; font: inherit; font-size: 0.82rem; cursor: pointer; border-radius: 2px;
+}
+.reset:hover { border-color: var(--ink-2); color: var(--ink); }
+
+/* ---- 3. tools ---- */
+.tools { list-style: none; margin: 0; padding: 0; }
+.tool { padding: 1.15rem 0 1.1rem; border-bottom: 1px solid var(--rule); transition: background 160ms; }
+.toolActive { background: linear-gradient(90deg, #fbf4f4, transparent 60%); }
+.toolHead { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+.toolName { margin: 0; font-size: 1.02rem; font-weight: 600; letter-spacing: -0.01em; }
+.toolTask { margin: 0.15rem 0 0; color: var(--ink-2); font-size: 0.88rem; max-width: 46ch; }
+.toolFig { text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.toolDollars { display: block; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); line-height: 1.1; }
+.toolHours { display: block; color: var(--ink-3); font-size: 0.8rem; margin-top: 0.15rem; }
+.toolBarTrack { height: 3px; background: var(--paper-2); margin: 0.7rem 0 0.85rem; }
+.toolBarFill { height: 100%; background: var(--mark); transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1); }
+
+.sliders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem 1.25rem; }
+.slider { min-width: 0; }
+.sliderHead { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--ink-2); margin-bottom: 0.2rem; }
+.sliderHead output { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.slider input[type="range"] { width: 100%; margin: 0; accent-color: var(--mark); cursor: ew-resize; }
+.slider input[type="range"]:focus-visible { outline: 2px solid var(--mark); outline-offset: 3px; border-radius: 2px; }
+.sliderHint { display: block; margin-top: 0.15rem; color: var(--ink-3); font-size: 0.74rem; }
+.toolMeta { margin: 0.75rem 0 0; color: var(--ink-3); font-size: 0.8rem; max-width: 72ch; }
+
+/* ---- projection + method ---- */
+.next { margin-top: 1.6rem; padding: 1rem 1.1rem; background: var(--paper-2); border-radius: 2px; }
+.nextTitle { margin: 0 0 0.35rem; font-size: 0.95rem; font-weight: 600; }
+.next p { margin: 0; color: var(--ink-2); font-size: 0.9rem; max-width: 72ch; }
+
+.method { margin-top: 1.8rem; }
+.methodTitle { margin: 0 0 0.5rem; font-size: 0.95rem; font-weight: 600; }
+.method p { margin: 0 0 0.75rem; color: var(--ink-2); font-size: 0.9rem; max-width: 72ch; }
+
+@media (max-width: 768px) {
+  .roi { font-size: 0.92rem; }
+  .sliders { grid-template-columns: 1fr; gap: 0.55rem; }
+  .toolHead { flex-direction: column; gap: 0.3rem; }
+  .toolFig { text-align: left; }
+  .reset { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seg, .cost, .toolBarFill { transition: none; }
+}
