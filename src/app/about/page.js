@@ -261,7 +261,7 @@ export default function AboutPage() {
               I AM ETHAN
             </h1>
             <div className={styles.mobileSubtitle}>
-              COMPUTATIONAL ARCHITECT / ZONING STRATEGIST
+              COMPUTATIONAL ARCHITECT / TOOLS · AI · AZURE
             </div>
           </div>
 
@@ -270,7 +270,7 @@ export default function AboutPage() {
             <h2 className={styles.mobileSectionTitle}>MANIFESTO</h2>
             <p className={styles.mobileBriefingText}>
               <Typewriter
-                text="I DECODE COMPLEX URBAN ORDINANCES THROUGH ALGORITHMIC PRECISION TO UNLOCK ARCHITECTURAL POTENTIAL."
+                text="I READ HOW THE WORK ACTUALLY FLOWS, THEN BUILD WHAT THE TEAM KEEPS USING."
                 config={EFFECT_CONFIG.typewriter}
               />
             </p>
@@ -280,8 +280,8 @@ export default function AboutPage() {
           <div className={styles.mobileMetaGrid}>
             {[
               { label: "Contact", value: "ethan_along@outlook.com", isSkill: false },
-              { label: "Focus", value: "Regulatory Innovation", isSkill: false },
-              { label: "Tech Stack", value: "Python / GH / React", isSkill: true },
+              { label: "Focus", value: "Internal Tools / AI Agents", isSkill: false },
+              { label: "Tech Stack", value: "C# / Python / Azure (AZ-104)", isSkill: true },
               { label: "LA Expertise", value: "CHIP / TOC / AB 1287", isSkill: true },
               { label: "Education", value: "UCLA Arch & UD", isSkill: false },
               { label: "Location", value: "Los Angeles, CA", isSkill: false }
@@ -321,6 +321,14 @@ export default function AboutPage() {
               Whether I am programming 6-axis robotic arms at UCLA or coordinating structural corrections with LADWP on a
               150k+ SQFT construction site, my goal is to bridge the gap between high-fidelity digital narrative and the
               ground-level realities of urban development.
+            </p>
+            <p className={styles.mobileText} style={{ marginTop: '1.5rem' }}>
+              Today I am the senior BIM & computational designer at a structural engineering practice in Los Angeles,
+              and I build the firm&apos;s internal tools: an <strong>AI detail library</strong>, an <strong>RFI agent</strong>,
+              a <strong>Revit add-in suite</strong> and the <strong>Azure platform</strong> under them, eight tools nine people use
+              every day. The method is the same one I use on a building: sit with the people doing the work, find the step that
+              costs the most, ship the smallest thing that removes it, and measure whether it stuck.{' '}
+              <Link href="/engineering" style={{ color: 'inherit', fontWeight: 600 }}>See the Engineering page →</Link>
             </p>
           </div>
 
@@ -451,7 +459,7 @@ export default function AboutPage() {
         </div>
         <div className={styles.sidebarBottom}>
           <div className={styles.sidebarMetadata}>COMPUTATIONAL ARCHITECT</div>
-          <div className={styles.sidebarMetadata}>ZONING STRATEGIST</div>
+          <div className={styles.sidebarMetadata}>TOOLS · AI · AZURE</div>
         </div>
       </aside>
 
@@ -460,7 +468,7 @@ export default function AboutPage() {
           {/* 核心宣言 - 打字机效果 */}
           <div className={`${styles.revealItem} ${styles.briefingText}`}>
             <Typewriter
-              text="I DECODE COMPLEX URBAN ORDINANCES THROUGH ALGORITHMIC PRECISION TO UNLOCK ARCHITECTURAL POTENTIAL."
+              text="I READ HOW THE WORK ACTUALLY FLOWS, THEN BUILD WHAT THE TEAM KEEPS USING."
               config={EFFECT_CONFIG.typewriter}
             />
           </div>
@@ -469,20 +477,19 @@ export default function AboutPage() {
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Contact</span>
               <span className={styles.metaValue}>ethan_along@outlook.com</span>
-              <span className={styles.metaValue}>ethanh@plusarchitects.com</span>
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Focus</span>
-              <span className={styles.metaValue}>Regulatory Innovation</span>
+              <span className={styles.metaValue}>Internal Tools / AI Agents</span>
               <span className={styles.metaValue}>Digital Entitlement</span>
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Tech Stack</span>
               <span className={styles.metaValue}>
-                <GlowLabel index={0} config={EFFECT_CONFIG.gradient}>Python / Grasshopper</GlowLabel>
+                <GlowLabel index={0} config={EFFECT_CONFIG.gradient}>C# / Python / TypeScript</GlowLabel>
               </span>
               <span className={styles.metaValue}>
-                <GlowLabel index={1} config={EFFECT_CONFIG.gradient}>UE5 / React / Three.js</GlowLabel>
+                <GlowLabel index={1} config={EFFECT_CONFIG.gradient}>Azure (AZ-104) / Revit / Rhino</GlowLabel>
               </span>
             </div>
             <div className={styles.metaItem}>
@@ -522,6 +529,14 @@ export default function AboutPage() {
               Whether I am programming 6-axis robotic arms at UCLA or coordinating structural corrections with LADWP on a
               150k+ SQFT construction site, my goal is to bridge the gap between high-fidelity digital narrative and the
               ground-level realities of urban development.
+            </p>
+            <p style={{marginTop: '2rem'}}>
+              Today I am the senior BIM & computational designer at a structural engineering practice in Los Angeles,
+              and I build the firm&apos;s internal tools: an <strong>AI detail library</strong>, an <strong>RFI agent</strong>,
+              a <strong>Revit add-in suite</strong> and the <strong>Azure platform</strong> under them, eight tools nine people use
+              every day. The method is the same one I use on a building: sit with the people doing the work, find the step that
+              costs the most, ship the smallest thing that removes it, and measure whether it stuck.{' '}
+              <Link href="/engineering" style={{ color: 'inherit', fontWeight: 600 }}>See the Engineering page →</Link>
             </p>
           </div>
 
