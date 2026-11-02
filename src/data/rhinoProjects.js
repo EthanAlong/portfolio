@@ -81,6 +81,7 @@ export const rhinoProjects = [
     content: [
       { type: 'textBlock', title: 'See the space behind the rules', text: 'A parcel boundary and a configurable rule set become a live, translucent buildable envelope. Setbacks, height, stepbacks, and daylight-plane assumptions can be inspected alongside the design massing. Edits to linked geometry trigger an updated review. The cover is an AI-generated concept illustration; the following images are actual Rhino prototype captures.' },
       { type: 'imageGrid', columns: 1, images: ['/zoning-envelope/overview.webp'], customTitle: 'Rhino / Overview', labels: ['Scheme comparison'] },
+      { type: 'interactive', component: 'zoning' },
       { type: 'textBlock', title: 'One model, multiple development scenarios', text: 'The study workflow links parcels and massing to named schemes and functional uses. It compares area, height, floor count, unit mix, and requirement policies across alternatives. Courtyard deductions and shared planning assumptions are visible in the review, so the geometry and the feasibility conversation stay connected.' },
       { type: 'imageGrid', columns: 1, images: ['/zoning-envelope/unit-planning.webp'], customTitle: 'Rhino / Unit Mix', labels: ['Residential planning'] },
       { type: 'imageGrid', columns: 1, images: ['/zoning-envelope/requirements.webp'], customTitle: 'Rhino / Requirements', labels: ['Policy comparison'] },

@@ -159,6 +159,7 @@ export const caseStudies = [
     image: '/zoning-envelope/overview.webp',
     imageSize: [1776, 791],
     links: [
+      { label: 'Try it in the browser', href: '/project/zoning-envelope#sandbox' },
       { label: 'Case study', href: '/project/zoning-envelope' },
       { label: 'Code', href: 'https://github.com/EthanAlong/ZoningEnvelope', external: true },
     ],
