@@ -17,9 +17,9 @@ export const engineeringIntro = {
 }
 
 export const proofPoints = [
-  { value: '6', label: 'internal tools in production' },
+  { value: '8', label: 'internal tools in production' },
   { value: '9', label: 'daily users across the practice' },
-  { value: '<$100', label: 'per month to run on Azure' },
+  { value: '89×', label: 'modelled return on run cost ($327K vs $3.7K a year)' },
   { value: '1,000+', label: 'structural details made searchable' },
 ]
 
@@ -37,11 +37,23 @@ export const caseStudies = [
     title: 'Internal Tools ROI',
     context: 'Structural engineering practice · 2026',
     problem: 'Six months of internal tooling needed to justify itself in hours and dollars, not anecdotes.',
-    built: 'A live ROI model priced task by task from before/after timings and measured run cost: detail search, drawing QA/QC, an RFI agent, a drafting-standards intake and a signed Revit add-in suite.',
-    outcome: '6 tools, 9 daily users, under $100/month on Azure. Usage logging since October 2026 is replacing estimated volumes with counts.',
+    built: 'A live ROI model priced task by task from before/after timings and measured run cost: detail search, drawing QA/QC, an RFI agent, detail downgrade, sheet-set printing, a family manager and a drafting-standards intake.',
+    outcome: '8 tools, 9 daily users: about $327K a year of staff time returned against $3.7K to run (89×), hosting under $100 a month. Usage logging since October 2026 is replacing estimated volumes with counts.',
     stack: ['Discovery', 'Product ownership', 'Azure', 'Microsoft 365', 'React'],
     image: '/internal-tools-roi/hero.png',
     links: [{ label: 'Interactive model', href: '/project/internal-tools-roi' }],
+  },
+  {
+    id: 'revit-agent',
+    title: 'AI Agent in Production Revit Models',
+    context: 'Structural engineering practice · Aviation · 2026',
+    problem: 'Repetitive model and sheet edits on live production models eat drafting hours, but an AI writing to a shared central model with no review is a non-starter for the engineers who sign the drawings.',
+    built: 'Claude Code and Codex drive Revit through an MCP bridge. Every write is a plan the engineer approves before it runs. Every element the agent touches carries an invisible marker, so a whole task can be found or rolled back with one filter. Risky batches log their before-state with a revert script, and a shared log lets any session, at home or in the office, pick up where the last one stopped.',
+    outcome: '34 approved plans executed on live workshared models, including 63 revision clouds re-sequenced into a bulletin and 286 view overrides refreshed in single passes, each one reversible. Writes to the central model stay a human decision.',
+    stack: ['Claude Code', 'Codex', 'MCP', 'Revit API', 'IronPython', 'Python'],
+    diagram: 'agent-loop',
+    links: [],
+    note: 'Private repository: client models. Walkthrough on request.',
   },
   {
     id: 'rag-system',
@@ -87,8 +99,7 @@ export const caseStudies = [
     built: 'A twice-daily GitHub Actions scraper over eight buildings on two leasing platforms (plain fetch, no browser), an append-only CSV, and a bilingual zoomable dashboard on GitHub Pages. A probe script tells you in one run whether a new building can be onboarded and which adapter it needs.',
     outcome: '~355 units per scrape. Concession banners are parsed into effective rent, and a moved banner is flagged as "check" instead of being logged as a fake "offer ended".',
     stack: ['Node', 'cheerio', 'GitHub Actions', 'ECharts'],
-    image: null,
-    stat: { value: '8', label: 'buildings tracked, 2× a day' },
+    image: '/dtla-rent-tracker/trend.webp',
     links: [
       { label: 'Live dashboard', href: 'https://ethanalong.github.io/dtla-rent-tracker/', external: true },
       { label: 'Code', href: 'https://github.com/EthanAlong/dtla-rent-tracker', external: true },

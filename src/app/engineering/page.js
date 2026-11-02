@@ -19,6 +19,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import styles from './engineering.module.css'
 import CountUp from '@/components/engineering/CountUp'
+import AgentLoop from '@/components/engineering/AgentLoop'
 
 // WebGL only on the client; the hero reads fine before it arrives.
 const StructureFrame = dynamic(() => import('@/components/engineering/StructureFrame'), { ssr: false })
@@ -132,6 +133,10 @@ function CaseRow({ study, index }) {
                 style={{ objectFit: 'contain' }}
               />
             </div>
+          ) : study.diagram === 'agent-loop' ? (
+            <div className={`${styles.caseImage} ${styles.caseDiagram}`}>
+              <AgentLoop className={styles.agentLoop} />
+            </div>
           ) : study.stat ? (
             <div className={`${styles.caseImage} ${styles.caseStat}`}>
               <span className={styles.caseStatValue}>{study.stat.value}</span>
@@ -143,11 +148,14 @@ function CaseRow({ study, index }) {
               <li key={s}>{s}</li>
             ))}
           </ul>
-          <div className={styles.links}>
-            {study.links.map((l) => (
-              <CaseLink key={l.href} link={l} />
-            ))}
-          </div>
+          {study.links.length > 0 && (
+            <div className={styles.links}>
+              {study.links.map((l) => (
+                <CaseLink key={l.href} link={l} />
+              ))}
+            </div>
+          )}
+          {study.note && <p className={styles.caseNote}>{study.note}</p>}
         </div>
       </div>
     </article>

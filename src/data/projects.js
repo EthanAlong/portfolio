@@ -1381,7 +1381,7 @@ const realProjects = [
     location: "Los Angeles / Digital",
     sector: "Internal Tools / Applied AI",
     status: "Live model, October 2026",
-    scale: "6 tools, 9 daily users",
+    scale: "8 tools, 9 daily users",
     architect: "Structural engineering practice (name withheld)",
     contribution: "Discovery, Product Ownership, Engineering, Rollout, ROI Model",
     content: [

@@ -363,6 +363,35 @@
   color: #555;
 }
 .links { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+.caseNote {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Agent-loop diagram ---------- */
+.caseDiagram { aspect-ratio: 16 / 10; }
+.agentLoop { position: absolute; inset: 0; width: 100%; height: 100%; }
+.agentLoop [data-draw] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;   /* arrowheads (markers) aren't dashed: fade them in with the stroke */
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.9s ease-in;
+}
+/* no transition shorthand here: it would reset the per-step delays below */
+.agentLoop rect[data-draw] { fill-opacity: 0; transition-property: stroke-dashoffset, opacity, fill-opacity; }
+.agentLoop text { opacity: 0; transition: opacity 0.6s ease; }
+/* sequence: each node group (and its outgoing arrow) after the previous */
+.agentLoop [data-seq="0"], .agentLoop [data-seq="0"] * { transition-delay: 0.3s; }
+.agentLoop [data-seq="1"], .agentLoop [data-seq="1"] * { transition-delay: 0.8s; }
+.agentLoop [data-seq="2"], .agentLoop [data-seq="2"] * { transition-delay: 1.3s; }
+.agentLoop [data-seq="3"], .agentLoop [data-seq="3"] * { transition-delay: 1.8s; }
+.agentLoop [data-seq="4"], .agentLoop > [data-seq="4"] { transition-delay: 2.3s; }
+.agentLoop > text:first-child { transition-delay: 0.1s; }
+.case.shown .agentLoop [data-draw] { stroke-dashoffset: 0; opacity: 1; }
+.case.shown .agentLoop rect[data-draw] { fill-opacity: 1; }
+.case.shown .agentLoop text { opacity: 1; }
+
 
 /* ---------- Toolbox ---------- */
 .toolbox {
@@ -436,6 +465,7 @@
   .method::before { transition: none; transform: scaleX(1); }
   .methodItem { transition: none; opacity: 1; transform: none; }
   .caseImageReveal, .caseImageReveal img { transition: none; clip-path: none; transform: none; }
+  .agentLoop [data-draw], .agentLoop text { transition: none; stroke-dashoffset: 0; opacity: 1; fill-opacity: 1; }
 }
 
 /* ---------- Tablet ---------- */
