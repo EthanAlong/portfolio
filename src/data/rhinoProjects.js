@@ -24,6 +24,7 @@ export const rhinoProjects = [
     content: [
       { type: 'textBlock', title: 'From a checklist to spatial feedback', text: 'Turning spaces, door maneuvering clearances, and accessible routes are easier to assess when their geometry is visible in context. ADA Checker draws translucent test volumes over the Rhino model and highlights conflicts in red and clear checks in green. The cover is an AI-generated concept illustration; the images below are actual Rhino captures.' },
       { type: 'imageGrid', columns: 1, images: ['/ada-checker/floor-perspective.webp'], customTitle: 'Rhino / Overview', labels: ['Clearance overlays'] },
+      { type: 'interactive', component: 'ada' },
       { type: 'textBlock', title: 'Place. Inspect. Recheck.', text: 'Place individual turning-space, door, or route checks, or use the automatic room and door workflows to review a floor. A dockable results panel links findings back to the model. Live rechecking responds to model edits, while overlay controls isolate turning spaces, doors, routes, and labels.' },
       { type: 'imageGrid', columns: 1, images: ['/ada-checker/floor-turning.webp'], customTitle: 'Rhino / Turning', labels: ['Floor study'] },
       { type: 'imageGrid', columns: 1, images: ['/ada-checker/room-detail.webp'], customTitle: 'Rhino / Detail', labels: ['Room inspection'] },

@@ -8,6 +8,8 @@
  */
 import "./globals.css"
 import SiteChrome from "@/components/site/SiteChrome"
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const SITE = "https://www.ethanhdigital.com"
 const DESCRIPTION =
@@ -36,6 +38,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body style={{ margin: 0, padding: 0 }} suppressHydrationWarning={true}>
         <SiteChrome>{children}</SiteChrome>
+        {/* every page, not just the ring: shows whether /engineering and the project pages get read */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
