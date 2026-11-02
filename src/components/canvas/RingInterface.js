@@ -1094,6 +1094,8 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, onPoint
  * 仅在桌面端使用，移动端使用 HTML 预览区域
  * ============================================================
  */
+const CENTRAL_TITLE_FONT = '/fonts/inter-latin-900-normal.woff'
+
 function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
   const group = useRef()
   const { central } = RING_PARAMS.desktop
@@ -1109,11 +1111,15 @@ function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
     return Array.isArray(activeProject.title) ? activeProject.title.join(' ') : activeProject.title
   }
 
+  // Image and title suspend separately, so one loading never holds the other back.
+  // The title uses the site's own Inter 900 (public/fonts, OFL): without a `font`
+  // troika fetches a fallback font from a CDN at runtime, which a slow or blocked
+  // CDN turns into no preview at all.
   return (
     <group ref={group}>
-      <Suspense fallback={null}>
-        {activeProject && (
-          <>
+      {activeProject && (
+        <>
+          <Suspense fallback={null}>
             <Image
               url={activeProject.mainImage}
               scale={[central.imageW, central.imageH]}
@@ -1122,19 +1128,21 @@ function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
               toneMapped={false}
               onClick={() => onNavigate(activeProject.id)}
             />
+          </Suspense>
+          <Suspense fallback={null}>
             <Text
+              font={CENTRAL_TITLE_FONT}
               position={[0, central.textY, central.zOffset + 0.2]}
               fontSize={1.2}
               color="white"
-              fontWeight={900}
               letterSpacing={-0.05}
               anchorY="middle"
             >
               {getTitleString().toUpperCase()}
             </Text>
-          </>
-        )}
-      </Suspense>
+          </Suspense>
+        </>
+      )}
     </group>
   )
 }

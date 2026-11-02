@@ -56,9 +56,12 @@ the **ring** (`/`, architecture + software projects) and **`/engineering`**
 - `prefers-reduced-motion`: ring snaps instead of easing, no intro/return spin, no
   spin-and-expand on navigate, background network and arc glow stand still, CSS reveals
   render at rest.
-- Headless Chromium here never shows the desktop central preview (drei `<Text>` fetches
-  its font from a CDN, the shared Suspense hangs), on hover or keyboard alike. Check
-  the lift with a focused-vs-Esc screenshot diff instead.
+- The central preview title uses `public/fonts/inter-latin-900-normal.woff` (OFL, copy of
+  the engineering OG font). Without a `font`, drei `<Text>` / troika fetches a fallback
+  font from jsdelivr at runtime. Image and title sit in separate Suspense boundaries.
+- Headless screenshots of the ring: launch Chromium with
+  `args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']`, otherwise the
+  central preview never draws (default headless GL), on hover or keyboard alike.
 
 ## Verify before pushing
 
