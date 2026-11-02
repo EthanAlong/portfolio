@@ -33,6 +33,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import styles from '../project/[id]/project.module.css'
+import AboutStory from '@/components/about/AboutStory'
+import AboutTimeline from '@/components/about/AboutTimeline'
+import { aboutIntro, aboutLocation } from '@/data/about'
 
 /**
  * 页面配置
@@ -270,7 +273,7 @@ export default function AboutPage() {
             <h2 className={styles.mobileSectionTitle}>MANIFESTO</h2>
             <p className={styles.mobileBriefingText}>
               <Typewriter
-                text="I READ HOW THE WORK ACTUALLY FLOWS, THEN BUILD WHAT THE TEAM KEEPS USING."
+                text={aboutIntro.manifesto}
                 config={EFFECT_CONFIG.typewriter}
               />
             </p>
@@ -283,8 +286,8 @@ export default function AboutPage() {
               { label: "Focus", value: "Internal Tools / AI Agents", isSkill: false },
               { label: "Tech Stack", value: "C# / Python / Azure (AZ-104)", isSkill: true },
               { label: "LA Expertise", value: "CHIP / TOC / AB 1287", isSkill: true },
-              { label: "Education", value: "UCLA Arch & UD", isSkill: false },
-              { label: "Location", value: "Los Angeles, CA", isSkill: false }
+              { label: "Role", value: "Senior BIM & Computational Designer", isSkill: false },
+              { label: "Location", value: aboutLocation.join(" · "), isSkill: false }
             ].map((item, i) => (
               <div
                 key={i}
@@ -306,30 +309,11 @@ export default function AboutPage() {
           {/* 详细介绍 */}
           <div className={`${styles.mobileContentSection} ${styles.mobileContentReveal}`}>
             <h2 className={styles.mobileSectionTitle}>ABOUT ME</h2>
-            <p className={styles.mobileText} style={{ marginBottom: '1.5rem' }}>
-              My practice is built on the conviction that the most innovative architectural solutions lie in the
-              <strong> fusion of computational logic and regulatory intelligence</strong>.
-              I don't just design spaces; I build systems that navigate the intricate parameters of modern city codes.
-            </p>
-            <p className={styles.mobileText} style={{ marginBottom: '1.5rem' }}>
-              At the start of 2026, I have pivoted my focus toward the <strong>Citywide Housing Incentive Program (CHIP)</strong>,
-              using custom-built scripts to automate the feasibility analysis of high-density infill.
-              By integrating <strong>AB 1287 stackable bonuses</strong> into my design workflows, I successfully transition projects
-              from discretionary public hearings into streamlined <strong>Ministerial (By-right) paths</strong>.
-            </p>
-            <p className={styles.mobileText}>
-              Whether I am programming 6-axis robotic arms at UCLA or coordinating structural corrections with LADWP on a
-              150k+ SQFT construction site, my goal is to bridge the gap between high-fidelity digital narrative and the
-              ground-level realities of urban development.
-            </p>
-            <p className={styles.mobileText} style={{ marginTop: '1.5rem' }}>
-              Today I am the senior BIM & computational designer at a structural engineering practice in Los Angeles,
-              and I build the firm&apos;s internal tools: an <strong>AI detail library</strong>, an <strong>RFI agent</strong>,
-              a <strong>Revit add-in suite</strong> and the <strong>Azure platform</strong> under them, eight tools nine people use
-              every day. The method is the same one I use on a building: sit with the people doing the work, find the step that
-              costs the most, ship the smallest thing that removes it, and measure whether it stuck.{' '}
-              <Link href="/engineering" style={{ color: 'inherit', fontWeight: 600 }}>See the Engineering page →</Link>
-            </p>
+            <AboutStory className={styles.mobileText} gap="1.5rem" />
+          </div>
+          <div className={`${styles.mobileContentSection} ${styles.mobileContentReveal}`}>
+            <h2 className={styles.mobileSectionTitle}>PATH</h2>
+            <AboutTimeline compact />
           </div>
 
           {/* 社交链接 - 带 LinkedIn 图标 */}
@@ -468,7 +452,7 @@ export default function AboutPage() {
           {/* 核心宣言 - 打字机效果 */}
           <div className={`${styles.revealItem} ${styles.briefingText}`}>
             <Typewriter
-              text="I READ HOW THE WORK ACTUALLY FLOWS, THEN BUILD WHAT THE TEAM KEEPS USING."
+              text={aboutIntro.manifesto}
               config={EFFECT_CONFIG.typewriter}
             />
           </div>
@@ -502,42 +486,19 @@ export default function AboutPage() {
               </span>
             </div>
             <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>Education</span>
-              <span className={styles.metaValue}>UCLA Architecture & Urban Design</span>
+              <span className={styles.metaLabel}>Role</span>
+              <span className={styles.metaValue}>Senior BIM & Computational Designer</span>
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Location</span>
-              <span className={styles.metaValue}>Los Angeles, CA</span>
+              {aboutLocation.map((l) => <span key={l} className={styles.metaValue}>{l}</span>)}
             </div>
           </div>
 
           {/* 第一人称详细文本 */}
           <div className={`${styles.revealItem} ${styles.moduleText}`}>
-            <p style={{marginBottom: '2rem'}}>
-              My practice is built on the conviction that the most innovative architectural solutions lie in the
-              <strong> fusion of computational logic and regulatory intelligence</strong>.
-              I don't just design spaces; I build systems that navigate the intricate parameters of modern city codes.
-            </p>
-            <p style={{marginBottom: '2rem'}}>
-              At the start of 2026, I have pivoted my focus toward the <strong>Citywide Housing Incentive Program (CHIP)</strong>,
-              using custom-built scripts to automate the feasibility analysis of high-density infill.
-              By integrating <strong>AB 1287 stackable bonuses</strong> into my design workflows, I successfully transition projects
-              from discretionary public hearings into streamlined <strong>Ministerial (By-right) paths</strong>,
-              maximizing density while ensuring technical compliance.
-            </p>
-            <p>
-              Whether I am programming 6-axis robotic arms at UCLA or coordinating structural corrections with LADWP on a
-              150k+ SQFT construction site, my goal is to bridge the gap between high-fidelity digital narrative and the
-              ground-level realities of urban development.
-            </p>
-            <p style={{marginTop: '2rem'}}>
-              Today I am the senior BIM & computational designer at a structural engineering practice in Los Angeles,
-              and I build the firm&apos;s internal tools: an <strong>AI detail library</strong>, an <strong>RFI agent</strong>,
-              a <strong>Revit add-in suite</strong> and the <strong>Azure platform</strong> under them, eight tools nine people use
-              every day. The method is the same one I use on a building: sit with the people doing the work, find the step that
-              costs the most, ship the smallest thing that removes it, and measure whether it stuck.{' '}
-              <Link href="/engineering" style={{ color: 'inherit', fontWeight: 600 }}>See the Engineering page →</Link>
-            </p>
+            <AboutStory />
+            <AboutTimeline />
           </div>
 
           {/* 社交二维码链接模块 - 带 LinkedIn 图标 */}
