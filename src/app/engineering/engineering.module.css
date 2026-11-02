@@ -608,6 +608,23 @@
   margin: 0 0 2rem;
 }
 .contactLinks { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
+.connect {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1.8rem;
+  padding: 0.95rem 1.6rem;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+.connect:hover { background: var(--data); }
+.connect:active { transform: scale(0.98); }
+.connect:focus-visible { outline: 2px solid var(--data); outline-offset: 3px; }
 
 /* ---------- Reveal ---------- */
 .reveal {

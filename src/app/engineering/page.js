@@ -22,7 +22,6 @@ import CountUp from '@/components/engineering/CountUp'
 import AgentLoop from '@/components/engineering/AgentLoop'
 import DataFlow from '@/components/engineering/DataFlow'
 import FlowDiagram from '@/components/engineering/FlowDiagram'
-import ContactForm from '@/components/contact/ContactForm'
 import { rfiFlow, azureMap, mailMcp } from '@/data/diagrams'
 
 // WebGL only on the client; the hero reads fine before it arrives.
@@ -326,13 +325,14 @@ export default function EngineeringPage() {
       {/* --- Contact --- */}
       <footer className={`${styles.contact} ${styles.reveal}`} id="contact">
         <h2 className={styles.contactHeading}>Hours to win back?</h2>
+        <a className={styles.connect} href={contact.linkedin} target="_blank" rel="noopener noreferrer">
+          Connect on LinkedIn <span aria-hidden="true">↗</span>
+        </a>
         <div className={styles.contactLinks}>
           <a href={`mailto:${contact.email}`}>{contact.email}</a>
-          <a href={contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
           <a href={contact.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           <Link href="/">Full portfolio →</Link>
         </div>
-        <ContactForm />
       </footer>
     </main>
   )
