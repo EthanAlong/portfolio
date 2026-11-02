@@ -30,7 +30,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
 /**
  * 常量配置
@@ -38,9 +38,12 @@ import { useEffect, useState } from 'react'
 const LOGO_TEXT = "EthanDigital"  // Logo 文字，用于逐字动画
 const MOBILE_BREAKPOINT = 768     // 移动端断点（px）
 
+const subscribeNothing = () => () => {}
+
 export default function SiteChrome({ children }) {
   const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
+  // false during SSR / hydration, true in the browser (no setState-in-effect)
+  const mounted = useSyncExternalStore(subscribeNothing, () => true, () => false)
   const [isMobile, setIsMobile] = useState(false)
 
   const isHome = pathname === '/'
@@ -80,9 +83,6 @@ export default function SiteChrome({ children }) {
     paddingRight: isFullWidthNav ? '40px' : '2.5rem',
   }
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   if (!mounted) return <>{children}</>
 

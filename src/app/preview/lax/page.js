@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link'
 
 import { useEffect, useRef, useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
@@ -34,9 +35,9 @@ export default function LaxPreview() {
   };
   return <main className={styles.shell}>
     <header className={styles.header}>
-      <a href="/">ETHANDIGITAL</a>
+      <Link href="/">ETHANDIGITAL</Link>
       <span>LAX / Motion study <i>INTERACTIVE STUDY</i></span>
-      <a className={styles.original} href="/project/lax-structural">Original project ↗</a>
+      <Link className={styles.original} href="/project/lax-structural">Original project ↗</Link>
     </header>
     <div ref={scroll} className={styles.scroll} onScroll={e => {
       const el = e.currentTarget;

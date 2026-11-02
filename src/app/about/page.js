@@ -28,7 +28,7 @@
  * ============================================================
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -190,10 +190,13 @@ const LinkedInIcon = ({ size = 24 }) => (
   </svg>
 )
 
+const subscribeNothing = () => () => {}
+
 export default function AboutPage() {
   const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  // false during SSR / hydration, true in the browser
+  const mounted = useSyncExternalStore(subscribeNothing, () => true, () => false)
 
   // 移动端检测
   useEffect(() => {
@@ -201,7 +204,6 @@ export default function AboutPage() {
       setIsMobile(window.innerWidth < PAGE_CONFIG.BREAKPOINT)
     }
     checkMobile()
-    setMounted(true)
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])

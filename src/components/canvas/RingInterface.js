@@ -319,11 +319,19 @@ function DataNetwork({ isMobile = false }) {
 
     const positions = new Float32Array(particleCount * 3);
     const particles = [];
+    // seeded PRNG (mulberry32): render must be pure, and a fixed seed keeps the network stable between visits
+    let seed = isMobile ? 0x9e3779b9 : 0x85ebca6b
+    const random = () => {
+      seed |= 0; seed = (seed + 0x6d2b79f5) | 0
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
 
     for (let i = 0; i < particleCount; i++) {
-      const x = (Math.random() - 0.5) * radius * 2;
-      const y = (Math.random() - 0.5) * radius * 1.5;
-      const z = (Math.random() - 0.5) * radius * 0.8;
+      const x = (random() - 0.5) * radius * 2;
+      const y = (random() - 0.5) * radius * 1.5;
+      const z = (random() - 0.5) * radius * 0.8;
 
       positions[i * 3] = x;
       positions[i * 3 + 1] = y;
@@ -888,7 +896,7 @@ function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible }
  * @param {Number} focusStrength - 移动端专用：当前项目的激活强度 (0~1)
  * ============================================================
  */
-function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTransitioning, isMobile, focusStrength }) {
+function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTransitioning, isMobile, focusStrengths }) {
   const ref = useRef()
   const [hovered, setHover] = useState(false)
 
@@ -919,6 +927,7 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
        *
        * 当 focusStrength 超过阈值时，执行弹出动效
        */
+      const focusStrength = focusStrengths.current[index] ?? 0
       const isSelected = focusStrength > (1 - selection.snapThreshold)
       const lerpSpeed = selection.lerpSpeed
 
@@ -1138,7 +1147,8 @@ function SceneContent({
   const focusStrengths = useRef(sortedProjects.map(() => 0))
 
   // 跟踪旋转速度，用于标签 fade in/out
-  const lastRotation = useRef(scrollRotation.current)
+  const lastRotation = useRef(0)
+  useEffect(() => { lastRotation.current = scrollRotation.current }, [scrollRotation])
   const [isSpinning, setIsSpinning] = useState(false)
   const spinTimeoutRef = useRef(null)
 
@@ -1314,7 +1324,7 @@ function SceneContent({
               isTransitioning={isTransitioning}
               isMobile={isMobile}
               // 传递 focusStrength 用于 CLOU 风格弹出判断
-              focusStrength={focusStrengths.current[i]}
+              focusStrengths={focusStrengths}
             />
           ))}
         </group>
