@@ -399,30 +399,107 @@
   color: var(--muted);
 }
 
-.caseBody {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 3.5rem;
+.caseMedia {
+  margin: 0 auto 3rem;
   padding-left: var(--index-col);
 }
+.caseFrame {
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f5f5f7;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 24px 60px -30px rgba(0, 0, 0, 0.25);
+}
+.caseImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 
-.caseFacts { margin: 0; display: flex; flex-direction: column; gap: 1.6rem; }
+.caseFacts {
+  margin: 0;
+  padding-left: var(--index-col);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.5rem;
+}
 .caseFacts dt {
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #999;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.6rem;
 }
 .caseFacts dd {
   margin: 0;
-  font-size: 1.02rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: #222;
 }
 
-.caseSide { display: flex; flex-direction: column; gap: 1.25rem; }
+/* AI Detail Library inside the Revit suite */
+.spotlight {
+  margin: 2.5rem 0 0 var(--index-col);
+  padding: 2rem 2.25rem;
+  border-radius: 14px;
+  background: #f5f5f7;
+}
+.spotlightLabel {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--data);
+}
+.spotlightTitle {
+  margin: 0.5rem 0 0.8rem;
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.spotlightText {
+  margin: 0;
+  max-width: 760px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.toolTable {
+  width: calc(100% - var(--index-col));
+  margin: 2.5rem 0 0 var(--index-col);
+  border-collapse: collapse;
+  font-size: 0.98rem;
+}
+.toolTable th, .toolTable td {
+  text-align: left;
+  padding: 0.9rem 1rem 0.9rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: baseline;
+}
+.toolTable thead th {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #999;
+  border-bottom: 1px solid #000;
+}
+.toolTable tbody th { font-weight: 700; white-space: nowrap; }
+.toolTable td { color: #444; }
+.toolBefore { color: #999 !important; text-decoration: line-through; text-decoration-color: #c7c7cc; white-space: nowrap; }
+.toolAfter { color: var(--data) !important; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.caseFoot {
+  margin-top: 2rem;
+  padding-left: var(--index-col);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2.5rem;
+}
+
 .caseImage {
   position: relative;
   width: 100%;
@@ -430,27 +507,6 @@
   background: #f4f4f4;
   overflow: hidden;
 }
-.caseStat {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 1.75rem;
-  gap: 0.5rem;
-}
-.caseStatValue {
-  font-size: clamp(3.5rem, 7vw, 6rem);
-  font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 0.9;
-}
-.caseStatLabel {
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
 .stack {
   list-style: none;
   margin: 0;
@@ -550,13 +606,15 @@
   transition: clip-path 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.2s;
 }
 .caseImageReveal img {
-  transform: scale(1.12);
+  transform: scale(1.06);
   transition: transform 1.6s cubic-bezier(0.2, 1, 0.3, 1) 0.2s;
 }
 .case.shown .caseImageReveal { clip-path: inset(0 0 0 0); }
+.caseFrame.caseImageReveal { clip-path: inset(100% 0 0 0 round 14px); }
+.case.shown .caseFrame.caseImageReveal { clip-path: inset(0 0 0 0 round 14px); }
 .case.shown .caseImageReveal img { transform: scale(1); }
 .case.shown .caseImageReveal:hover img {
-  transform: scale(1.03);
+  transform: scale(1.015);
   transition-delay: 0s;
   transition-duration: 0.8s;
 }
@@ -581,7 +639,7 @@
   .methodItem::before { display: none; }
   .method { grid-template-columns: repeat(2, 1fr); }
   .toolbox { grid-template-columns: repeat(2, 1fr); }
-  .caseBody { grid-template-columns: 1fr; gap: 2rem; }
+  .caseFacts { grid-template-columns: 1fr; gap: 1.6rem; }
 }
 
 /* ---------- Mobile ---------- */
@@ -610,7 +668,12 @@
   .flowStats > div:nth-child(3) { border-left: none; }
   .method { grid-template-columns: 1fr; gap: 1.6rem; }
   .page { --index-col: 2.4rem; }
-  .caseBody { padding-left: 0; }
+  .caseMedia, .caseFacts, .caseFoot { padding-left: 0; }
+  .caseMedia { margin-bottom: 2rem; }
+  .spotlight { margin-left: 0; padding: 1.5rem; }
+  .toolTable { width: 100%; margin-left: 0; font-size: 0.9rem; }
+  .toolTable thead th:nth-child(2), .toolTable td:nth-child(2) { display: none; }
+  .caseFrame { border-radius: 10px; }
   .case { padding: 2.5rem 0; }
   .toolbox { grid-template-columns: 1fr 1fr; gap: 1.6rem; }
 }

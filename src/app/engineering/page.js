@@ -101,6 +101,36 @@ function CaseLink({ link }) {
   )
 }
 
+function CaseMedia({ study }) {
+  if (study.diagram === 'agent-loop') {
+    return (
+      <div className={styles.caseMedia} style={{ maxWidth: 880 }}>
+        <div className={`${styles.caseImage} ${styles.caseDiagram}`}>
+          <AgentLoop className={styles.agentLoop} />
+        </div>
+      </div>
+    )
+  }
+  if (!study.image) return null
+  const [w, h] = study.imageSize || [1600, 900]
+  return (
+    <div className={styles.caseMedia} style={study.mediaWidth ? { maxWidth: study.mediaWidth } : undefined}>
+      <div className={`${styles.caseFrame} ${styles.caseImageReveal}`}>
+        {/* unoptimized: serve the original file. Re-encoding these UI
+            screenshots at q75 is what made the text mushy. */}
+        <Image
+          src={study.image}
+          alt={study.imageAlt || `${study.title} screenshot`}
+          width={w}
+          height={h}
+          unoptimized
+          className={styles.caseImg}
+        />
+      </div>
+    </div>
+  )
+}
+
 function CaseRow({ study, index }) {
   return (
     <article className={`${styles.case} ${styles.reveal}`} id={study.id}>
@@ -113,57 +143,68 @@ function CaseRow({ study, index }) {
         </div>
       </div>
 
-      <div className={styles.caseBody}>
-        <dl className={styles.caseFacts}>
-          <div>
-            <dt>Problem</dt>
-            <dd>{study.problem}</dd>
-          </div>
-          <div>
-            <dt>Built</dt>
-            <dd>{study.built}</dd>
-          </div>
-          <div>
-            <dt>Outcome</dt>
-            <dd>{study.outcome}</dd>
-          </div>
-        </dl>
+      <CaseMedia study={study} />
 
-        <div className={styles.caseSide}>
-          {study.image ? (
-            <div className={`${styles.caseImage} ${styles.caseImageReveal}`}>
-              <Image
-                src={study.image}
-                alt={`${study.title} screenshot`}
-                fill
-                sizes="(max-width: 768px) 100vw, 40vw"
-                style={{ objectFit: 'contain' }}
-              />
-            </div>
-          ) : study.diagram === 'agent-loop' ? (
-            <div className={`${styles.caseImage} ${styles.caseDiagram}`}>
-              <AgentLoop className={styles.agentLoop} />
-            </div>
-          ) : study.stat ? (
-            <div className={`${styles.caseImage} ${styles.caseStat}`}>
-              <span className={styles.caseStatValue}>{study.stat.value}</span>
-              <span className={styles.caseStatLabel}>{study.stat.label}</span>
-            </div>
-          ) : null}
-          <ul className={styles.stack} aria-label="Stack">
-            {study.stack.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ul>
-          {study.links.length > 0 && (
-            <div className={styles.links}>
-              {study.links.map((l) => (
-                <CaseLink key={l.href} link={l} />
-              ))}
-            </div>
-          )}
-          {study.note && <p className={styles.caseNote}>{study.note}</p>}
+      <dl className={styles.caseFacts}>
+        <div>
+          <dt>Problem</dt>
+          <dd>{study.problem}</dd>
         </div>
+        <div>
+          <dt>Built</dt>
+          <dd>{study.built}</dd>
+        </div>
+        <div>
+          <dt>Outcome</dt>
+          <dd>{study.outcome}</dd>
+        </div>
+      </dl>
+
+      {study.spotlight && (
+        <div className={styles.spotlight}>
+          <p className={styles.spotlightLabel}>{study.spotlight.label}</p>
+          <h4 className={styles.spotlightTitle}>{study.spotlight.title}</h4>
+          <p className={styles.spotlightText}>{study.spotlight.text}</p>
+        </div>
+      )}
+
+      {study.tools && (
+        <table className={styles.toolTable}>
+          <thead>
+            <tr>
+              <th scope="col">Tool</th>
+              <th scope="col">Task</th>
+              <th scope="col">Before</th>
+              <th scope="col">After</th>
+            </tr>
+          </thead>
+          <tbody>
+            {study.tools.map((t) => (
+              <tr key={t.name}>
+                <th scope="row">{t.name}</th>
+                <td>{t.what}</td>
+                <td className={styles.toolBefore}>{t.before}</td>
+                <td className={styles.toolAfter}>{t.after}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <div className={styles.caseFoot}>
+        <ul className={styles.stack} aria-label="Stack">
+          {study.stack.map((s) => (
+            <li key={s}>{s}</li>
+          ))}
+        </ul>
+        {study.links.length > 0 && (
+          <div className={styles.links}>
+            {study.links.map((l) => (
+              <CaseLink key={l.href} link={l} />
+            ))}
+          </div>
+        )}
+        {study.note && <p className={styles.caseNote}>{study.note}</p>}
       </div>
     </article>
   )

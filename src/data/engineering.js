@@ -54,6 +54,7 @@ export const caseStudies = [
     outcome: '8 tools, 9 daily users: about $327K a year of staff time returned against $3.7K to run (89×), hosting under $100 a month. Usage logging since October 2026 is replacing estimated volumes with counts.',
     stack: ['Discovery', 'Product ownership', 'Azure', 'Microsoft 365', 'React'],
     image: '/internal-tools-roi/hero.png',
+    imageSize: [1200, 695],
     links: [{ label: 'Interactive model', href: '/project/internal-tools-roi' }],
   },
   {
@@ -70,16 +71,29 @@ export const caseStudies = [
     note: 'Private repository: client models. Walkthrough on request.',
   },
   {
-    id: 'rag-system',
-    title: 'AI Detail Library',
-    tagline: '1,000+ details, searchable by meaning.',
+    id: 'revit-suite',
+    title: 'Revit Add-in Suite',
+    tagline: 'Four daily Revit chores, one signed add-in.',
     context: 'Structural engineering practice · 2025–26',
-    problem: 'Finding the right standard detail meant remembering cryptic sheet numbers across a 1,000+ drawing library.',
-    built: 'A Revit-side exporter tags details; vision-language models extract structured metadata; hybrid keyword + text + image-embedding retrieval with a second-pass AI check that filters near-miss results. Provisioned from infrastructure-as-code.',
-    outcome: 'Validated through structured human evaluation before rollout; serves the full curated library in daily production use.',
-    stack: ['Python', 'Azure AI Search', 'Bicep', 'VLM / embeddings', 'Revit API', 'React'],
-    image: '/rag-system/1.webp',
-    links: [{ label: 'Case study', href: '/project/rag-system' }],
+    problem: 'Drafters lost hours a week inside Revit: opening a 40-minute model to copy one detail, redrawing details an older Revit could not open, babysitting a 200-page print.',
+    built: 'One code-signed add-in suite, so IT installs it like any vendor tool. Each tool was scoped next to the person doing the task, and every fix ships with a no-restart workaround, because a Revit restart costs an engineer half an hour.',
+    outcome: 'Before → after per occurrence, from timed runs: 30 min → 5 min to find and place a detail; 30 min → 10 s to reuse a 2025 detail in a 2022 project; 90 min → 5 min of hands-on time per drawing set.',
+    spotlight: {
+      label: 'Spotlight',
+      title: 'AI Detail Library',
+      text: 'A Revit-side exporter tags every standard detail. Vision-language models write a structured record for each drawing; hybrid keyword, text-embedding and image-embedding search finds a detail by describing it, and a second AI pass drops near-misses. 1,000+ details, provisioned from infrastructure-as-code on Azure, validated with structured human evaluation before rollout.',
+    },
+    tools: [
+      { name: 'AI Detail Library', what: 'find a detail, bring it into the set', before: '30 min', after: '5 min' },
+      { name: 'Detail Downgrade', what: 'reuse a 2025 detail in Revit 2022', before: '30 min', after: '10 s' },
+      { name: 'Sheet-set Printing', what: 'print, merge, bookmark, link 200 pages', before: '90 min', after: '5 min' },
+      { name: 'Family Manager', what: 'find and load the right family', before: '20 min / day', after: '≈ 0' },
+    ],
+    stack: ['C#', 'Revit API', 'WPF', 'Python', 'Azure AI Search', 'Bicep', 'VLM / embeddings'],
+    image: '/rag-system/2.webp',
+    imageSize: [1525, 816],
+    imageAlt: 'AI Detail Library: a structural detail with its AI-generated summary, title, type and structural system',
+    links: [{ label: 'Detail library case study', href: '/project/rag-system' }],
   },
   {
     id: 'sb-web',
@@ -91,6 +105,7 @@ export const caseStudies = [
     outcome: 'Runs in production on Vercel, Render and Supabase with a mirrored staging stack: staging-first deploys, backups before every production migration, nightly database dumps.',
     stack: ['React 19', 'Vite', 'Mapbox GL', 'Express / Prisma', 'Supabase', 'Azure AD'],
     image: '/sb-web/map1.webp',
+    imageSize: [2000, 1027],
     links: [{ label: 'Case study', href: '/project/sb-web' }],
   },
   {
@@ -103,6 +118,7 @@ export const caseStudies = [
     outcome: 'A new zone is a new file, not new code: the configuration-over-customization pattern that makes a tool portable to the next client.',
     stack: ['C#', 'RhinoCommon', 'Eto', 'JSON rules'],
     image: '/zoning-envelope/overview.webp',
+    imageSize: [1776, 791],
     links: [
       { label: 'Case study', href: '/project/zoning-envelope' },
       { label: 'Code', href: 'https://github.com/EthanAlong/ZoningEnvelope', external: true },
@@ -118,6 +134,7 @@ export const caseStudies = [
     outcome: '~355 units per scrape. Concession banners are parsed into effective rent, and a moved banner is flagged as "check" instead of being logged as a fake "offer ended".',
     stack: ['Node', 'cheerio', 'GitHub Actions', 'ECharts'],
     image: '/dtla-rent-tracker/trend.webp',
+    imageSize: [1600, 588],
     links: [
       { label: 'Live dashboard', href: 'https://ethanalong.github.io/dtla-rent-tracker/', external: true },
       { label: 'Code', href: 'https://github.com/EthanAlong/dtla-rent-tracker', external: true },
@@ -133,22 +150,9 @@ export const caseStudies = [
     outcome: 'A finished schedule exports to a styled Excel workbook or a ZIP of every spec sheet, replacing hours of copy-paste per store.',
     stack: ['Next.js', 'TypeScript', 'Supabase', 'Prisma', 'Vercel'],
     image: '/store-equipment/1.webp',
+    imageSize: [1440, 1700],
+    mediaWidth: 640,  // tall screenshot: keep it from taking a whole screen
     links: [{ label: 'Case study', href: '/project/store-equipment' }],
-  },
-  {
-    id: 'unit-schedule-plugin',
-    title: 'Unit Schedule',
-    tagline: 'Unit mix straight from the Revit model.',
-    context: 'Multi-family residential · 2026',
-    problem: 'Unit mix, area and open-space tallies for multi-family projects are slow to assemble by hand from the model.',
-    built: 'A Revit 2025 add-in that scans rooms, detects unit types, tracks private and public open space, and shows a dashboard with CSV and report export.',
-    outcome: 'The schedule is read straight from the model and refreshes without restarting the plugin.',
-    stack: ['C#', '.NET 8', 'WPF / MVVM', 'Revit API'],
-    image: '/unit-schedule-plugin/7.webp',
-    links: [
-      { label: 'Case study', href: '/project/unit-schedule-plugin' },
-      { label: 'Code', href: 'https://github.com/EthanAlong/UnitSchedulePlugin', external: true },
-    ],
   },
 ]
 
