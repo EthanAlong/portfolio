@@ -46,6 +46,9 @@ export default function RootLayout({ children }) {
   const isHome = pathname === '/'
   const isProjectPage = pathname.startsWith('/project/')
   const isAboutPage = pathname === '/about'
+  const isEngineeringPage = pathname === '/engineering'
+  // 首页与 Engineering 页：导航栏占满宽度（非两栏布局）
+  const isFullWidthNav = isHome || isEngineeringPage
 
   /**
    * 移动端检测
@@ -60,13 +63,13 @@ export default function RootLayout({ children }) {
   }, [])
 
   // 动态类名：控制颜色主题
-  const themeClass = isHome ? 'nav-home' : 'nav-project'
+  const themeClass = (isHome ? 'nav-home' : 'nav-project') + (isEngineeringPage ? ' nav-solid' : '')
 
   // 动态样式：控制宽度和 Padding
   const navStyle = {
-    width: isHome ? '100%' : '38.2vw',
-    paddingLeft: isHome ? '40px' : '2.5rem',
-    paddingRight: isHome ? '40px' : '2.5rem',
+    width: isFullWidthNav ? '100%' : '38.2vw',
+    paddingLeft: isFullWidthNav ? '40px' : '2.5rem',
+    paddingRight: isFullWidthNav ? '40px' : '2.5rem',
   }
 
   useEffect(() => {
@@ -114,11 +117,21 @@ export default function RootLayout({ children }) {
                   </span>
                 ))}
               </Link>
-              {/* About 按钮带下划线动效 */}
-              <Link href="/about" className="about-btn">
-                <span className="about-text">ABOUT</span>
-                <span className="about-underline"></span>
-              </Link>
+              <div className="nav-links">
+                {/* Engineering：面向工程 / FDE 岗位的快速浏览页
+                    只在全宽导航（首页 / Engineering）显示：两栏页的导航只有 38.2vw 宽，放不下两个链接 */}
+                {isFullWidthNav && (
+                  <Link href="/engineering" className="about-btn" aria-current={isEngineeringPage ? 'page' : undefined}>
+                    <span className="about-text">ENGINEERING</span>
+                    <span className="about-underline"></span>
+                  </Link>
+                )}
+                {/* About 按钮带下划线动效 */}
+                <Link href="/about" className="about-btn" aria-current={isAboutPage ? 'page' : undefined}>
+                  <span className="about-text">ABOUT</span>
+                  <span className="about-underline"></span>
+                </Link>
+              </div>
             </div>
           </nav>
         )}
@@ -154,6 +167,13 @@ export default function RootLayout({ children }) {
           }
           .global-nav.nav-project {
             color: #000000;
+          }
+          /* Engineering 页是整页滚动：给导航一个半透明白底，避免压在正文上 */
+          .global-nav.nav-solid {
+            background: rgba(255, 255, 255, 0.86);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            backdrop-filter: saturate(180%) blur(14px);
+            height: 110px;
           }
 
           .nav-wrapper {
@@ -259,6 +279,16 @@ export default function RootLayout({ children }) {
             }
           }
 
+          .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+          }
+
+          .about-btn[aria-current='page'] .about-underline {
+            width: 100%;
+          }
+
           .about-text {
             transition: opacity 0.3s ease;
           }
@@ -301,6 +331,14 @@ export default function RootLayout({ children }) {
 
             .about-btn {
               font-size: 12px;
+            }
+
+            .nav-links {
+              gap: 1rem;
+            }
+
+            .global-nav.nav-solid {
+              height: 10vh;
             }
           }
         `}</style>

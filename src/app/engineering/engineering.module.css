@@ -1,0 +1,366 @@
+/**
+ * engineering.module.css — /engineering
+ *
+ * Same visual language as the project pages: white surface, black type,
+ * heavy uppercase headings, thin #eee rules, generous whitespace.
+ * Single column, editorial rows — no card grid, no dashboard framing
+ * (see docs/visual-direction.md).
+ */
+
+.page {
+  --max: 1180px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --rule: #e6e6e6;
+  --muted: #6b6b6b;
+  --index-col: 3rem;   /* 编号列宽：标题与正文都从这里对齐 */
+
+  min-height: 100vh;
+  background: #ffffff;
+  color: #000000;
+  padding: 0 var(--gutter) 18vh;
+  box-sizing: border-box;
+}
+
+.page * { box-sizing: border-box; }
+
+/* ---------- Hero ---------- */
+.hero {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding-top: clamp(140px, 24vh, 240px);
+  padding-bottom: 10vh;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 2rem;
+}
+
+.headline {
+  font-size: clamp(2.2rem, 6.4vw, 5.6rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.headlineLine {
+  display: block;
+  opacity: 0;
+  transform: translateY(0.4em);
+  animation: lineIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.headlineLine:nth-child(1) { animation-delay: 0.15s; }
+.headlineLine:nth-child(2) { animation-delay: 0.25s; }
+.headlineLine:nth-child(3) { animation-delay: 0.35s; }
+.headlineLine:nth-child(4) { animation-delay: 0.45s; }
+
+@keyframes lineIn {
+  to { opacity: 1; transform: none; }
+}
+
+.lede {
+  max-width: 680px;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.55;
+  color: #333;
+  margin: 3rem 0 0;
+}
+
+.heroLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+}
+.heroLinks a,
+.contactLinks a,
+.link {
+  position: relative;
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.heroLinks a::after,
+.contactLinks a::after,
+.link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0;
+  height: 1.5px;
+  background: currentColor;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.heroLinks a:hover::after,
+.contactLinks a:hover::after,
+.link:hover::after { width: 100%; }
+
+/* ---------- Proof strip ---------- */
+.proof {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 2px solid #000;
+  border-bottom: 1px solid var(--rule);
+}
+.proofItem {
+  padding: 2rem 1.5rem 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.proofItem + .proofItem {
+  border-left: 1px solid var(--rule);
+  padding-left: 1.5rem;
+}
+.proofValue {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.proofLabel {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ---------- Sections ---------- */
+.section {
+  max-width: var(--max);
+  margin: 16vh auto 0;
+}
+.sectionHeading {
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  margin: 0 0 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #000;
+}
+
+/* ---------- Method ---------- */
+.method {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2rem;
+}
+.methodItem { display: flex; flex-direction: column; gap: 0.6rem; }
+.methodIndex {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.methodStep {
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+.methodText {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #444;
+  margin: 0;
+}
+
+/* ---------- Case rows ---------- */
+.case {
+  padding: 3.5rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.case:first-of-type { padding-top: 1rem; }
+
+.caseHead {
+  display: flex;
+  gap: 0;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.caseIndex {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  flex: 0 0 var(--index-col);
+}
+.caseTitle {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0;
+}
+.caseContext {
+  margin: 0.6rem 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.caseBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 3.5rem;
+  padding-left: var(--index-col);
+}
+
+.caseFacts { margin: 0; display: flex; flex-direction: column; gap: 1.6rem; }
+.caseFacts dt {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 0.45rem;
+}
+.caseFacts dd {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: #222;
+}
+
+.caseSide { display: flex; flex-direction: column; gap: 1.25rem; }
+.caseImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #f4f4f4;
+  overflow: hidden;
+}
+.caseStat {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.75rem;
+  gap: 0.5rem;
+}
+.caseStatValue {
+  font-size: clamp(3.5rem, 7vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+.caseStatLabel {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.stack {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+}
+.stack li {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #555;
+}
+.links { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+
+/* ---------- Toolbox ---------- */
+.toolbox {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+.toolGroupTitle {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #999;
+  margin: 0 0 1rem;
+}
+.toolGroup ul { list-style: none; margin: 0; padding: 0; }
+.toolGroup li {
+  font-size: 1rem;
+  line-height: 1.9;
+  font-weight: 500;
+}
+
+/* ---------- Contact ---------- */
+.contact {
+  max-width: var(--max);
+  margin: 18vh auto 0;
+  border-top: 2px solid #000;
+  padding-top: 3rem;
+}
+.contactHeading {
+  font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  margin: 0 0 2rem;
+  max-width: 14ch;
+}
+.contactLinks { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
+
+/* ---------- Reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 1.1s cubic-bezier(0.2, 1, 0.3, 1), transform 1.1s cubic-bezier(0.2, 1, 0.3, 1);
+}
+.shown { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .headlineLine { animation: none; opacity: 1; transform: none; }
+  .reveal { transition: none; opacity: 1; transform: none; }
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 1024px) {
+  .method { grid-template-columns: repeat(2, 1fr); }
+  .toolbox { grid-template-columns: repeat(2, 1fr); }
+  .caseBody { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 768px) {
+  .hero { padding-top: 18vh; padding-bottom: 7vh; }
+  .lede { margin-top: 2rem; }
+  .proof { grid-template-columns: repeat(2, 1fr); }
+  .proofItem { padding: 1.4rem 1rem 1.4rem 0; }
+  .proofItem + .proofItem { padding-left: 1rem; }
+  .proofItem:nth-child(3) { border-left: none; padding-left: 0; border-top: 1px solid var(--rule); }
+  .proofItem:nth-child(4) { border-top: 1px solid var(--rule); }
+  .section { margin-top: 11vh; }
+  .method { grid-template-columns: 1fr; gap: 1.6rem; }
+  .page { --index-col: 2.4rem; }
+  .caseBody { padding-left: 0; }
+  .case { padding: 2.5rem 0; }
+  .toolbox { grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+}
