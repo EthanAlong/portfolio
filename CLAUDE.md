@@ -56,6 +56,16 @@ the **ring** (`/`, architecture + software projects) and **`/engineering`**
 - `prefers-reduced-motion`: ring snaps instead of easing, no intro/return spin, no
   spin-and-expand on navigate, background network and arc glow stand still, CSS reveals
   render at rest.
+- Central preview: textures load outside React (`loadCentralTexture`, LRU of 8, on-screen
+  ones pinned), so a switch keeps the old picture until the new one is decoded, then
+  crossfades (`central.fade`). Desktop preloads every main image at idle after the intro;
+  mobile only the two either side of the one on show.
+- Drag / swipe release carries on at release speed (`interaction.fling`); mobile then
+  settles with the nearest project exactly at the pop-out point (`fling.snap`). A pause
+  of >80 ms before letting go means "put it here". Headless drags are too slow to fling
+  (events 120-400 ms apart under SwiftShader): test by dispatching events in-page.
+- Cursor: `is-pointing` / `is-grabbing` classes on the wrapper, toggled directly (no
+  re-render on hover).
 - The central preview title uses `public/fonts/inter-latin-900-normal.woff` (OFL, copy of
   the engineering OG font). Without a `font`, drei `<Text>` / troika fetches a fallback
   font from jsdelivr at runtime. Image and title sit in separate Suspense boundaries.

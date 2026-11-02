@@ -35,7 +35,7 @@
  * ============================================================
  */
 
-import React, { useRef, useState, useEffect, useMemo, useSyncExternalStore, Suspense } from 'react'
+import React, { useRef, useState, useEffect, useLayoutEffect, useMemo, useSyncExternalStore, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Image, Text } from '@react-three/drei'
 import { useRouter } from 'next/navigation'
@@ -80,6 +80,52 @@ function rotationToFace(index, total, offset, current) {
   const turns = Math.round((current - base) / (Math.PI * 2))
   return base + turns * Math.PI * 2
 }
+
+/**
+ * Central preview textures, loaded outside React so a project switch keeps the
+ * old picture up until the new one is ready (no blank frame). A small LRU;
+ * textures on screen are pinned and never disposed.
+ */
+const CENTRAL_TEXTURE_CACHE = 8
+const centralTextures = new Map()   // url -> Promise<THREE.Texture>, oldest first
+const pinnedTextureUrls = new Set()
+let textureLoader = null
+function loadCentralTexture(url) {
+  const hit = centralTextures.get(url)
+  if (hit) {
+    centralTextures.delete(url)
+    centralTextures.set(url, hit)
+    return hit
+  }
+  textureLoader ??= new THREE.TextureLoader()
+  const loading = textureLoader.loadAsync(url)
+  centralTextures.set(url, loading)
+  for (const [oldUrl, old] of centralTextures) {
+    if (centralTextures.size <= CENTRAL_TEXTURE_CACHE) break
+    if (pinnedTextureUrls.has(oldUrl)) continue
+    centralTextures.delete(oldUrl)
+    old.then((t) => t.dispose(), () => {})
+  }
+  loading.catch(() => centralTextures.delete(url))
+  return loading
+}
+
+/** Warm the HTTP cache for an image; resolves when loaded or failed. */
+const preloadedImages = new Map()
+function preloadImage(url) {
+  if (!preloadedImages.has(url)) {
+    preloadedImages.set(url, new Promise((resolve) => {
+      const img = new window.Image()
+      img.onload = img.onerror = resolve
+      img.src = url
+    }))
+  }
+  return preloadedImages.get(url)
+}
+const whenIdle = (cb) =>
+  typeof window.requestIdleCallback === 'function'
+    ? window.requestIdleCallback(cb, { timeout: 1500 })
+    : window.setTimeout(cb, 200)
 
 const titleOf = (project) =>
   Array.isArray(project.title) ? project.title.join(' ') : project.title
@@ -139,6 +185,15 @@ const RING_PARAMS = {
     interaction: {
       dragSpeed: 0.028,          // 触摸滑动灵敏度
       damping: 5,                // 阻尼感（值越大越快停下）
+      // Release a swipe and the ring keeps going, then settles with the nearest
+      // project exactly at the pop-out point.
+      fling: {
+        time: 0.12,              // carry = release speed (rad/s) x this (s)
+        max: Math.PI * 1.2,      // longest carry (rad)
+        minSpeed: 0.5,           // slower releases just stop (rad/s)
+        duration: 1.0,           // carry ease-out (s)
+        snap: true,              // settle on a project
+      },
     },
     layout: {
       headerHeight: '10vh',      // 顶部导航区域高度
@@ -236,6 +291,14 @@ const RING_PARAMS = {
       wheelSpeed: 0.002,         // 滚轮灵敏度
       dragSpeed: 0.005,          // 鼠标拖拽灵敏度
       damping: 4,                // 旋转惯性阻尼
+      // Release a drag and the ring keeps going (no snap: desktop selects by hover).
+      fling: {
+        time: 0.25,              // carry = release speed (rad/s) x this (s)
+        max: Math.PI,            // longest carry (rad)
+        minSpeed: 0.5,           // slower releases just stop (rad/s)
+        duration: 1.0,           // carry ease-out (s)
+        snap: false,
+      },
     },
     mouseTilt: {
       xIntensity: 0.04,          // 俯仰倾斜强度
@@ -243,6 +306,7 @@ const RING_PARAMS = {
       smoothing: 0.05,           // 倾斜跟随平滑度
     },
     central: {
+      fade: 0.22,                // crossfade between projects (s)
       imageW: 18,                // 中央大图宽度
       imageH: 12,                // 中央大图高度
       yOffset: -5.5,             // Y轴偏移
@@ -939,7 +1003,7 @@ function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible, 
  * @param {Number} focusStrength - 移动端专用：当前项目的激活强度 (0~1)
  * ============================================================
  */
-function ProjectItem({ item, index, total, setActiveProject, onNavigate, onPointerOverItem, isTransitioning, isMobile, focusStrengths, isKbFocused, reducedMotion }) {
+function ProjectItem({ item, index, total, setActiveProject, onNavigate, onPointerOverItem, onPointerChange, isTransitioning, isMobile, focusStrengths, isKbFocused, reducedMotion }) {
   const ref = useRef()
   const [hovered, setHover] = useState(false)
   // desktop: the mouse and the keyboard lift a tile the same way
@@ -1065,10 +1129,14 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, onPoint
             setActiveProject(item)
             // the mouse takes over from keyboard focus
             onPointerOverItem?.()
+            onPointerChange?.(1)
           }
         }}
         onPointerOut={() => {
-          if (!isMobile) setHover(false)
+          if (!isMobile) {
+            if (hovered) onPointerChange?.(-1)
+            setHover(false)
+          }
         }}
         onClick={(e) => {
           e.stopPropagation()
@@ -1096,41 +1164,91 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, onPoint
  */
 const CENTRAL_TITLE_FONT = '/fonts/inter-latin-900-normal.woff'
 
-function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
+function CentralDisplay({ activeProject, onNavigate, isTransitioning, reducedMotion, onPointerChange }) {
   const group = useRef()
+  const frontRef = useRef()
+  const backRef = useRef()
+  const titleRef = useRef()
+  const fade = useRef(1)
+  const pointing = useRef(false)
   const { central } = RING_PARAMS.desktop
 
-  useFrame(() => {
+  // front = the project on show; back = the one fading out under it
+  const [layers, setLayers] = useState({ front: null, back: null })
+
+  // switch only once the new picture is decoded; the old one stays up meanwhile
+  useEffect(() => {
+    if (!activeProject) return
+    let alive = true
+    loadCentralTexture(activeProject.mainImage).then((texture) => {
+      if (!alive) return
+      setLayers((l) => (l.front?.project.id === activeProject.id
+        ? l
+        : { back: l.front, front: { project: activeProject, texture } }))
+    }, () => {})
+    return () => { alive = false }
+  }, [activeProject])
+
+  // restart the crossfade before the new layer is ever painted; pin what is on screen
+  useLayoutEffect(() => {
+    fade.current = 0
+    pinnedTextureUrls.clear()
+    if (layers.front) pinnedTextureUrls.add(layers.front.project.mainImage)
+    if (layers.back) pinnedTextureUrls.add(layers.back.project.mainImage)
+  }, [layers])
+
+  useFrame((_, delta) => {
     if (!group.current) return
-    const targetScale = (activeProject && !isTransitioning) ? 1 : 0
+    const targetScale = (activeProject && layers.front && !isTransitioning) ? 1 : 0
     group.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1)
+
+    fade.current = reducedMotion ? 1 : Math.min(1, fade.current + delta / central.fade)
+    if (frontRef.current) frontRef.current.material.opacity = fade.current
+    if (backRef.current) {
+      backRef.current.material.opacity = 1 - fade.current
+      backRef.current.visible = fade.current < 1
+    }
+    if (titleRef.current) titleRef.current.fillOpacity = fade.current
   })
 
-  const getTitleString = () => {
-    if (!activeProject) return ""
-    return Array.isArray(activeProject.title) ? activeProject.title.join(' ') : activeProject.title
+  const setPointing = (on) => {
+    if (pointing.current === on) return
+    pointing.current = on
+    onPointerChange?.(on ? 1 : -1)
   }
-
-  // Image and title suspend separately, so one loading never holds the other back.
+  const { front, back } = layers
   // The title uses the site's own Inter 900 (public/fonts, OFL): without a `font`
-  // troika fetches a fallback font from a CDN at runtime, which a slow or blocked
-  // CDN turns into no preview at all.
+  // troika fetches a fallback font from a CDN at runtime.
   return (
     <group ref={group}>
-      {activeProject && (
+      {back && (
+        <Image
+          key={back.project.id}
+          ref={backRef}
+          texture={back.texture}
+          scale={[central.imageW, central.imageH]}
+          position={[0, central.yOffset, central.zOffset - 0.05]}
+          transparent
+          toneMapped={false}
+        />
+      )}
+      {front && (
         <>
-          <Suspense fallback={null}>
-            <Image
-              url={activeProject.mainImage}
-              scale={[central.imageW, central.imageH]}
-              position={[0, central.yOffset, central.zOffset]}
-              transparent
-              toneMapped={false}
-              onClick={() => onNavigate(activeProject.id)}
-            />
-          </Suspense>
+          <Image
+            key={front.project.id}
+            ref={frontRef}
+            texture={front.texture}
+            scale={[central.imageW, central.imageH]}
+            position={[0, central.yOffset, central.zOffset]}
+            transparent
+            toneMapped={false}
+            onClick={() => onNavigate(front.project.id)}
+            onPointerOver={() => setPointing(true)}
+            onPointerOut={() => setPointing(false)}
+          />
           <Suspense fallback={null}>
             <Text
+              ref={titleRef}
               font={CENTRAL_TITLE_FONT}
               position={[0, central.textY, central.zOffset + 0.2]}
               fontSize={1.2}
@@ -1138,7 +1256,7 @@ function CentralDisplay({ activeProject, onNavigate, isTransitioning }) {
               letterSpacing={-0.05}
               anchorY="middle"
             >
-              {getTitleString().toUpperCase()}
+              {titleOf(front.project).toUpperCase()}
             </Text>
           </Suspense>
         </>
@@ -1177,6 +1295,7 @@ function SceneContent({
   sortedProjects,
   kbIndex,        // keyboard-focused project index (desktop lift), or null
   onPointerOverItem,
+  onPointerChange,
   reducedMotion,
 }) {
   const spinGroup = useRef()
@@ -1373,6 +1492,7 @@ function SceneContent({
               setActiveProject={setActiveProject}
               onNavigate={onNavigate}
               onPointerOverItem={onPointerOverItem}
+              onPointerChange={onPointerChange}
               isTransitioning={isTransitioning}
               isMobile={isMobile}
               // 传递 focusStrength 用于 CLOU 风格弹出判断
@@ -1389,6 +1509,8 @@ function SceneContent({
             activeProject={activeProject}
             onNavigate={onNavigate}
             isTransitioning={isTransitioning}
+            reducedMotion={reducedMotion}
+            onPointerChange={onPointerChange}
           />
         )}
       </group>
@@ -1509,6 +1631,15 @@ export default function RingInterface() {
   // index of the project whose hidden link has keyboard focus, or null
   const [kbIndex, setKbIndex] = useState(null)
   const linkRefs = useRef([])
+
+  // cursor: "pointer" over anything clickable in the scene, "grabbing" while dragging.
+  // Set on the wrapper's classList directly: a hover must not re-render the page.
+  const wrapperRef = useRef(null)
+  const pointerCount = useRef(0)
+  const handlePointerChange = (delta) => {
+    pointerCount.current = Math.max(0, pointerCount.current + delta)
+    wrapperRef.current?.classList.toggle('is-pointing', pointerCount.current > 0)
+  }
 
   // 图片预加载进度状态
   const [loadProgress, setLoadProgress] = useState(0)
@@ -1738,13 +1869,59 @@ export default function RingInterface() {
     // 获取当前设备的交互参数
     const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop
 
+    // --- drag speed sampling (for the fling on release) ---
+    const drag = { v: 0, t: 0, startX: 0 }   // rad/s, last sample (ms), press x
+    const sample = (dTheta) => {
+      const now = performance.now()
+      const inst = (dTheta / Math.max(now - drag.t, 1)) * 1000
+      drag.v = drag.t ? drag.v * 0.5 + inst * 0.5 : inst
+      drag.t = now
+    }
+    const startDrag = (x) => {
+      gsap.killTweensOf(targetRotation)   // grabbing the ring stops any carry / spin
+      isDragging.current = true
+      drag.v = 0
+      drag.t = 0
+      drag.startX = x
+    }
+    // keep going at release speed, then (mobile) settle on the nearest project
+    const release = () => {
+      if (!isDragging.current) return
+      isDragging.current = false
+      wrapperRef.current?.classList.remove('is-grabbing')
+      if (isTransitioning) return
+      const { fling } = params.interaction
+      const reduced = prefersReducedMotion()
+      // a pause before letting go means "put it here"
+      const v = reduced || performance.now() - drag.t > 80 ? 0 : drag.v
+      let end = targetRotation.current
+      if (Math.abs(v) >= fling.minSpeed) {
+        end += THREE.MathUtils.clamp(v * fling.time, -fling.max, fling.max)
+      }
+      if (fling.snap) {
+        const n = sortedProjects.length
+        const offset = params.selection.selectionOffset
+        const nearest = ((Math.round((-end - offset) / ((Math.PI * 2) / n)) % n) + n) % n
+        end = rotationToFace(nearest, n, offset, end)
+      }
+      if (end === targetRotation.current) return
+      if (reduced) {
+        targetRotation.current = end
+        return
+      }
+      gsap.to(targetRotation, { current: end, duration: fling.duration, ease: 'power3.out' })
+    }
+
     // --- 桌面端专用事件 ---
     const hMove = (e) => {
       mousePos.current.x = (e.clientX / window.innerWidth) * 2 - 1
       mousePos.current.y = (e.clientY / window.innerHeight) * 2 - 1
       if (isDragging.current && !isTransitioning) {
-        targetRotation.current += (e.clientX - lastMouseX.current) * params.interaction.dragSpeed
+        const dTheta = (e.clientX - lastMouseX.current) * params.interaction.dragSpeed
+        targetRotation.current += dTheta
+        sample(dTheta)
         lastMouseX.current = e.clientX
+        if (Math.abs(e.clientX - drag.startX) > 3) wrapperRef.current?.classList.add('is-grabbing')
       }
     }
     const hWheel = (e) => {
@@ -1753,32 +1930,30 @@ export default function RingInterface() {
       }
     }
     const hDown = (e) => {
-      if (!isTransitioning) {
-        isDragging.current = true
+      if (!isTransitioning && e.button === 0) {
+        startDrag(e.clientX)
         lastMouseX.current = e.clientX
       }
     }
-    const hUp = () => {
-      isDragging.current = false
-    }
+    const hUp = () => release()
 
     // --- 移动端触摸事件 ---
     const hTouchStart = (e) => {
       if (!isTransitioning && e.touches.length === 1) {
-        isDragging.current = true
+        startDrag(e.touches[0].clientX)
         lastTouchX.current = e.touches[0].clientX
       }
     }
     const hTouchMove = (e) => {
       if (isDragging.current && !isTransitioning && e.touches.length === 1) {
         const touchX = e.touches[0].clientX
-        targetRotation.current += (touchX - lastTouchX.current) * params.interaction.dragSpeed
+        const dTheta = (touchX - lastTouchX.current) * params.interaction.dragSpeed
+        targetRotation.current += dTheta
+        sample(dTheta)
         lastTouchX.current = touchX
       }
     }
-    const hTouchEnd = () => {
-      isDragging.current = false
-    }
+    const hTouchEnd = () => release()
 
     if (isMobile) {
       // 移动端只监听触摸事件
@@ -1805,7 +1980,32 @@ export default function RingInterface() {
         window.removeEventListener('mouseup', hUp)
       }
     }
-  }, [hasMounted, isTransitioning, isMobile])
+  }, [hasMounted, isTransitioning, isMobile, sortedProjects])
+
+  /**
+   * Preload the projects' main images so a preview switch is instant:
+   * desktop warms all of them one by one at idle after the intro; mobile (data
+   * plans) only the two either side of the project on show.
+   */
+  useEffect(() => {
+    if (!hasMounted || isLoading || isMobile) return
+    let cancelled = false
+    let i = 0
+    const next = () => {
+      if (cancelled || i >= sortedProjects.length) return
+      preloadImage(sortedProjects[i++].mainImage).then(() => whenIdle(next))
+    }
+    whenIdle(next)
+    return () => { cancelled = true }
+  }, [hasMounted, isLoading, isMobile, sortedProjects])
+
+  useEffect(() => {
+    if (!hasMounted || isLoading || !isMobile || !activeProject) return
+    const n = sortedProjects.length
+    const at = sortedProjects.findIndex((p) => p.id === activeProject.id)
+    if (at < 0) return
+    for (const d of [1, -1, 2, -2]) preloadImage(sortedProjects[(at + d + n) % n].mainImage)
+  }, [hasMounted, isLoading, isMobile, activeProject, sortedProjects])
 
   /**
    * Arrow keys browse the ring: they move DOM focus along the hidden link
@@ -1969,7 +2169,7 @@ export default function RingInterface() {
   const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop
 
   return (
-    <div className={`main-wrapper ${isTransitioning ? 'is-blurring' : ''} ${isMobile ? 'is-mobile' : ''}`}>
+    <div ref={wrapperRef} className={`main-wrapper ${isTransitioning ? 'is-blurring' : ''} ${isMobile ? 'is-mobile' : ''}`}>
 
       {/* 初始加载动画 */}
       {isLoading && (
@@ -2099,6 +2299,7 @@ export default function RingInterface() {
             sortedProjects={sortedProjects}
             kbIndex={isMobile ? null : kbIndex}
             onPointerOverItem={() => setKbIndex(null)}
+            onPointerChange={handlePointerChange}
             reducedMotion={reducedMotion}
           />
         </Canvas>
@@ -2121,6 +2322,9 @@ export default function RingInterface() {
           overflow: hidden;
           font-family: -apple-system, sans-serif;
         }
+
+        .main-wrapper.is-pointing { cursor: pointer; }
+        .main-wrapper.is-grabbing { cursor: grabbing; }
 
         .main-wrapper.is-mobile {
           display: flex;
