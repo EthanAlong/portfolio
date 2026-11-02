@@ -63,3 +63,31 @@ export const azureMap = {
     { from: 'qaqc', to: 'ai', seq: 3 },
   ],
 }
+
+export const mailMcp = {
+  id: 'mail',
+  title: 'OUTLOOK MCP · ONE ENDPOINT, EVERY CLAUDE SURFACE',
+  aria: 'Outlook MCP: claude.ai, Claude Code and a scheduled routine connect over OAuth to one server on Azure Container Apps. The server lets only the owner sign in, lets mail go only to the owner, drafts by default, and keeps sessions in Key Vault. It talks to the Microsoft personal-account login and Microsoft Graph; sending needs the owner to approve each message.',
+  footer: 'MIT FORK · + DCR · + ALLOW-LISTS · + KEY VAULT · 24 TESTS',
+  frames: [{ x: 172, y: 40, w: 290, h: 292, label: 'AZURE · CONTAINER APPS · MY SUBSCRIPTION' }],
+  nodes: [
+    { id: 'web', x: 16, y: 74, w: 132, h: 44, title: 'claude.ai', lines: ['web · phone · desktop'], seq: 0 },
+    { id: 'code', x: 16, y: 146, w: 132, h: 44, title: 'Claude Code', lines: ['any machine'], seq: 0 },
+    { id: 'routine', x: 16, y: 218, w: 132, h: 44, title: 'Scheduled routine', lines: ['job-search tracker'], seq: 0 },
+    { id: 'server', x: 190, y: 66, w: 254, h: 112, title: 'outlook-mcp server', solid: true, seq: 1,
+      lines: ['OAuth 2.1 · dynamic client registration', 'only my account may sign in', 'mail may only be sent to me', 'drafts by default', 'Python · FastMCP · Microsoft Graph'] },
+    { id: 'kv', x: 190, y: 246, w: 254, h: 56, title: 'Key Vault', lines: ['sessions + secrets, via managed identity'], seq: 2 },
+    { id: 'login', x: 484, y: 66, w: 140, h: 56, title: 'Microsoft login', lines: ['personal accounts only'], seq: 2 },
+    { id: 'graph', x: 484, y: 146, w: 140, h: 56, title: 'Microsoft Graph', lines: ['my Outlook.com inbox'], seq: 2 },
+    { id: 'me', x: 484, y: 246, w: 140, h: 56, actor: 'Human gate', title: 'Send = my click', lines: ['approved per message'], seq: 3 },
+  ],
+  edges: [
+    { from: 'web', to: 'server', seq: 1 },
+    { from: 'code', to: 'server', seq: 1 },
+    { from: 'routine', to: 'server', seq: 1 },
+    { from: 'server', to: 'login', seq: 2 },
+    { from: 'server', to: 'graph', seq: 2 },
+    { from: 'server', to: 'kv', seq: 2 },
+    { from: 'server', to: 'me', dashed: true, packets: false, seq: 3 },
+  ],
+}

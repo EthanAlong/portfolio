@@ -22,7 +22,7 @@ import CountUp from '@/components/engineering/CountUp'
 import AgentLoop from '@/components/engineering/AgentLoop'
 import DataFlow from '@/components/engineering/DataFlow'
 import FlowDiagram from '@/components/engineering/FlowDiagram'
-import { rfiFlow, azureMap } from '@/data/diagrams'
+import { rfiFlow, azureMap, mailMcp } from '@/data/diagrams'
 
 // WebGL only on the client; the hero reads fine before it arrives.
 const StructureFrame = dynamic(() => import('@/components/engineering/StructureFrame'), { ssr: false })
@@ -114,7 +114,7 @@ function CaseMedia({ study }) {
       </div>
     )
   }
-  const spec = study.diagram === 'rfi' ? rfiFlow : study.diagram === 'azure' ? azureMap : null
+  const spec = { rfi: rfiFlow, azure: azureMap, mail: mailMcp }[study.diagram] || null
   if (spec) {
     return (
       <div className={styles.caseMedia} style={{ maxWidth: 960 }}>
