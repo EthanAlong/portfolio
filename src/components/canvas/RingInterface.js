@@ -42,6 +42,7 @@ import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { projects, RING_CATEGORIES } from '@/data/projects'
+import { ringThumb } from '@/lib/thumb'
 import { Html, Line } from '@react-three/drei'
 
 /**
@@ -984,7 +985,7 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
     <Suspense fallback={null}>
       <Image
         ref={ref}
-        url={item.ringImage}
+        url={ringThumb(item.ringImage)}
         transparent
         side={THREE.DoubleSide}
         rotation={[0, angle + Math.PI / 2, 0]}
@@ -1461,7 +1462,7 @@ export default function RingInterface() {
       setCanRenderCanvas(true)
       if (!globalInitialized) {
         // 首次加载：预加载所有 Ring 图片
-        const ringImages = projects.map(p => p.ringImage)
+        const ringImages = projects.map(p => ringThumb(p.ringImage))
         let loaded = 0
         const total = ringImages.length
         let actualProgress = 0
