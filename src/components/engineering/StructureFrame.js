@@ -38,6 +38,19 @@ const FRAME_PARAMS = {
   lineOpacity: 0.42,
   braceOpacity: 0.2,
   sweepPeriod: 7,        // 扫描面往返周期（秒）
+
+  // Data packets: small blue pulses that run along the members once the
+  // frame is up, biased upward — "data moving through the structure".
+  packets: 90,           // 数量
+  packetColor: '#0071e3',// 唯一的强调色：只给"数据"用
+  packetSpeed: [0.9, 1.8], // units / s（随机区间）
+  trail: 0.38,           // 拖尾长度（占一根构件的比例）
+  upBias: 3.2,           // 向上走的权重（横向 = 1，向下 = 0.2）
+
+  // Scroll link (Apple-style hero): as the page scrolls one viewport, the
+  // frame zooms in and turns a little faster.
+  scrollZoom: 0.18,
+  scrollTurn: 0.9,       // rad over one viewport
 }
 
 /** Build all segments, sorted by floor so drawRange reveals bottom → top. */
@@ -109,6 +122,65 @@ function buildFrame() {
   return { lines: flatten(lines), braces: flatten(braces), joints: flatten(joints), H }
 }
 
+/** Node graph over the structural lines, for packets to walk along. */
+function buildGraph(positions) {
+  const key = (x, y, z) => `${x.toFixed(3)},${y.toFixed(3)},${z.toFixed(3)}`
+  const index = new Map()
+  const nodes = []
+  const adj = []
+  const nodeOf = (x, y, z) => {
+    const k = key(x, y, z)
+    let i = index.get(k)
+    if (i === undefined) {
+      i = nodes.length
+      index.set(k, i)
+      nodes.push([x, y, z])
+      adj.push([])
+    }
+    return i
+  }
+  for (let v = 0; v < positions.length; v += 6) {
+    const a = nodeOf(positions[v], positions[v + 1], positions[v + 2])
+    const b = nodeOf(positions[v + 3], positions[v + 4], positions[v + 5])
+    adj[a].push(b)
+    adj[b].push(a)
+  }
+  const minY = Math.min(...nodes.map((n) => n[1]))
+  const ground = nodes.map((n, i) => (Math.abs(n[1] - minY) < 1e-3 ? i : -1)).filter((i) => i >= 0)
+  return { nodes, adj, ground }
+}
+
+/** Pick the next node: never straight back, prefer going up. */
+function nextNode(graph, from, at, upBias) {
+  const opts = graph.adj[at].filter((n) => n !== from)
+  if (!opts.length) return from
+  const y = graph.nodes[at][1]
+  const w = opts.map((n) => {
+    const dy = graph.nodes[n][1] - y
+    return dy > 1e-3 ? upBias : dy < -1e-3 ? 0.2 : 1
+  })
+  let r = Math.random() * w.reduce((s, x) => s + x, 0)
+  for (let i = 0; i < opts.length; i++) {
+    r -= w[i]
+    if (r <= 0) return opts[i]
+  }
+  return opts[opts.length - 1]
+}
+
+function spawnWalkers(graph) {
+  const { packets, packetSpeed, upBias } = FRAME_PARAMS
+  return Array.from({ length: packets }, () => {
+    const a = graph.ground[Math.floor(Math.random() * graph.ground.length)]
+    return {
+      a,
+      b: nextNode(graph, -1, a, upBias),
+      t: Math.random(),
+      speed: packetSpeed[0] + Math.random() * (packetSpeed[1] - packetSpeed[0]),
+      hops: Math.floor(Math.random() * 12), // stagger the first resets
+    }
+  })
+}
+
 /** Vertex count to draw for a build progress p (0–1), interpolating inside a floor. */
 function countAt(ends, p) {
   const floors = ends.length
@@ -131,6 +203,21 @@ function Frame({ reduced }) {
   const sweep = useRef()
   const mouse = useRef({ x: 0, y: 0 })
   const t0 = useRef(null)
+  const scrollRot = useRef(0)
+
+  // --- packets ---
+  const graph = useMemo(() => buildGraph(data.lines.positions), [data])
+  // GPU buffers (pure allocation); the random walk state lives in a ref and
+  // is created on the first frame, so render stays pure.
+  const buffers = useMemo(() => ({
+    heads: new Float32Array(FRAME_PARAMS.packets * 3),
+    trails: new Float32Array(FRAME_PARAMS.packets * 6),
+  }), [])
+  const walkers = useRef(null)
+  const headGeo = useRef()
+  const trailGeo = useRef()
+  const headMat = useRef()
+  const trailMat = useRef()
 
   useEffect(() => {
     const onMove = (e) => {
@@ -159,9 +246,18 @@ function Frame({ reduced }) {
 
     if (reduced) return
 
-    // slow spin + parallax tilt (lerped)
+    // scroll link: 0 at the top, 1 after one viewport
+    const k = Math.min(1, Math.max(0, window.scrollY / window.innerHeight))
+    const { scrollZoom, scrollTurn } = FRAME_PARAMS
     const g = group.current
-    g.rotation.y += delta * spinSpeed
+    const sc = g.scale.x + ((1 + k * scrollZoom) - g.scale.x) * 0.08
+    g.scale.setScalar(sc)
+    const targetRot = k * scrollTurn
+    const dRot = (targetRot - scrollRot.current) * 0.08
+    scrollRot.current += dRot
+
+    // slow spin + parallax tilt (lerped)
+    g.rotation.y += delta * spinSpeed + dRot
     g.rotation.x += ((mouse.current.y * parallax * 0.5 + 0.12) - g.rotation.x) * 0.05
     g.position.x += ((mouse.current.x * parallax * 0.6) - g.position.x) * 0.05
 
@@ -173,6 +269,54 @@ function Frame({ reduced }) {
       s.position.y = Math.sin(phase) * (data.H / 2) * 0.92
       s.material.opacity += ((visible ? 0.05 : 0) - s.material.opacity) * 0.04
     }
+
+    // data packets — appear once the frame is up
+    const on = raw >= 1
+    headMat.current.opacity += ((on ? 1 : 0) - headMat.current.opacity) * 0.05
+    trailMat.current.opacity += ((on ? 0.7 : 0) - trailMat.current.opacity) * 0.05
+    if (headMat.current.opacity < 0.01) return
+    if (!walkers.current) walkers.current = spawnWalkers(graph)
+    const { nodes } = graph
+    // write through the GPU attributes (the arrays React handed to three)
+    const heads = headGeo.current.attributes.position.array
+    const trails = trailGeo.current.attributes.position.array
+    const list = walkers.current
+    const dt = Math.min(delta, 0.05)
+    for (let i = 0; i < list.length; i++) {
+      const pk = list[i]
+      const A = nodes[pk.a]
+      const B = nodes[pk.b]
+      const len = Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) || 1
+      pk.t += (pk.speed * dt) / len
+      if (pk.t >= 1) {
+        pk.hops++
+        // at the roof (no way further up) or after a long walk: re-enter at the ground
+        const atTop = graph.adj[pk.b].every((n) => nodes[n][1] <= nodes[pk.b][1] + 1e-3)
+        if ((atTop && Math.random() < 0.5) || pk.hops > 26) {
+          pk.a = graph.ground[Math.floor(Math.random() * graph.ground.length)]
+          pk.b = nextNode(graph, -1, pk.a, FRAME_PARAMS.upBias)
+          pk.hops = 0
+        } else {
+          const n = nextNode(graph, pk.a, pk.b, FRAME_PARAMS.upBias)
+          pk.a = pk.b
+          pk.b = n
+        }
+        pk.t = 0
+        continue
+      }
+      const P = nodes[pk.a]
+      const Q = nodes[pk.b]
+      const t1 = pk.t
+      const t2 = Math.max(0, pk.t - FRAME_PARAMS.trail)
+      for (let c = 0; c < 3; c++) {
+        const h = P[c] + (Q[c] - P[c]) * t1
+        heads[i * 3 + c] = h
+        trails[i * 6 + c] = h
+        trails[i * 6 + 3 + c] = P[c] + (Q[c] - P[c]) * t2
+      }
+    }
+    headGeo.current.attributes.position.needsUpdate = true
+    trailGeo.current.attributes.position.needsUpdate = true
   })
 
   const { bays, bay } = FRAME_PARAMS
@@ -200,6 +344,20 @@ function Frame({ reduced }) {
           <bufferAttribute attach="attributes-position" args={[data.joints.positions, 3]} />
         </bufferGeometry>
         <pointsMaterial color="#000000" size={3} sizeAttenuation={false} transparent opacity={0.6} />
+      </points>
+
+      {/* data packets: head + short trail along the member */}
+      <lineSegments>
+        <bufferGeometry ref={trailGeo}>
+          <bufferAttribute attach="attributes-position" args={[buffers.trails, 3]} />
+        </bufferGeometry>
+        <lineBasicMaterial ref={trailMat} color={FRAME_PARAMS.packetColor} transparent opacity={0} depthWrite={false} />
+      </lineSegments>
+      <points>
+        <bufferGeometry ref={headGeo}>
+          <bufferAttribute attach="attributes-position" args={[buffers.heads, 3]} />
+        </bufferGeometry>
+        <pointsMaterial ref={headMat} color={FRAME_PARAMS.packetColor} size={4.5} sizeAttenuation={false} transparent opacity={0} depthWrite={false} />
       </points>
 
       {/* analysis plane */}
@@ -235,7 +393,7 @@ export default function StructureFrame({ className }) {
       <Canvas
         frameloop={!visible ? 'never' : reduced ? 'demand' : 'always'}
         dpr={[1, 2]}
-        camera={{ position: [0, 0.5, 9.6], fov: 38 }}
+        camera={{ position: [0, 0.5, 10.4], fov: 38 }}
         gl={{ antialias: true, alpha: true }}
       >
         <Frame reduced={reduced} />

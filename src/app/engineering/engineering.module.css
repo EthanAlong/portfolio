@@ -13,6 +13,7 @@
   --rule: #e6e6e6;
   --muted: #6b6b6b;
   --index-col: 3rem;   /* 编号列宽：标题与正文都从这里对齐 */
+  --data: #0071e3;     /* 唯一的强调色：只给"数据"用（3D 数据包、数据流、时间线脉冲） */
 
   min-height: 100vh;
   background: #ffffff;
@@ -39,11 +40,14 @@
   z-index: 0;
   top: 2vh;
   right: calc(-1 * var(--gutter));
-  width: min(48vw, 700px);
-  height: min(96vh, 880px);
+  width: min(54vw, 800px);
+  height: min(100vh, 920px);
   pointer-events: none;
   opacity: 0;
   animation: fadeIn 1.2s ease 0.2s forwards;
+  /* soft edges: when the frame zooms on scroll it dissolves instead of being cut by the canvas */
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%);
 }
 .hero > :not(.heroCanvas) { position: relative; z-index: 1; }
 @keyframes fadeIn { to { opacity: 1; } }
@@ -58,6 +62,11 @@
 }
 
 .headline {
+  /* scroll link: lifts, shrinks and fades as the first viewport scrolls away */
+  transform-origin: 0 100%;
+  transform: translate3d(0, calc(var(--hero-k, 0) * -48px), 0) scale(calc(1 - var(--hero-k, 0) * 0.08));
+  opacity: calc(1 - var(--hero-k, 0) * 0.85);
+  will-change: transform, opacity;
   font-size: clamp(2.2rem, 6.4vw, 5.6rem);
   font-weight: 900;
   line-height: 0.92;
@@ -88,6 +97,7 @@
   animation: fadeIn 1s ease 0.75s forwards;
 }
 .lede {
+  translate: 0 calc(var(--hero-k, 0) * -24px);
   max-width: 680px;
   font-size: clamp(1.05rem, 1.6vw, 1.3rem);
   line-height: 1.55;
@@ -191,6 +201,71 @@
   border-bottom: 2px solid #000;
 }
 
+/* ---------- Data flow ---------- */
+.flowSection {
+  max-width: var(--max);
+  margin: 18vh auto 0;
+  text-align: center;
+}
+.flowSection .eyebrow { margin-bottom: 1.25rem; }
+.flowHeading {
+  font-size: clamp(2rem, 5.2vw, 4.4rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  margin: 0;
+}
+.flowHeading span { display: block; }
+.flowHeading span + span { color: #86868b; }
+.flowLede {
+  max-width: 620px;
+  margin: 1.75rem auto 0;
+  font-size: clamp(1.02rem, 1.4vw, 1.2rem);
+  line-height: 1.55;
+  color: #515154;
+}
+.flowDiagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 4.5rem auto 0;
+  max-width: 1080px;
+  overflow: visible;
+}
+.flowDiagram :global(.df-curve) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.flowDiagram:global(.df-shown) :global(.df-curve) { stroke-dashoffset: 0; }
+.flowDiagram :global(.df-node) {
+  opacity: 0;
+  transform: translateY(10px);
+  transform-box: fill-box;
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+.flowDiagram :global(.df-core) { transition-delay: 0.5s; }
+.flowDiagram:global(.df-shown) :global(.df-node) { opacity: 1; transform: none; }
+.flowDiagram :global(.df-packets) { opacity: 0; transition: opacity 0.8s ease 1.8s; }
+.flowDiagram:global(.df-shown) :global(.df-packets) { opacity: 1; }
+
+.flowStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 4rem auto 0;
+  max-width: 900px;
+}
+.flowStats > div { display: flex; flex-direction: column; gap: 0.4rem; padding: 0 1rem; }
+.flowStats > div + div { border-left: 1px solid var(--rule); }
+.flowStatValue {
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--data);
+  font-variant-numeric: tabular-nums;
+}
+.flowStatLabel { font-size: 13px; color: #6e6e73; line-height: 1.4; }
+
 /* ---------- Method ---------- */
 .method {
   position: relative;
@@ -214,6 +289,27 @@
   transition: transform 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.1s;
 }
 .method.shown::before { transform: scaleX(1); }
+/* a data pulse that keeps running along the timeline */
+.method::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 56px;
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(0, 113, 227, 0), var(--data));
+  opacity: 0;
+}
+.method.shown::after {
+  animation: pulseRun 3.6s cubic-bezier(0.45, 0, 0.55, 1) 2.2s infinite;
+}
+@keyframes pulseRun {
+  0% { left: 0; opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { left: calc(100% - 56px); opacity: 0; }
+}
 
 .methodItem {
   display: flex;
@@ -464,6 +560,10 @@
   .reveal { transition: none; opacity: 1; transform: none; }
   .method::before { transition: none; transform: scaleX(1); }
   .methodItem { transition: none; opacity: 1; transform: none; }
+  .method.shown::after { animation: none; }
+  .headline, .lede { transform: none; translate: none; opacity: 1; }
+  .flowDiagram :global(.df-curve), .flowDiagram :global(.df-node) { transition: none; stroke-dashoffset: 0; opacity: 1; transform: none; }
+  .flowDiagram :global(.df-packets) { display: none; }
   .caseImageReveal, .caseImageReveal img { transition: none; clip-path: none; transform: none; }
   .agentLoop [data-draw], .agentLoop text { transition: none; stroke-dashoffset: 0; opacity: 1; fill-opacity: 1; }
 }
@@ -497,6 +597,10 @@
   .proofItem:nth-child(3) { border-left: none; padding-left: 0; border-top: 1px solid var(--rule); }
   .proofItem:nth-child(4) { border-top: 1px solid var(--rule); }
   .section { margin-top: 11vh; }
+  .flowSection { margin-top: 12vh; }
+  .flowDiagram { margin-top: 2.5rem; max-width: 420px; }
+  .flowStats { grid-template-columns: repeat(2, 1fr); row-gap: 1.6rem; margin-top: 2.5rem; }
+  .flowStats > div:nth-child(3) { border-left: none; }
   .method { grid-template-columns: 1fr; gap: 1.6rem; }
   .page { --index-col: 2.4rem; }
   .caseBody { padding-left: 0; }

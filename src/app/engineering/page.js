@@ -20,6 +20,7 @@ import dynamic from 'next/dynamic'
 import styles from './engineering.module.css'
 import CountUp from '@/components/engineering/CountUp'
 import AgentLoop from '@/components/engineering/AgentLoop'
+import DataFlow from '@/components/engineering/DataFlow'
 
 // WebGL only on the client; the hero reads fine before it arrives.
 const StructureFrame = dynamic(() => import('@/components/engineering/StructureFrame'), { ssr: false })
@@ -27,6 +28,7 @@ import {
   engineeringIntro,
   proofPoints,
   workingMethod,
+  dataFlow,
   caseStudies,
   toolbox,
   contact,
@@ -66,6 +68,9 @@ function ScrollProgress() {
       const max = document.documentElement.scrollHeight - window.innerHeight
       const k = max > 0 ? window.scrollY / max : 0
       if (bar.current) bar.current.style.transform = `scaleX(${k})`
+      // hero scroll link: 0 at the top → 1 after one viewport (Apple-style fade/scale)
+      const hk = Math.min(1, window.scrollY / window.innerHeight)
+      document.documentElement.style.setProperty('--hero-k', hk.toFixed(4))
     }
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
     update()
@@ -75,6 +80,7 @@ function ScrollProgress() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
       cancelAnimationFrame(raf)
+      document.documentElement.style.removeProperty('--hero-k')
     }
   }, [])
   return <div ref={bar} className={styles.progress} aria-hidden="true" />
@@ -198,6 +204,24 @@ export default function EngineeringPage() {
             <span className={styles.proofLabel}>{p.label}</span>
           </div>
         ))}
+      </section>
+
+      {/* --- Data flow --- */}
+      <section className={styles.flowSection} aria-labelledby="flow-heading">
+        <p className={`${styles.eyebrow} ${styles.reveal}`}>{dataFlow.eyebrow}</p>
+        <h2 id="flow-heading" className={`${styles.flowHeading} ${styles.reveal}`}>
+          {dataFlow.heading.map((l) => <span key={l}>{l}</span>)}
+        </h2>
+        <p className={`${styles.flowLede} ${styles.reveal}`}>{dataFlow.lede}</p>
+        <DataFlow className={styles.flowDiagram} />
+        <div className={`${styles.flowStats} ${styles.reveal}`}>
+          {dataFlow.stats.map((st) => (
+            <div key={st.label}>
+              <CountUp className={styles.flowStatValue} value={st.value} />
+              <span className={styles.flowStatLabel}>{st.label}</span>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* --- Method --- */}

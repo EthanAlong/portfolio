@@ -23,6 +23,18 @@ export const proofPoints = [
   { value: '1,000+', label: 'structural details made searchable' },
 ]
 
+export const dataFlow = {
+  eyebrow: 'Data flow',
+  heading: ['From the model', 'to the people who use it.'],
+  lede: 'Every tool reads from the systems the team already works in, runs through one small platform, and lands back where the work happens.',
+  stats: [
+    { value: '4', label: 'sources the team already uses' },
+    { value: '1', label: 'platform to run and secure' },
+    { value: '8', label: 'tools on top of it' },
+    { value: '9', label: 'people using it every day' },
+  ],
+}
+
 export const workingMethod = [
   { step: 'Discover', text: 'Start next to the person doing the work: the PM filing RFIs, the drafter reopening a 40-minute model to copy one detail.' },
   { step: 'Scope', text: 'Pick the pain that costs the most hours, and the smallest thing that removes it. Know who has to say yes.' },
@@ -68,12 +80,12 @@ export const caseStudies = [
   },
   {
     id: 'sb-web',
-    title: 'Firm Web Platform & Project Atlas',
+    title: 'Project Atlas & Tool Suite',
     context: 'Structural engineering practice · 2025–26',
-    problem: 'The team needed one fast place to find any past project on the map and reach the engineering tools they use every day.',
-    built: 'A login-gated platform: an interactive map of the firm’s projects (with a 3D campus view), a registry of in-house structural web tools, automated drawing QA/QC and an admin center for roles and usage.',
-    outcome: 'The firm’s daily-driver platform. A new tool is a page plus a registry entry, live on the next deploy.',
-    stack: ['Next.js', 'Supabase', 'Mapbox', 'Node'],
+    problem: 'The team needed one fast place to find any past project on the map, show it to a client, and reach the engineering tools they use every day.',
+    built: 'A Mapbox GL globe of 200+ projects: select one and the camera flies into a 3D oblique view with the building extruded, drone-style multi-waypoint tours, Speckle 3D model embeds and campus roll-ups. Company sign-in through Azure AD, token-based public share links, and the calculators and QA/QC split into their own suite with a single-sign-on handoff.',
+    outcome: 'Runs in production on Vercel, Render and Supabase with a mirrored staging stack: staging-first deploys, backups before every production migration, nightly database dumps.',
+    stack: ['React 19', 'Vite', 'Mapbox GL', 'Express / Prisma', 'Supabase', 'Azure AD'],
     image: '/sb-web/map1.webp',
     links: [{ label: 'Case study', href: '/project/sb-web' }],
   },
