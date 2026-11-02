@@ -13,10 +13,15 @@
  * ============================================================
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import styles from './engineering.module.css'
+import CountUp from '@/components/engineering/CountUp'
+
+// WebGL only on the client; the hero reads fine before it arrives.
+const StructureFrame = dynamic(() => import('@/components/engineering/StructureFrame'), { ssr: false })
 import {
   engineeringIntro,
   proofPoints,
@@ -48,6 +53,30 @@ function useReveal() {
     items.forEach((el) => io.observe(el))
     return () => io.disconnect()
   }, [])
+}
+
+/** Thin bar under the nav that tracks scroll position. */
+function ScrollProgress() {
+  const bar = useRef(null)
+  useEffect(() => {
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      const k = max > 0 ? window.scrollY / max : 0
+      if (bar.current) bar.current.style.transform = `scaleX(${k})`
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      cancelAnimationFrame(raf)
+    }
+  }, [])
+  return <div ref={bar} className={styles.progress} aria-hidden="true" />
 }
 
 function CaseLink({ link }) {
@@ -94,7 +123,7 @@ function CaseRow({ study, index }) {
 
         <div className={styles.caseSide}>
           {study.image ? (
-            <div className={styles.caseImage}>
+            <div className={`${styles.caseImage} ${styles.caseImageReveal}`}>
               <Image
                 src={study.image}
                 alt={`${study.title} screenshot`}
@@ -130,12 +159,19 @@ export default function EngineeringPage() {
 
   return (
     <main className={styles.page}>
+      <ScrollProgress />
+
       {/* --- Hero --- */}
       <header className={styles.hero}>
+        <StructureFrame className={styles.heroCanvas} />
         <p className={styles.eyebrow}>{engineeringIntro.eyebrow}</p>
         <h1 className={styles.headline}>
-          {engineeringIntro.headline.map((line) => (
-            <span key={line} className={styles.headlineLine}>{line}</span>
+          {engineeringIntro.headline.map((line, i) => (
+            <span key={line} className={styles.headlineMask}>
+              <span className={styles.headlineLine} style={{ animationDelay: `${0.15 + i * 0.1}s` }}>
+                {line}
+              </span>
+            </span>
           ))}
         </h1>
         <p className={styles.lede}>{engineeringIntro.lede}</p>
@@ -150,7 +186,7 @@ export default function EngineeringPage() {
       <section className={`${styles.proof} ${styles.reveal}`} aria-label="In production">
         {proofPoints.map((p) => (
           <div key={p.label} className={styles.proofItem}>
-            <span className={styles.proofValue}>{p.value}</span>
+            <CountUp className={styles.proofValue} value={p.value} />
             <span className={styles.proofLabel}>{p.label}</span>
           </div>
         ))}
@@ -159,9 +195,9 @@ export default function EngineeringPage() {
       {/* --- Method --- */}
       <section className={styles.section} id="method">
         <h2 className={`${styles.sectionHeading} ${styles.reveal}`}>How I work</h2>
-        <ol className={styles.method}>
+        <ol className={`${styles.method} ${styles.reveal}`}>
           {workingMethod.map((m, i) => (
-            <li key={m.step} className={`${styles.methodItem} ${styles.reveal}`}>
+            <li key={m.step} className={styles.methodItem} style={{ '--i': i }}>
               <span className={styles.methodIndex}>{i + 1}</span>
               <h3 className={styles.methodStep}>{m.step}</h3>
               <p className={styles.methodText}>{m.text}</p>
