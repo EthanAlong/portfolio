@@ -35,6 +35,7 @@ import { useRouter } from 'next/navigation'
 import styles from '../project/[id]/project.module.css'
 import AboutStory from '@/components/about/AboutStory'
 import AboutTimeline from '@/components/about/AboutTimeline'
+import ContactForm from '@/components/contact/ContactForm'
 import { aboutIntro, aboutLocation } from '@/data/about'
 
 /**
@@ -319,6 +320,9 @@ export default function AboutPage() {
           {/* 社交链接 - 带 LinkedIn 图标 */}
           <div className={`${styles.mobileContentSection} ${styles.mobileContentReveal}`}>
             <h2 className={styles.mobileSectionTitle}>CONNECT</h2>
+            <p className={styles.mobileText} style={{ marginBottom: 0 }}>Leave a message, or find me on LinkedIn.</p>
+            <ContactForm compact />
+            <div style={{ height: '2rem' }} />
             <Link
               href="https://www.linkedin.com/in/yixiang-huang-08b70620a/"
               target="_blank"
@@ -514,6 +518,8 @@ export default function AboutPage() {
             }}>
               Connect
             </h3>
+            <ContactForm />
+            <div style={{ height: '2.5rem' }} />
 
             <div style={{ display: 'flex', gap: '2rem' }}>
               <Link href="https://www.linkedin.com/in/yixiang-huang-08b70620a/" target="_blank" rel="noopener noreferrer">

@@ -1377,12 +1377,12 @@ const realProjects = [
     ringImage: "/internal-tools-roi/hero.png",
     mainImage: "/internal-tools-roi/hero.png",
     description:
-      "What six months of internal tooling returned to a mid-size structural engineering practice in Los Angeles, as a live model: a searchable detail library, automated drawing QA/QC, an RFI agent, a drafting-standards intake and a signed Revit add-in suite, priced task by task from before/after timings and the measured run cost. Drag the assumptions; the conclusion holds.",
+      "What six months of internal tooling returned to Saiful Bouquet Structural Engineers, a mid-size practice in Los Angeles, as a live model: a searchable detail library, automated drawing QA/QC, an RFI agent, a drafting-standards intake and a signed Revit add-in suite, priced task by task from before/after timings and the measured run cost. Drag the assumptions; the conclusion holds.",
     location: "Los Angeles / Digital",
     sector: "Internal Tools / Applied AI",
     status: "Live model, October 2026",
     scale: "8 tools, 9 daily users",
-    architect: "Structural engineering practice (name withheld)",
+    architect: "Saiful Bouquet Structural Engineers",
     contribution: "Discovery, Product Ownership, Engineering, Rollout, ROI Model",
     content: [
       {

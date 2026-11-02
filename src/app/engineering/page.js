@@ -22,6 +22,7 @@ import CountUp from '@/components/engineering/CountUp'
 import AgentLoop from '@/components/engineering/AgentLoop'
 import DataFlow from '@/components/engineering/DataFlow'
 import FlowDiagram from '@/components/engineering/FlowDiagram'
+import ContactForm from '@/components/contact/ContactForm'
 import { rfiFlow, azureMap, mailMcp } from '@/data/diagrams'
 
 // WebGL only on the client; the hero reads fine before it arrives.
@@ -331,6 +332,7 @@ export default function EngineeringPage() {
           <a href={contact.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           <Link href="/">Full portfolio →</Link>
         </div>
+        <ContactForm />
       </footer>
     </main>
   )
