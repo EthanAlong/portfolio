@@ -92,7 +92,7 @@
   to { transform: none; }
 }
 
-.lede, .heroLinks {
+.lede, .heroLinks, .cert {
   opacity: 0;
   animation: fadeIn 1s ease 0.75s forwards;
 }
@@ -104,6 +104,22 @@
   color: #333;
   margin: 3rem 0 0;
 }
+
+.cert {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 1.6rem 0 0;
+  padding: 0.45rem 0.9rem 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: #f5f5f7;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+  translate: 0 calc(var(--hero-k, 0) * -24px);
+}
+.certDot { width: 7px; height: 7px; border-radius: 50%; background: var(--data); }
+.certCode { color: var(--data); font-weight: 700; }
 
 .heroLinks {
   display: flex;
@@ -551,6 +567,8 @@
 .case.shown .agentLoop [data-draw] { stroke-dashoffset: 0; opacity: 1; }
 .case.shown .agentLoop rect[data-draw] { fill-opacity: 1; }
 .case.shown .agentLoop text { opacity: 1; }
+.agentLoop :global(.fd-packets) { opacity: 0; transition: opacity 0.8s ease 2.4s; }
+.case.shown .agentLoop :global(.fd-packets) { opacity: 1; }
 
 
 /* ---------- Toolbox ---------- */
@@ -631,6 +649,8 @@
   .flowDiagram :global(.df-packets) { display: none; }
   .caseImageReveal, .caseImageReveal img { transition: none; clip-path: none; transform: none; }
   .agentLoop [data-draw], .agentLoop text { transition: none; stroke-dashoffset: 0; opacity: 1; fill-opacity: 1; }
+  .agentLoop :global(.fd-packets) { display: none; }
+  .cert { animation: none; opacity: 1; translate: none; }
 }
 
 /* ---------- Tablet ---------- */

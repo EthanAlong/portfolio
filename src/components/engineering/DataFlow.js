@@ -26,8 +26,8 @@ const FLOW = {
   ],
   core: {
     title: 'Platform',
-    lines: ['ingest · embed · check', 'Azure · Supabase', 'LLM + vision models'],
-    short: ['ingest · embed · check', 'Azure · Supabase'],
+    lines: ['ingest · embed · check', 'Azure · Postgres', 'LLM + vision models'],
+    short: ['ingest · embed · check', 'Azure · Postgres'],
   },
   outputs: [
     { label: 'Detail search', short: 'Search' },
@@ -140,7 +140,7 @@ export default function DataFlow({ className }) {
       className={`${className || ''} ${shown ? 'df-shown' : ''}`}
       viewBox={`-4 -4 ${L.W + 8} ${L.H + 8}`}
       role="img"
-      aria-label="Data flow: Revit models, Rhino, drawing sets and Microsoft 365 feed one platform that ingests, embeds and checks them on Azure and Supabase with language and vision models; it serves detail search, drawing QA/QC, an RFI agent and Revit add-ins."
+      aria-label="Data flow: Revit models, Rhino, drawing sets and Microsoft 365 feed one platform that ingests, embeds and checks them on Azure and Postgres with language and vision models; it serves detail search, drawing QA/QC, an RFI agent and Revit add-ins."
     >
       {/* curves */}
       {paths.map((d, i) => (

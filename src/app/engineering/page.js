@@ -21,6 +21,8 @@ import styles from './engineering.module.css'
 import CountUp from '@/components/engineering/CountUp'
 import AgentLoop from '@/components/engineering/AgentLoop'
 import DataFlow from '@/components/engineering/DataFlow'
+import FlowDiagram from '@/components/engineering/FlowDiagram'
+import { rfiFlow, azureMap } from '@/data/diagrams'
 
 // WebGL only on the client; the hero reads fine before it arrives.
 const StructureFrame = dynamic(() => import('@/components/engineering/StructureFrame'), { ssr: false })
@@ -29,6 +31,7 @@ import {
   proofPoints,
   workingMethod,
   dataFlow,
+  certification,
   caseStudies,
   toolbox,
   contact,
@@ -107,6 +110,16 @@ function CaseMedia({ study }) {
       <div className={styles.caseMedia} style={{ maxWidth: 880 }}>
         <div className={`${styles.caseImage} ${styles.caseDiagram}`}>
           <AgentLoop className={styles.agentLoop} />
+        </div>
+      </div>
+    )
+  }
+  const spec = study.diagram === 'rfi' ? rfiFlow : study.diagram === 'azure' ? azureMap : null
+  if (spec) {
+    return (
+      <div className={styles.caseMedia} style={{ maxWidth: 960 }}>
+        <div className={`${styles.caseImage} ${styles.caseDiagram}`}>
+          <FlowDiagram spec={spec} className={styles.agentLoop} />
         </div>
       </div>
     )
@@ -231,6 +244,10 @@ export default function EngineeringPage() {
           ))}
         </h1>
         <p className={styles.lede}>{engineeringIntro.lede}</p>
+        <p className={styles.cert}>
+          <span className={styles.certDot} aria-hidden="true" />
+          {certification.name} <span className={styles.certCode}>{certification.code}</span>
+        </p>
         <nav className={styles.heroLinks} aria-label="Jump to">
           <a href="#work">Work</a>
           <a href="#method">Method</a>

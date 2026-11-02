@@ -58,6 +58,19 @@ export const caseStudies = [
     links: [{ label: 'Interactive model', href: '/project/internal-tools-roi' }],
   },
   {
+    id: 'rfi-agent',
+    title: 'RFI Agent',
+    tagline: 'Email in. Folder, PDF and log row out.',
+    context: 'Structural engineering practice · Construction administration · 2026',
+    problem: 'The RFI coordinator filed about 60 RFIs a day by hand: download the PDF from the contractor’s portal, name the folder the project’s way, save the email, type the log row. Engineers filing their own lost about an hour a day each.',
+    built: 'An Outlook add-in sends the email to an async Azure Functions intake; an LLM reads the number, title, dates and which project it belongs to; she confirms on a card in the portal; a small Windows runner files the folder, PDF and original .msg and appends the log row (Graph API for cloud workbooks, an XML-level edit for local ones so logos and formulas survive). Each project’s naming, log layout and due-date rule is a JSON protocol, not code; PDFs come from Procore links or Bluebeam Studio sessions.',
+    outcome: 'Live in ten days, now on several active jobs. 3 min → 10 s per RFI, and the engineers’ hour a day back. Four layers of duplicate protection, because two people filing the same RFI was the real failure mode. On the RFIs and submittals replayed against her hand-filed ones, the folder names and log rows came out identical.',
+    stack: ['Python', 'Azure Functions', 'Storage queues', 'Azure OpenAI', 'Microsoft Graph', 'Office add-in', 'PyInstaller'],
+    diagram: 'rfi',
+    links: [],
+    note: 'Private repository: client correspondence. Walkthrough on request.',
+  },
+  {
     id: 'revit-agent',
     title: 'Revit AI Agent',
     tagline: 'AI edits live models. Engineers approve every write.',
@@ -81,7 +94,7 @@ export const caseStudies = [
     spotlight: {
       label: 'Spotlight',
       title: 'AI Detail Library',
-      text: 'A Revit-side exporter tags every standard detail. Vision-language models write a structured record for each drawing; hybrid keyword, text-embedding and image-embedding search finds a detail by describing it, and a second AI pass drops near-misses. 1,000+ details, provisioned from infrastructure-as-code on Azure, validated with structured human evaluation before rollout.',
+      text: 'A Revit-side exporter tags every standard detail. A vision-language model writes a structured record for each drawing; one Postgres query (pgvector) matches by keyword, meaning and image similarity, and a second AI pass drops near-misses. The model was picked by a blind evaluation of four frontier models, scored by six engineers in a review tool I built: the people who live with the results made the call, and it was adopted on day one. 1,000+ details, all of it reproducible from Bicep.',
     },
     tools: [
       { name: 'AI Detail Library', what: 'find a detail, bring it into the set', before: '30 min', after: '5 min' },
@@ -89,11 +102,24 @@ export const caseStudies = [
       { name: 'Sheet-set Printing', what: 'print, merge, bookmark, link 200 pages', before: '90 min', after: '5 min' },
       { name: 'Family Manager', what: 'find and load the right family', before: '20 min / day', after: '≈ 0' },
     ],
-    stack: ['C#', 'Revit API', 'WPF', 'Python', 'Azure AI Search', 'Bicep', 'VLM / embeddings'],
+    stack: ['C#', 'Revit API', 'WPF', 'Python', 'Postgres + pgvector', 'Azure Functions', 'Bicep'],
     image: '/rag-system/2.webp',
     imageSize: [1525, 816],
     imageAlt: 'AI Detail Library: a structural detail with its AI-generated summary, title, type and structural system',
     links: [{ label: 'Detail library case study', href: '/project/rag-system' }],
+  },
+  {
+    id: 'azure-platform',
+    title: 'Azure Platform',
+    tagline: 'Every tool’s backend, rebuilt from one Bicep file.',
+    context: 'Structural engineering practice · 2026 · Microsoft Certified: Azure Administrator Associate (AZ-104)',
+    problem: 'The tools needed a backend the firm’s IT could audit, pay for and eventually take over: no secrets in browsers, predictable cost, nothing that only runs on one person’s machine.',
+    built: 'Python and Node Azure Functions (Flex Consumption) behind a thin session proxy with company sign-in; Postgres Flexible Server with pgvector as the system of record; blob storage behind 15-minute SAS links; six storage queues so long jobs survive a closed browser; model deployments on Azure OpenAI. Named, separately rotatable keys per caller, HMAC identity tokens for attribution, budget alerts and per-user cost telemetry. Every resource is in Bicep; every infra change is shown as a what-if first.',
+    outcome: 'Prototyped on a personal subscription, then moved into the company subscription as one replay of the same Bicep, with Contributor rights rather than Owner; the personal resource group was deleted a week later. IT got a written brief first: system map, access needed, run cost. Measured spend in the first three weeks of production: $16.82.',
+    stack: ['Bicep', 'Azure Functions', 'PostgreSQL + pgvector', 'Blob + Queue Storage', 'Azure OpenAI', 'Entra ID', 'AZ-104'],
+    diagram: 'azure',
+    links: [],
+    note: 'Private repository: company infrastructure. System map and IT brief on request.',
   },
   {
     id: 'sb-web',
@@ -160,8 +186,13 @@ export const toolbox = [
   { group: 'AEC platforms', items: ['Revit API', 'RhinoCommon', 'Grasshopper', 'AutoCAD'] },
   { group: 'Languages', items: ['C# / .NET', 'Python', 'TypeScript', 'JavaScript'] },
   { group: 'AI', items: ['RAG / hybrid search', 'Vision-language extraction', 'Agents with human approval', 'Evaluation'] },
-  { group: 'Cloud & delivery', items: ['Azure', 'Bicep', 'Supabase / Postgres', 'Vercel', 'GitHub Actions'] },
+  { group: 'Cloud & delivery', items: ['Azure (AZ-104)', 'Bicep', 'Postgres + pgvector', 'Vercel / Render', 'GitHub Actions'] },
 ]
+
+export const certification = {
+  name: 'Microsoft Certified: Azure Administrator Associate',
+  code: 'AZ-104',
+}
 
 export const contact = {
   email: 'Ethan_along@outlook.com',
