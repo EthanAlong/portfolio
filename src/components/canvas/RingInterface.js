@@ -35,7 +35,7 @@
  * ============================================================
  */
 
-import React, { useRef, useState, useEffect, useMemo, Suspense } from 'react'
+import React, { useRef, useState, useEffect, useMemo, useSyncExternalStore, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Image, Text } from '@react-three/drei'
 import { useRouter } from 'next/navigation'
@@ -53,6 +53,40 @@ import { Html, Line } from '@react-three/drei'
 let globalInitialized = false;
 // 记录最后一次旋转的时间戳，用于确保每次返回都会触发旋转动画
 let lastSpinTimestamp = 0;
+
+/**
+ * prefers-reduced-motion: the ring snaps instead of spinning, the background
+ * network and arc glow stand still, and the CSS reveals render at rest.
+ */
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia(REDUCED_MOTION_QUERY).matches
+const subscribeReducedMotion = (onChange) => {
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY)
+  mq.addEventListener('change', onChange)
+  return () => mq.removeEventListener('change', onChange)
+}
+function useReducedMotion() {
+  return useSyncExternalStore(subscribeReducedMotion, prefersReducedMotion, () => false)
+}
+
+/**
+ * Ring rotation that brings item `index` to the angle `offset`, choosing the
+ * full turn nearest the current rotation so the ring never unwinds.
+ * An item at angle a sits in front of the camera when a + rotation = 0.
+ */
+function rotationToFace(index, total, offset, current) {
+  const base = -(index / total) * Math.PI * 2 - offset
+  const turns = Math.round((current - base) / (Math.PI * 2))
+  return base + turns * Math.PI * 2
+}
+
+const titleOf = (project) =>
+  Array.isArray(project.title) ? project.title.join(' ') : project.title
+
+const CATEGORY_LABEL = Object.fromEntries(
+  Object.values(RING_CATEGORIES).map((c) => [c.id, c.label])
+)
 
 /**
  * ============================================================
@@ -172,6 +206,12 @@ const RING_PARAMS = {
     selection: {
       // 桌面端不使用角度选中，而是 hover 触发
       selectionOffset: 0,
+      // Keyboard / screen-reader focus rotates the focused project to this
+      // ring angle (radians; 0 = front, nearest the camera, + = toward the
+      // left) and lifts it. Tiles stand radially, so the front one is seen
+      // edge-on: front-left faces the camera, reads large, and clears both the
+      // central preview and the PORTFOLIO title. → brings the next one in from the right.
+      keyboardAngle: 1.0,
       snapThreshold: 0.15,
       lerpSpeed: 0.1,
     },
@@ -307,7 +347,7 @@ const CONFIG = {
  * 移动端减少粒子数量以提升性能
  * ============================================================
  */
-function DataNetwork({ isMobile = false }) {
+function DataNetwork({ isMobile = false, reducedMotion = false }) {
   const groupRef = useRef()
   const linesRef = useRef()
 
@@ -359,6 +399,7 @@ function DataNetwork({ isMobile = false }) {
   }, [isMobile])
 
   useFrame((state, delta) => {
+    if (reducedMotion) return
     if (groupRef.current) {
       groupRef.current.rotation.y -= delta * 0.03;
     }
@@ -506,10 +547,11 @@ function getCategoryLayout(sortedProjects) {
  * @param {number} categoryIndex - 类别索引（用于Y轴错开）/ Category index (for Y offset)
  * @param {number} flowLengthMultiplier - 光晕长度倍率 / Glow length multiplier
  */
-function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex, flowLengthMultiplier = 1.0 }) {
+function CategoryArc({ startAngle, endAngle, isMobile, isVisible, categoryIndex, flowLengthMultiplier = 1.0, reducedMotion = false }) {
   const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop;
-  const { arcOffset, arcGap, arcYOffset, arcYBase, arcColor, arcWidth, arcOpacity, flowEnabled, flowColor, flowSpeed, flowLength: baseFlowLength, flowIntensity, flowPause, fadeSpeed } = params.category;
+  const { arcOffset, arcGap, arcYOffset, arcYBase, arcColor, arcWidth, arcOpacity, flowEnabled: flowConfigured, flowColor, flowSpeed, flowLength: baseFlowLength, flowIntensity, flowPause, fadeSpeed } = params.category;
   const ringRadius = params.ring.radius;
+  const flowEnabled = flowConfigured && !reducedMotion;
 
   // 计算弧线实际半径和Y位置 / Calculate actual arc radius and Y position
   const arcRadius = ringRadius + arcOffset;
@@ -831,7 +873,7 @@ function CategoryConnector({ midAngle, isSpinning, isMobile, isVisible, category
  * @param {boolean} isVisible - 控制整体可见性（loading完成后才显示）
  *                              Controls visibility (shows after loading completes)
  */
-function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible }) {
+function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible, reducedMotion }) {
   // 计算类别布局 / Calculate category layout
   const categoryLayout = useMemo(
     () => getCategoryLayout(sortedProjects),
@@ -859,6 +901,7 @@ function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible }
             isVisible={isVisible}
             categoryIndex={categoryIndex}
             flowLengthMultiplier={flowLengthMultiplier || 1.0}
+            reducedMotion={reducedMotion}
           />
           <CategoryLabel
             midAngle={layout.midAngle}
@@ -896,9 +939,11 @@ function CategoryDecorations({ sortedProjects, isSpinning, isMobile, isVisible }
  * @param {Number} focusStrength - 移动端专用：当前项目的激活强度 (0~1)
  * ============================================================
  */
-function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTransitioning, isMobile, focusStrengths }) {
+function ProjectItem({ item, index, total, setActiveProject, onNavigate, onPointerOverItem, isTransitioning, isMobile, focusStrengths, isKbFocused, reducedMotion }) {
   const ref = useRef()
   const [hovered, setHover] = useState(false)
+  // desktop: the mouse and the keyboard lift a tile the same way
+  const lifted = !isMobile && (hovered || isKbFocused)
 
   // 计算项目在环上的静态角度位置
   const angle = (index / total) * Math.PI * 2
@@ -913,6 +958,20 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
   // 桌面端 GSAP hover 动画 refs
   const hoverTween = useRef(null)
   const targetY = useRef(0)
+
+  // lift / drop with a GSAP spring (back.out); instant under reduced motion
+  useEffect(() => {
+    if (isMobile) return
+    if (hoverTween.current) hoverTween.current.kill()
+    const to = lifted ? visuals.selectedTranslateY : 0
+    if (reducedMotion) {
+      targetY.current = to
+      return
+    }
+    hoverTween.current = lifted
+      ? gsap.to(targetY, { current: to, duration: 0.4, ease: "back.out(1.7)" })
+      : gsap.to(targetY, { current: to, duration: 0.3, ease: "power2.out" })
+  }, [lifted, isMobile, reducedMotion, visuals.selectedTranslateY])
 
   useFrame(() => {
     if (!ref.current) return
@@ -971,7 +1030,7 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
        */
       const lerpSpeed = selection.lerpSpeed
       const baseRadius = ring.radius
-      const targetRadius = hovered ? baseRadius + (ring.hoverOut || 0) : baseRadius
+      const targetRadius = lifted ? baseRadius + (ring.hoverOut || 0) : baseRadius
       currentRadius.current = THREE.MathUtils.lerp(currentRadius.current, targetRadius, lerpSpeed)
 
       // 更新位置（Y 轴由 GSAP 的 targetY.current 控制）
@@ -982,7 +1041,7 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
       )
 
       // 更新缩放
-      const targetScale = hovered ? visuals.selectedScale : 1
+      const targetScale = lifted ? visuals.selectedScale : 1
       ref.current.scale.lerp(
         new THREE.Vector3(ring.imageW * targetScale, ring.imageH * targetScale, 1),
         lerpSpeed
@@ -1004,32 +1063,12 @@ function ProjectItem({ item, index, total, setActiveProject, onNavigate, isTrans
             e.stopPropagation()
             setHover(true)
             setActiveProject(item)
-
-            // 取消之前的动画
-            if (hoverTween.current) hoverTween.current.kill()
-
-            // GSAP 弹出动画（带回弹缓动）
-            hoverTween.current = gsap.to(targetY, {
-              current: visuals.selectedTranslateY,
-              duration: 0.4,
-              ease: "back.out(1.7)"
-            })
+            // the mouse takes over from keyboard focus
+            onPointerOverItem?.()
           }
         }}
         onPointerOut={() => {
-          if (!isMobile) {
-            setHover(false)
-
-            // 取消之前的动画
-            if (hoverTween.current) hoverTween.current.kill()
-
-            // GSAP 收回动画
-            hoverTween.current = gsap.to(targetY, {
-              current: 0,
-              duration: 0.3,
-              ease: "power2.out"
-            })
-          }
+          if (!isMobile) setHover(false)
         }}
         onClick={(e) => {
           e.stopPropagation()
@@ -1127,6 +1166,10 @@ function SceneContent({
   mousePos,
   isMobile,
   onFocusUpdate,  // 新增：用于向父组件传递当前选中项目
+  sortedProjects,
+  kbIndex,        // keyboard-focused project index (desktop lift), or null
+  onPointerOverItem,
+  reducedMotion,
 }) {
   const spinGroup = useRef()
   const tiltGroup = useRef()
@@ -1139,9 +1182,6 @@ function SceneContent({
   const initialOffset = params.ring.initialOffset
   const scrollRotation = useRef(initialOffset)
   const transitionRadiusScale = useRef(1.0)
-
-  // 按类别排序的项目列表
-  const sortedProjects = useMemo(() => getSortedProjects(projects), [])
 
   // 存储每个项目的 focusStrength（移动端使用）
   const focusStrengths = useRef(sortedProjects.map(() => 0))
@@ -1159,7 +1199,8 @@ function SceneContent({
 
   // GSAP 转场动画
   useEffect(() => {
-    if (isTransitioning) {
+    // reduced motion: no spin-and-expand, the blur + overlay carry the transition
+    if (isTransitioning && !reducedMotion) {
       // 创建动画时间轴
       const tl = gsap.timeline()
 
@@ -1182,7 +1223,7 @@ function SceneContent({
         tl.kill()
       }
     }
-  }, [isTransitioning])
+  }, [isTransitioning, reducedMotion])
 
   useFrame((state, delta) => {
     // --- 相机入场动画 ---
@@ -1193,7 +1234,8 @@ function SceneContent({
 
     // --- 平滑插值旋转角度 ---
     // 转场时直接跟随 GSAP 动画的目标值，不使用 damp 阻尼
-    if (isTransitioning) {
+    // reduced motion: follow the target exactly (snap) instead of easing toward it
+    if (isTransitioning || reducedMotion) {
       scrollRotation.current = targetRotation.current
     } else {
       scrollRotation.current = THREE.MathUtils.damp(
@@ -1299,7 +1341,7 @@ function SceneContent({
   return (
     <>
       <group ref={bgGroup}>
-        <DataNetwork isMobile={isMobile} />
+        <DataNetwork isMobile={isMobile} reducedMotion={reducedMotion} />
       </group>
 
       <group ref={tiltGroup}>
@@ -1310,6 +1352,7 @@ function SceneContent({
             isSpinning={isSpinning || isTransitioning}
             isMobile={isMobile}
             isVisible={introActive && !isTransitioning}
+            reducedMotion={reducedMotion}
           />
 
           {/* 项目图片 */}
@@ -1321,10 +1364,13 @@ function SceneContent({
               item={item}
               setActiveProject={setActiveProject}
               onNavigate={onNavigate}
+              onPointerOverItem={onPointerOverItem}
               isTransitioning={isTransitioning}
               isMobile={isMobile}
               // 传递 focusStrength 用于 CLOU 风格弹出判断
               focusStrengths={focusStrengths}
+              isKbFocused={kbIndex === i}
+              reducedMotion={reducedMotion}
             />
           ))}
         </group>
@@ -1359,13 +1405,65 @@ function MobilePreview({ activeProject, onNavigate, isTransitioning }) {
     return Array.isArray(activeProject.title) ? activeProject.title.join(' ') : activeProject.title
   }
 
+  // a real link: focusable, announced, middle-click / long-press work
   return (
-    <div className="mobile-preview" onClick={() => onNavigate(activeProject.id)}>
+    <a
+      className="mobile-preview"
+      href={`/project/${activeProject.id}`}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+        e.preventDefault()
+        onNavigate(activeProject.id)
+      }}
+    >
       <div className="mobile-preview-image">
-        <img src={activeProject.mainImage} alt={getTitleString()} />
+        <img src={activeProject.mainImage} alt="" />
       </div>
       <div className="mobile-preview-title">{getTitleString().toUpperCase()}</div>
-    </div>
+    </a>
+  )
+}
+
+/**
+ * ============================================================
+ * ProjectLinks - the ring as a plain list of links
+ * ============================================================
+ *
+ * The canvas is invisible to screen readers and to Tab, so every project is
+ * also a visually hidden link, in ring order. Focusing one (Tab, arrow keys,
+ * a screen reader) turns the ring to it; Enter plays the normal transition.
+ * Rendered before mount too, so the server HTML links every project.
+ * ============================================================
+ */
+function ProjectLinks({ sortedProjects, linkRefs, onFocusIndex, onLeave, onOpen }) {
+  return (
+    <nav
+      className="ring-a11y"
+      aria-label="Projects"
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) onLeave?.()
+      }}
+    >
+      <ul>
+        {sortedProjects.map((p, i) => (
+          <li key={p.id}>
+            <a
+              ref={linkRefs ? (el) => { linkRefs.current[i] = el } : undefined}
+              href={`/project/${p.id}`}
+              onFocus={onFocusIndex ? () => onFocusIndex(i) : undefined}
+              onClick={onOpen ? (e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+                e.preventDefault()
+                onOpen(p.id)
+              } : undefined}
+            >
+              {titleOf(p)}
+              <span>, {CATEGORY_LABEL[p.type || 'professional'] || ''}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }
 
@@ -1396,6 +1494,13 @@ export default function RingInterface() {
   const [showOverlay, setShowOverlay] = useState(false)
   // 移动端返回时的快速过渡状态
   const [isReturning, setIsReturning] = useState(globalInitialized)
+
+  // ring order (by category), shared by the scene and the link list
+  const sortedProjects = useMemo(() => getSortedProjects(projects), [])
+  const reducedMotion = useReducedMotion()
+  // index of the project whose hidden link has keyboard focus, or null
+  const [kbIndex, setKbIndex] = useState(null)
+  const linkRefs = useRef([])
 
   // 图片预加载进度状态
   const [loadProgress, setLoadProgress] = useState(0)
@@ -1533,8 +1638,8 @@ export default function RingInterface() {
             setTimeout(() => {
               setIsLoading(false)
 
-              // 使用 GSAP 执行入场旋转
-              gsap.to(targetRotation, {
+              // 使用 GSAP 执行入场旋转（减弱动效时不转）
+              if (!prefersReducedMotion()) gsap.to(targetRotation, {
                 current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
                 duration: CONFIG.INTRO.SPIN_DURATION,
                 ease: CONFIG.INTRO.SPIN_EASE,
@@ -1554,8 +1659,8 @@ export default function RingInterface() {
         setTimeout(() => {
           setIsReturning(false) // 隐藏返回过渡层
 
-          // 使用 GSAP 执行返回旋转
-          gsap.to(targetRotation, {
+          // 使用 GSAP 执行返回旋转（减弱动效时不转）
+          if (!prefersReducedMotion()) gsap.to(targetRotation, {
             current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
             duration: CONFIG.INTRO.SPIN_DURATION,
             ease: CONFIG.INTRO.SPIN_EASE,
@@ -1577,7 +1682,7 @@ export default function RingInterface() {
       if (document.visibilityState === 'visible' && globalInitialized) {
         const now = Date.now()
         // 如果距离上次旋转超过1秒，触发新的旋转
-        if (now - lastSpinTimestamp > 1000) {
+        if (now - lastSpinTimestamp > 1000 && !prefersReducedMotion()) {
           gsap.to(targetRotation, {
             current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
             duration: CONFIG.INTRO.SPIN_DURATION,
@@ -1592,7 +1697,7 @@ export default function RingInterface() {
     const handlePopState = () => {
       if (globalInitialized) {
         const now = Date.now()
-        if (now - lastSpinTimestamp > 500) {
+        if (now - lastSpinTimestamp > 500 && !prefersReducedMotion()) {
           setTimeout(() => {
             gsap.to(targetRotation, {
               current: targetRotation.current + CONFIG.INTRO.SPIN_KICK,
@@ -1694,7 +1799,69 @@ export default function RingInterface() {
     }
   }, [hasMounted, isTransitioning, isMobile])
 
-  if (!hasMounted) return <div className="bg-black w-screen h-screen" />
+  /**
+   * Arrow keys browse the ring: they move DOM focus along the hidden link
+   * list (so a screen reader announces each project), and the link's focus
+   * handler turns the ring. Only when focus is on the page itself or already
+   * in the list, so the nav and other controls keep their own keys.
+   */
+  useEffect(() => {
+    if (!hasMounted) return
+    const onKey = (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || isLoading || isTransitioning) return
+      const links = linkRefs.current
+      const n = sortedProjects.length
+      const focused = document.activeElement
+      const cur = links.indexOf(focused)
+      if (cur < 0 && focused && focused !== document.body) return
+      // from outside the list, the first key picks the project on show
+      const shown = activeProject ? sortedProjects.findIndex(p => p.id === activeProject.id) : -1
+      let next
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+          next = cur < 0 ? Math.max(shown, 0) : (cur + 1) % n
+          break
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          next = cur < 0 ? (shown >= 0 ? shown : n - 1) : (cur - 1 + n) % n
+          break
+        case 'Home': next = 0; break
+        case 'End': next = n - 1; break
+        case 'Escape':
+          if (cur >= 0) focused.blur()
+          return
+        default:
+          return
+      }
+      e.preventDefault()
+      links[next]?.focus()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [hasMounted, isLoading, isTransitioning, activeProject, sortedProjects])
+
+  if (!hasMounted) {
+    return (
+      <div className="bg-black w-screen h-screen">
+        <ProjectLinks sortedProjects={sortedProjects} />
+      </div>
+    )
+  }
+
+  /**
+   * Keyboard / screen-reader focus on project i: turn the ring so it faces
+   * the camera (desktop) or the pop-out point (mobile), and select it.
+   */
+  const focusProject = (i) => {
+    const offset = isMobile
+      ? RING_PARAMS.mobile.selection.selectionOffset
+      : RING_PARAMS.desktop.selection.keyboardAngle
+    gsap.killTweensOf(targetRotation)  // an intro spin must not carry it past
+    targetRotation.current = rotationToFace(i, sortedProjects.length, offset, targetRotation.current)
+    setKbIndex(i)
+    if (!isMobile) setActiveProject(sortedProjects[i])
+  }
 
   /**
    * 导航处理：触发转场动画并跳转到项目详情页
@@ -1706,6 +1873,8 @@ export default function RingInterface() {
 
     // 预加载目标项目的图片资源
     const targetProject = projects.find(p => p.id === id)
+    // the overlay spells this title; a keyboard Enter may beat the ring's own pick
+    if (targetProject) setActiveProject(targetProject)
     let actualProgress = 0
     let displayProgress = 0
     let isComplete = false
@@ -1786,10 +1955,7 @@ export default function RingInterface() {
   /**
    * 获取加载动画标题文字
    */
-  const getLoaderTitle = () => {
-    if (!activeProject) return ""
-    return Array.isArray(activeProject.title) ? activeProject.title.join(' ') : activeProject.title
-  }
+  const getLoaderTitle = () => (activeProject ? titleOf(activeProject) : "")
 
   // 获取当前设备的参数配置
   const params = isMobile ? RING_PARAMS.mobile : RING_PARAMS.desktop
@@ -1861,9 +2027,24 @@ export default function RingInterface() {
         </div>
       )}
 
+      {/* the ring for keyboards and screen readers */}
+      <ProjectLinks
+        sortedProjects={sortedProjects}
+        linkRefs={linkRefs}
+        onFocusIndex={focusProject}
+        onLeave={() => setKbIndex(null)}
+        onOpen={handleNavigate}
+      />
+      {kbIndex !== null && !isMobile && !isLoading && !isTransitioning && (
+        <div className="ring-kbd-hint" aria-hidden="true">
+          ← → Browse · Enter Open · Esc Leave
+        </div>
+      )}
+
       {/* 3D Ring Canvas */}
       {canRenderCanvas && (
         <Canvas
+          aria-hidden="true"
           camera={{
             position: isMobile
               ? [
@@ -1907,6 +2088,10 @@ export default function RingInterface() {
             mousePos={mousePos}
             isMobile={isMobile}
             onFocusUpdate={handleFocusUpdate}
+            sortedProjects={sortedProjects}
+            kbIndex={isMobile ? null : kbIndex}
+            onPointerOverItem={() => setKbIndex(null)}
+            reducedMotion={reducedMotion}
           />
         </Canvas>
       )}
@@ -2262,6 +2447,47 @@ export default function RingInterface() {
           text-align: center;
           opacity: 0;
           animation: fadeIn 0.4s ease forwards 0.2s;
+        }
+
+        a.mobile-preview {
+          color: inherit;
+          text-decoration: none;
+          outline: none;
+        }
+        a.mobile-preview:focus-visible .mobile-preview-image {
+          outline: 2px solid #0071e3;
+          outline-offset: 3px;
+        }
+
+        /* keyboard hint, only while a ring link has focus */
+        .ring-kbd-hint {
+          position: absolute;
+          bottom: 44px;
+          right: 40px;
+          z-index: 10;
+          pointer-events: none;
+          color: rgba(255, 255, 255, 0.55);
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        /* reduced motion: reveals render at rest, no blur ramp */
+        @media (prefers-reduced-motion: reduce) {
+          .ring-canvas canvas { transition: none; }
+          .home-title-text,
+          .stagger-letter,
+          .mobile-preview-image,
+          .mobile-preview-title,
+          .load-progress-text,
+          .transition-progress-wrapper {
+            animation: none;
+            opacity: 1;
+          }
+          .wipe-text::after { animation: none; transform: translateX(101%); }
+          .return-loader::after { animation: none; }
         }
 
         /* 移动端触摸区域设置 - 禁止整页滚动 */

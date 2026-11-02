@@ -42,6 +42,24 @@ the **ring** (`/`, architecture + software projects) and **`/engineering`**
 - Every animation has a `prefers-reduced-motion` path; canvases stop rendering
   off screen.
 
+## The ring (`src/components/canvas/RingInterface.js`)
+
+- Every project is also a visually hidden link (`ProjectLinks`, class `ring-a11y` in
+  `globals.css`), in ring order, rendered before mount too, so the server HTML links
+  every project. The canvas is `aria-hidden`.
+- Tab / ← → ↑ ↓ / Home / End move focus along that list; focus turns the ring
+  (`rotationToFace`) and lifts the tile exactly like a hover. Desktop slot =
+  `RING_PARAMS.desktop.selection.keyboardAngle` (front-left: tiles stand radially, so
+  the front one is edge-on); mobile = the existing `selectionOffset` pop-out point.
+  Enter plays the normal transition, Esc leaves. Arrow keys are only taken when focus is
+  on the page or already in the list.
+- `prefers-reduced-motion`: ring snaps instead of easing, no intro/return spin, no
+  spin-and-expand on navigate, background network and arc glow stand still, CSS reveals
+  render at rest.
+- Headless Chromium here never shows the desktop central preview (drei `<Text>` fetches
+  its font from a CDN, the shared Suspense hangs), on hover or keyboard alike. Check
+  the lift with a focused-vs-Esc screenshot diff instead.
+
 ## Verify before pushing
 
 ```bash
@@ -56,7 +74,7 @@ inner scroll container; check computed styles or a viewport screenshot instead.
 
 1. Real 2x screenshots / GIFs from Ethan's Windows machine: Detail Viewer, ROI
    page, Detail DB Exporter, RhinoInitiator wizard, ZoningEnvelope run.
-2. Ring keyboard navigation / accessibility (agreed, not started).
+2. ~~Ring keyboard navigation / accessibility~~ done 2026-11-02 (see "The ring" above).
 3. TOC / CHIP density-bonus calculator on the TOC project pages (parked; rules
    must be checked against the TOC Guidelines text).
 4. ZoningEnvelope v0.7 (scheme comparison) is on Ethan's machine, not pushed.

@@ -90,3 +90,16 @@ h1, h2, h3, h4, h5, h6, button, a, span, div {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
 }
+/* Home ring: the project list for keyboards and screen readers (RingInterface ProjectLinks).
+   Visually hidden but focusable; the focused project shows up lifted in the ring instead. */
+.ring-a11y {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
