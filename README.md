@@ -6,6 +6,8 @@
 
 Combining the high-performance rendering capabilities of **React Three Fiber** with the server-side advantages of **Next.js**, this project delivers a digital experience characterized by spatial depth, parallax effects, and seamless cinematic transitions.
 
+> **Live**: https://www.ethanhdigital.com · **Engineering view**: https://www.ethanhdigital.com/engineering
+>
 > **Documentation**: [中文文档](./DOCUMENTATION_CN.md)
 > **Documentation**: [English Documentation](./DOCUMENTATION_ENG.md)
 
@@ -64,7 +66,7 @@ Combining the high-performance rendering capabilities of **React Three Fiber** w
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/portfolio.git
+git clone https://github.com/EthanAlong/portfolio.git
 cd portfolio
 
 # Install dependencies
