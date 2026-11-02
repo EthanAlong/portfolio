@@ -50,6 +50,14 @@ export default function RootLayout({ children }) {
   // 首页与 Engineering 页：导航栏占满宽度（非两栏布局）
   const isFullWidthNav = isHome || isEngineeringPage
 
+  // Portfolio | Engineering switch. The thumb moves on click (optimistic),
+  // before the route finishes loading; once the pathname changes it is
+  // derived from the route again.
+  const [switchClick, setSwitchClick] = useState(null)
+  const switchOn = switchClick && switchClick.from === pathname
+    ? switchClick.to === 'engineering'
+    : isEngineeringPage
+
   /**
    * 移动端检测
    */
@@ -117,21 +125,43 @@ export default function RootLayout({ children }) {
                   </span>
                 ))}
               </Link>
-              <div className="nav-links">
-                {/* Engineering：面向工程 / FDE 岗位的快速浏览页
-                    只在全宽导航（首页 / Engineering）显示：两栏页的导航只有 38.2vw 宽，放不下两个链接 */}
-                {isFullWidthNav && (
-                  <Link href="/engineering" className="about-btn" aria-current={isEngineeringPage ? 'page' : undefined}>
-                    <span className="about-text">ENGINEERING</span>
-                    <span className="about-underline"></span>
+              {/* Portfolio | Engineering — Apple-style segmented switch, centred in the nav.
+                  Only on the full-width navs (home / engineering); the 38.2vw
+                  two-column nav has no room for it. */}
+              {isFullWidthNav && (
+                <nav className={`mode-switch${switchOn ? ' is-eng' : ''}`} aria-label="View">
+                  <span className="mode-thumb" aria-hidden="true" />
+                  <Link
+                    href="/"
+                    className="mode-option"
+                    aria-current={!switchOn ? 'page' : undefined}
+                    onClick={(e) => {
+                      if (isHome) { e.preventDefault(); return }
+                      setSwitchClick({ from: pathname, to: 'home' })
+                    }}
+                  >
+                    <span className="mode-long">Portfolio</span>
+                    <span className="mode-short">Work</span>
                   </Link>
-                )}
-                {/* About 按钮带下划线动效 */}
-                <Link href="/about" className="about-btn" aria-current={isAboutPage ? 'page' : undefined}>
-                  <span className="about-text">ABOUT</span>
-                  <span className="about-underline"></span>
-                </Link>
-              </div>
+                  <Link
+                    href="/engineering"
+                    className="mode-option"
+                    aria-current={switchOn ? 'page' : undefined}
+                    onClick={(e) => {
+                      if (isEngineeringPage) { e.preventDefault(); return }
+                      setSwitchClick({ from: pathname, to: 'engineering' })
+                    }}
+                  >
+                    <span className="mode-long">Engineering</span>
+                    <span className="mode-short">Eng</span>
+                  </Link>
+                </nav>
+              )}
+              {/* About 按钮带下划线动效 */}
+              <Link href="/about" className="about-btn" aria-current={isAboutPage ? 'page' : undefined}>
+                <span className="about-text">ABOUT</span>
+                <span className="about-underline"></span>
+              </Link>
             </div>
           </nav>
         )}
@@ -279,10 +309,74 @@ export default function RootLayout({ children }) {
             }
           }
 
-          .nav-links {
+          /* ============================================ */
+          /* Portfolio | Engineering 分段滑块 */
+          /* ============================================ */
+          .nav-wrapper { position: relative; }
+          .mode-switch {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 3px;
+            border-radius: 999px;
+            pointer-events: auto;
+            opacity: 0;
+            /* opacity-only entrance: a transform keyframe would undo the centring */
+            animation: modeIn 0.6s ease forwards 0.6s;
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            backdrop-filter: blur(16px) saturate(180%);
+          }
+          @keyframes modeIn { to { opacity: 1; } }
+          .mode-thumb {
+            position: absolute;
+            top: 3px;
+            bottom: 3px;
+            left: 3px;
+            width: calc(50% - 3px);
+            border-radius: 999px;
+            transition: transform 0.5s cubic-bezier(0.34, 1.32, 0.64, 1);
+          }
+          .mode-switch.is-eng .mode-thumb { transform: translateX(100%); }
+          .mode-option {
+            position: relative;
+            z-index: 1;
             display: flex;
             align-items: center;
-            gap: 2rem;
+            justify-content: center;
+            padding: 8px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: color 0.35s ease;
+          }
+          .mode-short { display: none; }
+
+          /* dark home: frosted white */
+          .nav-home .mode-switch { background: rgba(255, 255, 255, 0.14); }
+          .nav-home .mode-thumb { background: #ffffff; }
+          .nav-home .mode-option { color: rgba(255, 255, 255, 0.72); }
+          .nav-home .mode-option[aria-current='page'] { color: #000000; }
+          /* light pages: Apple segmented control */
+          .nav-project .mode-switch { background: rgba(0, 0, 0, 0.06); }
+          .nav-project .mode-thumb {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+          }
+          .nav-project .mode-option { color: #6e6e73; }
+          .nav-project .mode-option[aria-current='page'] { color: #000000; }
+          .mode-option:hover { color: inherit; }
+          .nav-home .mode-option:not([aria-current='page']):hover { color: #ffffff; }
+          .nav-project .mode-option:not([aria-current='page']):hover { color: #000000; }
+          .mode-option:focus-visible { outline: 2px solid #0071e3; outline-offset: 2px; border-radius: 999px; }
+
+          @media (prefers-reduced-motion: reduce) {
+            .mode-thumb { transition: none; }
           }
 
           .about-btn[aria-current='page'] .about-underline {
@@ -333,9 +427,15 @@ export default function RootLayout({ children }) {
               font-size: 12px;
             }
 
-            .nav-links {
-              gap: 1rem;
+            /* phone: sits in the gap between logo and ABOUT, short labels */
+            .mode-switch {
+              position: static;
+              transform: none;
+              margin: 0 auto;
             }
+            .mode-option { padding: 6px 10px; font-size: 10px; letter-spacing: 0.06em; }
+            .mode-long { display: none; }
+            .mode-short { display: inline; }
 
             .global-nav.nav-solid {
               height: 10vh;

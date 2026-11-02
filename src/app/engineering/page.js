@@ -108,6 +108,7 @@ function CaseRow({ study, index }) {
         <span className={styles.caseIndex}>{String(index + 1).padStart(2, '0')}</span>
         <div>
           <h3 className={styles.caseTitle}>{study.title}</h3>
+          {study.tagline && <p className={styles.caseTagline}>{study.tagline}</p>}
           <p className={styles.caseContext}>{study.context}</p>
         </div>
       </div>
@@ -190,8 +191,8 @@ export default function EngineeringPage() {
         </h1>
         <p className={styles.lede}>{engineeringIntro.lede}</p>
         <nav className={styles.heroLinks} aria-label="Jump to">
-          <a href="#work">Selected work</a>
-          <a href="#method">How I work</a>
+          <a href="#work">Work</a>
+          <a href="#method">Method</a>
           <a href="#contact">Contact</a>
         </nav>
       </header>
@@ -226,7 +227,7 @@ export default function EngineeringPage() {
 
       {/* --- Method --- */}
       <section className={styles.section} id="method">
-        <h2 className={`${styles.sectionHeading} ${styles.reveal}`}>How I work</h2>
+        <h2 className={`${styles.sectionHeading} ${styles.reveal}`}>Method</h2>
         <ol className={`${styles.method} ${styles.reveal}`}>
           {workingMethod.map((m, i) => (
             <li key={m.step} className={styles.methodItem} style={{ '--i': i }}>
@@ -240,7 +241,7 @@ export default function EngineeringPage() {
 
       {/* --- Case studies --- */}
       <section className={styles.section} id="work">
-        <h2 className={`${styles.sectionHeading} ${styles.reveal}`}>Selected work</h2>
+        <h2 className={`${styles.sectionHeading} ${styles.reveal}`}>Work</h2>
         {caseStudies.map((s, i) => (
           <CaseRow key={s.id} study={s} index={i} />
         ))}
@@ -248,7 +249,7 @@ export default function EngineeringPage() {
 
       {/* --- Toolbox --- */}
       <section className={styles.section}>
-        <h2 className={`${styles.sectionHeading} ${styles.reveal}`}>Toolbox</h2>
+        <h2 className={`${styles.sectionHeading} ${styles.reveal}`}>Stack</h2>
         <div className={styles.toolbox}>
           {toolbox.map((g) => (
             <div key={g.group} className={`${styles.toolGroup} ${styles.reveal}`}>
@@ -265,7 +266,7 @@ export default function EngineeringPage() {
 
       {/* --- Contact --- */}
       <footer className={`${styles.contact} ${styles.reveal}`} id="contact">
-        <h2 className={styles.contactHeading}>Have a workflow that eats hours?</h2>
+        <h2 className={styles.contactHeading}>Hours to win back?</h2>
         <div className={styles.contactLinks}>
           <a href={`mailto:${contact.email}`}>{contact.email}</a>
           <a href={contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>

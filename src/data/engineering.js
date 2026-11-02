@@ -11,27 +11,27 @@
 
 export const engineeringIntro = {
   eyebrow: 'Engineering',
-  headline: ['I sit with the people', 'who have the problem,', 'then ship the tool', 'they keep using.'],
+  headline: ['Find the pain.', 'Ship the fix.', 'Measure it.'],
   lede:
-    'Senior BIM & Computational Designer at a structural engineering practice in Los Angeles. I find the slow, expensive step in how a team actually works, scope the smallest tool that removes it, deploy it inside the systems they already have (Revit, Rhino, Microsoft 365, Azure), and measure whether it stuck.',
+    'Senior BIM & computational designer at a structural engineering practice in Los Angeles. I work next to the team, ship tools into the systems they already use (Revit, Rhino, Microsoft 365, Azure) and measure whether they stick.',
 }
 
 export const proofPoints = [
-  { value: '8', label: 'internal tools in production' },
-  { value: '9', label: 'daily users across the practice' },
-  { value: '89×', label: 'modelled return on run cost ($327K vs $3.7K a year)' },
-  { value: '1,000+', label: 'structural details made searchable' },
+  { value: '8', label: 'tools in production' },
+  { value: '9', label: 'daily users' },
+  { value: '89×', label: 'return on run cost (modelled)' },
+  { value: '1,000+', label: 'details searchable' },
 ]
 
 export const dataFlow = {
   eyebrow: 'Data flow',
-  heading: ['From the model', 'to the people who use it.'],
-  lede: 'Every tool reads from the systems the team already works in, runs through one small platform, and lands back where the work happens.',
+  heading: ['Model in.', 'Answers out.'],
+  lede: 'Read from what the team already uses. Run through one small platform. Land back where the work happens.',
   stats: [
-    { value: '4', label: 'sources the team already uses' },
-    { value: '1', label: 'platform to run and secure' },
-    { value: '8', label: 'tools on top of it' },
-    { value: '9', label: 'people using it every day' },
+    { value: '4', label: 'sources' },
+    { value: '1', label: 'platform' },
+    { value: '8', label: 'tools' },
+    { value: '9', label: 'daily users' },
   ],
 }
 
@@ -47,6 +47,7 @@ export const caseStudies = [
   {
     id: 'internal-tools-roi',
     title: 'Internal Tools ROI',
+    tagline: '$327K a year back. $3.7K to run.',
     context: 'Structural engineering practice · 2026',
     problem: 'Six months of internal tooling needed to justify itself in hours and dollars, not anecdotes.',
     built: 'A live ROI model priced task by task from before/after timings and measured run cost: detail search, drawing QA/QC, an RFI agent, detail downgrade, sheet-set printing, a family manager and a drafting-standards intake.',
@@ -57,7 +58,8 @@ export const caseStudies = [
   },
   {
     id: 'revit-agent',
-    title: 'AI Agent in Production Revit Models',
+    title: 'Revit AI Agent',
+    tagline: 'AI edits live models. Engineers approve every write.',
     context: 'Structural engineering practice · Aviation · 2026',
     problem: 'Repetitive model and sheet edits on live production models eat drafting hours, but an AI writing to a shared central model with no review is a non-starter for the engineers who sign the drawings.',
     built: 'Claude Code and Codex drive Revit through an MCP bridge. Every write is a plan the engineer approves before it runs. Every element the agent touches carries an invisible marker, so a whole task can be found or rolled back with one filter. Risky batches log their before-state with a revert script, and a shared log lets any session, at home or in the office, pick up where the last one stopped.',
@@ -70,6 +72,7 @@ export const caseStudies = [
   {
     id: 'rag-system',
     title: 'AI Detail Library',
+    tagline: '1,000+ details, searchable by meaning.',
     context: 'Structural engineering practice · 2025–26',
     problem: 'Finding the right standard detail meant remembering cryptic sheet numbers across a 1,000+ drawing library.',
     built: 'A Revit-side exporter tags details; vision-language models extract structured metadata; hybrid keyword + text + image-embedding retrieval with a second-pass AI check that filters near-miss results. Provisioned from infrastructure-as-code.',
@@ -80,7 +83,8 @@ export const caseStudies = [
   },
   {
     id: 'sb-web',
-    title: 'Project Atlas & Tool Suite',
+    title: 'Project Atlas',
+    tagline: '200+ projects on a 3D globe.',
     context: 'Structural engineering practice · 2025–26',
     problem: 'The team needed one fast place to find any past project on the map, show it to a client, and reach the engineering tools they use every day.',
     built: 'A Mapbox GL globe of 200+ projects: select one and the camera flies into a 3D oblique view with the building extruded, drone-style multi-waypoint tours, Speckle 3D model embeds and campus roll-ups. Company sign-in through Azure AD, token-based public share links, and the calculators and QA/QC split into their own suite with a single-sign-on handoff.',
@@ -91,7 +95,8 @@ export const caseStudies = [
   },
   {
     id: 'zoning-envelope',
-    title: 'Zoning Envelope for Rhino',
+    title: 'Zoning Envelope',
+    tagline: 'A new zone is a JSON file, not new code.',
     context: 'Development feasibility · 2026',
     problem: 'Early feasibility calls need the buildable envelope on screen while the massing is still moving.',
     built: 'A Rhino 8 plugin that turns setbacks, height, daylight planes, FAR and coverage into a live envelope and checks a massing against it, with per-facade opening limits. Each jurisdiction is a JSON rule file carrying its source and a verification note.',
@@ -106,6 +111,7 @@ export const caseStudies = [
   {
     id: 'dtla-rent-tracker',
     title: 'DTLA Rent Tracker',
+    tagline: '8 buildings, scraped twice a day.',
     context: 'Personal · 2026',
     problem: 'Walking into a lease renewal with no price history for the building or its comps.',
     built: 'A twice-daily GitHub Actions scraper over eight buildings on two leasing platforms (plain fetch, no browser), an append-only CSV, and a bilingual zoomable dashboard on GitHub Pages. A probe script tells you in one run whether a new building can be onboarded and which adapter it needs.',
@@ -119,7 +125,8 @@ export const caseStudies = [
   },
   {
     id: 'store-equipment',
-    title: 'Store Equipment Manager',
+    title: 'Store Builder',
+    tagline: 'A master spreadsheet became 209 searchable cards.',
     context: 'Retail buildouts · 2025',
     problem: 'Store planners ran every new supermarket from a master spreadsheet, a tab per store, and spec PDFs linked out to Drive.',
     built: 'A Python step migrated the workbook and re-hosted the PDFs; a searchable catalog of 209 equipment cards and a drag-and-drop store builder replaced the tabs.',
@@ -130,7 +137,8 @@ export const caseStudies = [
   },
   {
     id: 'unit-schedule-plugin',
-    title: 'Unit Schedule Plugin',
+    title: 'Unit Schedule',
+    tagline: 'Unit mix straight from the Revit model.',
     context: 'Multi-family residential · 2026',
     problem: 'Unit mix, area and open-space tallies for multi-family projects are slow to assemble by hand from the model.',
     built: 'A Revit 2025 add-in that scans rooms, detects unit types, tracks private and public open space, and shows a dashboard with CSV and report export.',
