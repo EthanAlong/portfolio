@@ -55,6 +55,7 @@ import dynamic from 'next/dynamic'
 const LaxScrollStudy = dynamic(() => import('@/components/project/LaxScrollStudy'), { ssr: false })
 import RoiExplorer from '@/components/roi/RoiExplorer'
 const ZoningSandbox = dynamic(() => import('@/components/zoning/ZoningSandbox'), { ssr: false })
+const StorageSandbox = dynamic(() => import('@/components/storage/StorageSandbox'), { ssr: false })
 
 /**
  * 页面配置
@@ -307,6 +308,9 @@ export default function ProjectPage({ params }) {
           {/* 动态内容渲染 - 带淡入效果 */}
           {project.content?.map((block, idx) => {
             // 交互模块 / interactive block (e.g. the ROI explorer)
+            if (block.type === 'interactive' && block.component === 'storage') {
+              return <div key={idx} style={{ marginBottom: '4rem' }}><StorageSandbox /></div>
+            }
             if (block.type === 'interactive' && block.component === 'zoning') {
               return <div key={idx} style={{ marginBottom: '4rem' }}><ZoningSandbox /></div>
             }
@@ -507,6 +511,9 @@ export default function ProjectPage({ params }) {
           {/* 动态内容渲染 */}
           {project.content?.map((block, idx) => {
             // 交互模块 / interactive block (e.g. the ROI explorer)
+            if (block.type === 'interactive' && block.component === 'storage') {
+              return <div key={idx} style={{ marginBottom: '4rem' }}><StorageSandbox /></div>
+            }
             if (block.type === 'interactive' && block.component === 'zoning') {
               return <div key={idx} style={{ marginBottom: '4rem' }}><ZoningSandbox /></div>
             }
